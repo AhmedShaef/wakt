@@ -51,7 +51,7 @@ func init() {
 	emailRegex = regexp.MustCompile(emailRegexString)
 }
 
-// Check validates the provided model against it's declared tags.
+// Check validates the provided model against it's declared tag.
 func Check(val interface{}) error {
 	if err := validate.Struct(val); err != nil {
 
