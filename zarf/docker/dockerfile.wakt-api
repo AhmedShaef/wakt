@@ -1,0 +1,44 @@
+# Build the Go Binary.
+FROM golang:1.18.0 as build_wakt-api
+ENV CGO_ENABLED 0
+ARG BUILD_REF
+
+# Create the service directory and the copy the module files first and then
+# download the dependencies. If this doesn't change, we won't need to do this
+# again in future builds.
+# RUN mkdir /service
+# COPY go.* /service/
+# WORKDIR /service
+# RUN go mod download
+
+# Copy the source code into the container.
+COPY . /service
+
+# Build the admin binary.
+WORKDIR /service/app/tooling/wakt-admin
+RUN go build -ldflags "-X main.build=${BUILD_REF}"
+
+# Build the service binary.
+WORKDIR /service/app/services/wakt-api
+RUN go build -ldflags "-X main.build=${BUILD_REF}"
+
+
+# Run the Go Binary in Alpine.
+FROM alpine:3.15.2
+ARG BUILD_DATE
+ARG BUILD_REF
+RUN addgroup -g 1000 -S wakt && \
+    adduser -u 1000 -h /service -G wakt -S wakt
+COPY --from=build_wakt-api --chown=wakt:wakt /service/zarf/keys/. /service/zarf/keys/.
+COPY --from=build_wakt-api --chown=wakt:wakt /service/app/tooling/wakt-admin/wakt-admin /service/wakt-admin
+COPY --from=build_wakt-api --chown=wakt:wakt /service/app/services/wakt-api/wakt-api /service/wakt-api
+WORKDIR /service
+USER wakt
+CMD ["./wakt-api"]
+
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="wakt-api" \
+      org.opencontainers.image.authors="Ahmed Shaef <shaef@outlook.com>" \
+      org.opencontainers.image.source="https://github.com/AhmedShaef/wakt/app/wakt-api" \
+      org.opencontainers.image.revision="${BUILD_REF}" \
+      org.opencontainers.image.vendor="Shaef"
