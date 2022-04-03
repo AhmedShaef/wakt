@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wakt-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wakt-pod # Base POD name
+  namespace: wakt-system
+spec:
+  selector:
+    matchLabels:
+      app: wakt # Selector for POD name search.
+  template:
+    metadata:
+      labels:
+        app: wakt
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      terminationGracePeriodSeconds: 60
+      initContainers:
+      # wakt-api init container configuration
+      - name: init-migrate
+        image: wakt-api-image
+        command: ['./wakt-admin', 'migrate']
+      - name: init-seed
+        image: wakt-api-image
+        command: ['./wakt-admin', 'seed']
+      containers:
+      # wakt-api container configuration
+      - name: wakt-api
+        image: wakt-api-image
+        ports:
+        - name: wakt-api
+          containerPort: 3000
+        - name: wakt-api-debug
+          containerPort: 4000
+        readinessProbe: # readiness probes mark the service available to accept traffic.
+          httpGet:
+            path: /debug/readiness
+            port: 4000
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 2
+        livenessProbe: # liveness probes mark the service alive or dead (to be restarted).
+          httpGet:
+            path: /debug/liveness
+            port: 4000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 2
+        env:
+        - name: wakt_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: db_host
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBERNETES_PODNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: KUBERNETES_NAMESPACE_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: KUBERNETES_NODENAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      # metrics container configuration
+      - name: metrics
+        image: metrics-image
+        ports:
+        - name: metrics
+          containerPort: 3001
+        - name: metrics-debug
+          containerPort: 4001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wakt-service
+  namespace: wakt-system
+spec:
+  type: ClusterIP
+  selector:
+    app: wakt
+  ports:
+  - name: wakt-api
+    port: 3000
+    targetPort: wakt-api
+  - name: wakt-api-debug
+    port: 4000
+    targetPort: wakt-api-debug
+  - name: metrics
+    port: 3001
+    targetPort: metrics
+  - name: metrics-debug
+    port: 4001
+    targetPort: metrics-debug
