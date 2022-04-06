@@ -178,3 +178,34 @@ func (s Store) QueryUnique(ctx context.Context, name, column, id string) string 
 
 	return nam
 }
+
+// QueryWorkspaceClients retrieves a list of existing client from the database.
+func (s Store) QueryWorkspaceClients(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Client, error) {
+	data := struct {
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		WorkspaceID string `db:"wid"`
+	}{
+		Offset:      (pageNumber - 1) * rowsPerPage,
+		RowsPerPage: rowsPerPage,
+		WorkspaceID: workspaceID,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		clients
+	WHERE
+		wid = :wid
+	ORDER BY
+		client_id
+	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
+
+	var clients []Client
+	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &clients); err != nil {
+		return nil, fmt.Errorf("selecting client: %w", err)
+	}
+
+	return clients, nil
+}
