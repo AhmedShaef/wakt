@@ -231,7 +231,7 @@ func (s Store) QueryBulkIDs(ctx context.Context, projectID []string) ([]Project,
 
 	var project []Project
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &project); err != nil {
-		return nil, fmt.Errorf("selecting time_entrie: %w", err)
+		return nil, fmt.Errorf("selecting time_entry: %w", err)
 	}
 
 	return project, nil
