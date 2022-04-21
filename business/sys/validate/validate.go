@@ -89,17 +89,6 @@ func CheckID(id string) error {
 	return nil
 }
 
-// CheckBulkIDs validates that the format of an ids is valid.
-func CheckBulkIDs(id []string) error {
-	for _, ID := range id {
-
-		if _, err := uuid.Parse(ID); err != nil {
-			return errors.New("ID is not in its proper form")
-		}
-	}
-	return nil
-}
-
 // CheckEmail validates that the string is an email.
 func CheckEmail(email string) bool {
 	return emailRegex.MatchString(email)
