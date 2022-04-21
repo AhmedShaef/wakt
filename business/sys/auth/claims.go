@@ -11,6 +11,8 @@ import (
 const (
 	RoleAdmin = "ADMIN"
 	RoleUser  = "USER"
+	RolePro   = "PRO"
+	RoleFree  = "FREE"
 )
 
 // Claims represents the authorization claims transmitted via a JWT.
