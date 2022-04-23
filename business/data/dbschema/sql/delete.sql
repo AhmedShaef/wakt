@@ -1,2 +1,10 @@
-DELETE FROM workspaces;
-DELETE FROM users;
+DROP TABLE workspace_users;
+DROP TABLE project_users;
+DROP TABLE tags;
+DROP TABLE groups;
+DROP TABLE time_entries;
+DROP TABLE tasks;
+DROP TABLE projects;
+DROP TABLE clients;
+DROP TABLE workspaces;
+DROP TABLE users;
