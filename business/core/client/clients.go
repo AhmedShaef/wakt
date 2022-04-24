@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/client/db"
-	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -18,12 +17,9 @@ import (
 
 // Set of error variables for CRUD operations.
 var (
-	ErrNotFound              = errors.New("user not found")
-	ErrInvalidID             = errors.New("ID is not in its proper form")
-	ErrInvalidEmail          = errors.New("email is not valid")
-	ErrUniqueEmail           = errors.New("email is not unique")
-	ErrAuthenticationFailure = errors.New("authentication failed")
-	ErrInvalidPassword       = errors.New("password is not valid")
+	ErrNotFound    = errors.New("user not found")
+	ErrInvalidID   = errors.New("ID is not in its proper form")
+	ErrUniqueEmail = errors.New("email is not unique")
 )
 
 // Core manages the set of APIs for user access.
@@ -39,18 +35,9 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 }
 
 // Create inserts a new client into the database.
-func (c Core) Create(ctx context.Context, nc NewClient, email string, now time.Time) (Client, error) {
+func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.Time) (Client, error) {
 	if err := validate.Check(nc); err != nil {
 		return Client{}, fmt.Errorf("validating data: %w", err)
-	}
-
-	usr, err := user.Core{}.QueryByEmail(ctx, email)
-	if err != nil {
-		return Client{}, fmt.Errorf("querying user: %w", err)
-	}
-
-	if nc.Wid == "" {
-		nc.Wid = usr.DefaultWid
 	}
 
 	nameInWorkspace := c.store.QueryUnique(ctx, nc.Name, "wid", nc.Wid)
@@ -61,24 +48,14 @@ func (c Core) Create(ctx context.Context, nc NewClient, email string, now time.T
 	dbclint := db.Client{
 		ID:          validate.GenerateID(),
 		Name:        nc.Name,
+		Uid:         userID,
 		Wid:         nc.Wid,
 		Notes:       nc.Notes,
 		DateUpdated: now,
 	}
 
-	// This provides an example of how to execute a transaction if required.
-	tran := func(tx sqlx.ExtContext) error {
-		if err := c.store.Tran(tx).Create(ctx, dbclint); err != nil {
-			if errors.Is(err, database.ErrDBDuplicatedEntry) {
-				return fmt.Errorf("create: %w", ErrUniqueEmail)
-			}
-			return fmt.Errorf("create: %w", err)
-		}
-		return nil
-	}
-
-	if err := c.store.WithinTran(ctx, tran); err != nil {
-		return Client{}, fmt.Errorf("tran: %w", err)
+	if err := c.store.Create(ctx, dbclint); err != nil {
+		return Client{}, fmt.Errorf("create: %w", err)
 	}
 
 	return toClient(dbclint), nil
@@ -131,8 +108,8 @@ func (c Core) Delete(ctx context.Context, clientID string) error {
 }
 
 //Query retrieves a list of existing client from the database.
-func (c Core) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Client, error) {
-	dbclient, err := c.store.Query(ctx, pageNumber, rowsPerPage)
+func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
+	dbclient, err := c.store.Query(ctx, userID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
@@ -155,4 +132,13 @@ func (c Core) QueryByID(ctx context.Context, clientID string) (Client, error) {
 	}
 
 	return toClient(dbclient), nil
+}
+
+// QueryWorkspaceClients retrieves a list of existing workspace from the database.
+func (c Core) QueryWorkspaceClients(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Client, error) {
+	dbClient, err := c.store.QueryWorkspaceClients(ctx, workspaceID, pageNumber, rowsPerPage)
+	if err != nil {
+		return nil, fmt.Errorf("query: %w", err)
+	}
+	return toClientsSlice(dbClient), nil
 }
