@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, client Client) error {
 	const q = `
 	INSERT INTO clients
-		(client_id, name, wid, notes, date_updated)
+		(client_id, name, uid, wid, notes, date_updated)
 	VALUES
-		(:client_id, :name, :wid, :notes, :date_updated)`
+		(:client_id, :name, :uid, :wid, :notes, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, client); err != nil {
 		return fmt.Errorf("inserting client: %w", err)
@@ -82,9 +82,9 @@ func (s Store) Update(ctx context.Context, client Client) error {
 // Delete removes a client from the database.
 func (s Store) Delete(ctx context.Context, clientID string) error {
 	data := struct {
-		clientID string `db:"client_id"`
+		ClientID string `db:"client_id"`
 	}{
-		clientID: clientID,
+		ClientID: clientID,
 	}
 
 	const q = `
@@ -101,13 +101,15 @@ func (s Store) Delete(ctx context.Context, clientID string) error {
 }
 
 // Query retrieves a list of existing client from the database.
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Client, error) {
+func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
 	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		ClientID    string `db:"user_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
+		ClientID:    userID,
 	}
 
 	const q = `
@@ -115,6 +117,8 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Cl
 		*
 	FROM
 		clients
+	WHERE
+		uid = :user_id
 	ORDER BY
 		client_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
@@ -130,9 +134,9 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Cl
 // QueryByID gets the specified client from the database.
 func (s Store) QueryByID(ctx context.Context, clientID string) (Client, error) {
 	data := struct {
-		clientID string `db:"client_id"`
+		ClientID string `db:"client_id"`
 	}{
-		clientID: clientID,
+		ClientID: clientID,
 	}
 
 	const q = `
@@ -154,13 +158,13 @@ func (s Store) QueryByID(ctx context.Context, clientID string) (Client, error) {
 // QueryUnique gets the specified project from the database.
 func (s Store) QueryUnique(ctx context.Context, name, column, id string) string {
 	data := struct {
-		name   string `db:"name"`
-		column string `db:"column"`
-		id     string `db:"id"`
+		Name   string `db:"name"`
+		Column string `db:"column"`
+		Id     string `db:"id"`
 	}{
-		name:   name,
-		column: column,
-		id:     id,
+		Name:   name,
+		Column: column,
+		Id:     id,
 	}
 
 	const q = `
@@ -184,7 +188,7 @@ func (s Store) QueryWorkspaceClients(ctx context.Context, workspaceID string, pa
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
@@ -197,7 +201,7 @@ func (s Store) QueryWorkspaceClients(ctx context.Context, workspaceID string, pa
 	FROM
 		clients
 	WHERE
-		wid = :wid
+		wid = :workspace_id
 	ORDER BY
 		client_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
