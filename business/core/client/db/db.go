@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, client Client) error {
 	const q = `
 	INSERT INTO clients
-		(client_id, name, uid, wid, notes, date_updated)
+		(client_id, name, uid, wid, notes, date_created, date_updated)
 	VALUES
-		(:client_id, :name, :uid, :wid, :notes, :date_updated)`
+		(:client_id, :name, :uid, :wid, :notes, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, client); err != nil {
 		return fmt.Errorf("inserting client: %w", err)
