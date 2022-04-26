@@ -17,9 +17,8 @@ import (
 
 // Set of error variables for CRUD operations.
 var (
-	ErrNotFound    = errors.New("user not found")
-	ErrInvalidID   = errors.New("ID is not in its proper form")
-	ErrUniqueEmail = errors.New("email is not unique")
+	ErrNotFound  = errors.New("user not found")
+	ErrInvalidID = errors.New("ID is not in its proper form")
 )
 
 // Core manages the set of APIs for user access.
@@ -51,6 +50,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 		Uid:         userID,
 		Wid:         nc.Wid,
 		Notes:       nc.Notes,
+		DateCreated: now,
 		DateUpdated: now,
 	}
 
