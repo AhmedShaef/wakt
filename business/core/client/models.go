@@ -13,6 +13,7 @@ type Client struct {
 	Uid         string    `json:"uid"`
 	Wid         string    `json:"wid"`
 	Notes       string    `json:"notes"`
+	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
 
