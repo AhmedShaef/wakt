@@ -48,10 +48,10 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 // Create inserts a new tag into the database.
 func (s Store) Create(ctx context.Context, tag Tag) error {
 	const q = `
-	INSERT INTO tag
-		(tag_id, name, wid)
+	INSERT INTO tags
+		(tag_id, name, wid, date_created, date_updated)
 	VALUES
-		(:tag_id, :name, :wid)`
+		(:tag_id, :name, :wid, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, tag); err != nil {
 		return fmt.Errorf("inserting tag: %w", err)
@@ -64,10 +64,10 @@ func (s Store) Create(ctx context.Context, tag Tag) error {
 func (s Store) Update(ctx context.Context, tag Tag) error {
 	const q = `
 	UPDATE
-		tag
+		tags
 	SET 
 		"name" = :name,
-		"notes" = :notes
+		"date_updated" = :date_updated
 	WHERE
 		tag_id = :tag_id`
 
@@ -81,14 +81,14 @@ func (s Store) Update(ctx context.Context, tag Tag) error {
 // Delete removes a tag from the database.
 func (s Store) Delete(ctx context.Context, tagID string) error {
 	data := struct {
-		tagID string `db:"tag_id"`
+		TagID string `db:"tag_id"`
 	}{
-		tagID: tagID,
+		TagID: tagID,
 	}
 
 	const q = `
 	DELETE FROM
-		tag
+		tags
 	WHERE
 		tag_id = :tag_id`
 
@@ -102,16 +102,16 @@ func (s Store) Delete(ctx context.Context, tagID string) error {
 // QueryByID gets the specified tag from the database.
 func (s Store) QueryByID(ctx context.Context, tagID string) (Tag, error) {
 	data := struct {
-		tagID string `db:"tag_id"`
+		TagID string `db:"tag_id"`
 	}{
-		tagID: tagID,
+		TagID: tagID,
 	}
 
 	const q = `
 	SELECT
 		*
 	FROM
-		tag
+		tags
 	WHERE 
 		tag_id = :tag_id`
 
@@ -128,7 +128,7 @@ func (s Store) QueryWorkspaceTags(ctx context.Context, workspaceID string, pageN
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
@@ -141,7 +141,7 @@ func (s Store) QueryWorkspaceTags(ctx context.Context, workspaceID string, pageN
 	FROM
 		tags
 	WHERE
-		wid = :wid
+		wid = :workspace_id
 	ORDER BY
 		tag_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
