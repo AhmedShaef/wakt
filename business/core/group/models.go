@@ -11,6 +11,7 @@ type Group struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Wid         string    `json:"wid"`
+	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
 
