@@ -2,14 +2,17 @@ package tag
 
 import (
 	"github.com/AhmedShaef/wakt/business/core/tag/db"
+	"time"
 	"unsafe"
 )
 
 // Tag represents an individual tag.
 type Tag struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Wid  string `json:"wid"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Wid         string    `json:"wid"`
+	DateCreated time.Time `json:"date_created"`
+	DateUpdated time.Time `json:"date_updated"`
 }
 
 // NewTag contains information needed to create a new tag.
