@@ -48,10 +48,10 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 // Create inserts a new group into the database.
 func (s Store) Create(ctx context.Context, group Group) error {
 	const q = `
-	INSERT INTO group
-		(group_id, name, wid, date_updated)
+	INSERT INTO groups
+		(group_id, name, wid, date_created, date_updated)
 	VALUES
-		(:group_id, :name, :wid, :date_updated)`
+		(:group_id, :name, :wid, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, group); err != nil {
 		return fmt.Errorf("inserting group: %w", err)
@@ -64,7 +64,7 @@ func (s Store) Create(ctx context.Context, group Group) error {
 func (s Store) Update(ctx context.Context, group Group) error {
 	const q = `
 	UPDATE
-		group
+		groups
 	SET 
 		"name" = :name,
 		"date_updated" = :date_updated
@@ -81,14 +81,14 @@ func (s Store) Update(ctx context.Context, group Group) error {
 // Delete removes a group from the database.
 func (s Store) Delete(ctx context.Context, groupID string) error {
 	data := struct {
-		groupID string `db:"group_id"`
+		GroupID string `db:"group_id"`
 	}{
-		groupID: groupID,
+		GroupID: groupID,
 	}
 
 	const q = `
 	DELETE FROM
-		group
+		groups
 	WHERE
 		group_id = :group_id`
 
@@ -102,16 +102,16 @@ func (s Store) Delete(ctx context.Context, groupID string) error {
 // QueryByID gets the specified group from the database.
 func (s Store) QueryByID(ctx context.Context, groupID string) (Group, error) {
 	data := struct {
-		groupID string `db:"group_id"`
+		GroupID string `db:"group_id"`
 	}{
-		groupID: groupID,
+		GroupID: groupID,
 	}
 
 	const q = `
 	SELECT
 		*
 	FROM
-		group
+		groups
 	WHERE 
 		group_id = :group_id`
 
@@ -128,7 +128,7 @@ func (s Store) QueryWorkspaceGroups(ctx context.Context, workspaceID string, pag
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
@@ -141,7 +141,7 @@ func (s Store) QueryWorkspaceGroups(ctx context.Context, workspaceID string, pag
 	FROM
 		groups
 	WHERE
-		wid = :wid
+		wid = :workspace_id
 	ORDER BY
 		group_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
