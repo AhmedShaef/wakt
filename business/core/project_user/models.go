@@ -12,18 +12,17 @@ type ProjectUser struct {
 	Pid         string    `json:"pid"`
 	Uid         string    `json:"uid"`
 	Wid         string    `json:"wid"`
-	Manager     bool      `json:"manager"`
 	Rate        float64   `json:"rate"`
+	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
 
 // NewProjectUser contains information needed to create a new ProjectUser.
 type NewProjectUser struct {
-	Pid     string  `json:"pid" validate:"required"`
-	Uid     string  `json:"uid" validate:"required"`
-	Wid     string  `json:"wid"`
-	Manager bool    `json:"manager"`
-	Rate    float64 `json:"rate"`
+	Pid  string  `json:"pid" validate:"required"`
+	Uid  string  `json:"uid" validate:"required"`
+	Wid  string  `json:"wid" validate:"required"`
+	Rate float64 `json:"rate"`
 }
 
 // UpdateProjectUser defines what information may be provided to modify an existing
@@ -33,8 +32,7 @@ type NewProjectUser struct {
 // we do not want to use pointers to basic types ,but we make exceptions around
 // marshalling/unmarshalling.
 type UpdateProjectUser struct {
-	Manager *bool    `json:"manager"`
-	Rate    *float64 `json:"rate"`
+	Rate *float64 `json:"rate"`
 }
 
 // =============================================================================
