@@ -14,6 +14,7 @@ type Task struct {
 	Uid              string        `db:"uid"`
 	EstimatedSeconds time.Duration `db:"estimated_seconds"`
 	Active           bool          `db:"active"`
+	DateCreated      time.Time     `db:"date_created"`
 	DateUpdated      time.Time     `db:"date_updated"`
 	TrackedSeconds   time.Duration `db:"tracked_seconds"`
 }
