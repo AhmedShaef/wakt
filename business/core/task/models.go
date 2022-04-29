@@ -15,6 +15,7 @@ type Task struct {
 	Uid              string        `json:"uid"`
 	EstimatedSeconds time.Duration `json:"estimated_seconds"`
 	Active           bool          `json:"active"`
+	DateCreated      time.Time     `json:"date_created"`
 	DateUpdated      time.Time     `json:"date_updated"`
 	TrackedSeconds   time.Duration `json:"tracked_seconds"`
 }
@@ -23,7 +24,7 @@ type Task struct {
 type NewTask struct {
 	Name             string        `json:"name" validate:"required"`
 	Pid              string        `json:"pid" validate:"required"`
-	Wid              string        `json:"wid"`
+	Wid              string        `json:"wid" validate:"required"`
 	Uid              string        `json:"uid"`
 	EstimatedSeconds time.Duration `json:"estimated_seconds"`
 	Active           bool          `json:"active"`
