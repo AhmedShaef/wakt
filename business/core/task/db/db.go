@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, task Task) error {
 	const q = `
 	INSERT INTO tasks
-		(task_id, name, pid, wid, uid, estimated_seconds, active, date_updated, tracked_seconds)
+		(task_id, name, pid, wid, uid, estimated_seconds, active, date_created, date_updated, tracked_seconds)
 	VALUES
-		(:task_id, :name, :pid, :wid, :uid, :estimated_seconds, :active, :date_updated, :tracked_seconds)`
+		(:task_id, :name, :pid, :wid, :uid, :estimated_seconds, :active, :date_created, :date_updated, :tracked_seconds)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, task); err != nil {
 		return fmt.Errorf("inserting task: %w", err)
@@ -84,9 +84,9 @@ func (s Store) Update(ctx context.Context, task Task) error {
 // Delete removes a task from the database.
 func (s Store) Delete(ctx context.Context, taskID string) error {
 	data := struct {
-		taskID string `db:"task_id"`
+		TaskID string `db:"task_id"`
 	}{
-		taskID: taskID,
+		TaskID: taskID,
 	}
 
 	const q = `
@@ -132,9 +132,9 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Ta
 // QueryByID gets the specified task from the database.
 func (s Store) QueryByID(ctx context.Context, taskID string) (Task, error) {
 	data := struct {
-		taskID string `db:"task_id"`
+		TaskID string `db:"task_id"`
 	}{
-		taskID: taskID,
+		TaskID: taskID,
 	}
 
 	const q = `
@@ -156,13 +156,13 @@ func (s Store) QueryByID(ctx context.Context, taskID string) (Task, error) {
 // QueryUnique gets the specified project from the database.
 func (s Store) QueryUnique(ctx context.Context, name, column, id string) string {
 	data := struct {
-		name   string `db:"name"`
-		column string `db:"column"`
-		id     string `db:"id"`
+		Name   string `db:"name"`
+		Column string `db:"column"`
+		Id     string `db:"id"`
 	}{
-		name:   name,
-		column: column,
-		id:     id,
+		Name:   name,
+		Column: column,
+		Id:     id,
 	}
 
 	const q = `
@@ -241,7 +241,7 @@ func (s Store) QueryWorkspaceTasks(ctx context.Context, workspaceID string, page
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
@@ -254,7 +254,7 @@ func (s Store) QueryWorkspaceTasks(ctx context.Context, workspaceID string, page
 	FROM
 		tasks
 	WHERE
-		wid = :wid
+		wid = :workspace_id
 	ORDER BY
 		task_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
