@@ -50,9 +50,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, project Project) error {
 	const q = `
 	INSERT INTO projects
-		(project_id, name, wid, cid, active, is_private, template, template_id, billable, auto_estimates, estimated_hours, date_updated, color, rate, date_created)
+		(project_id, name, wid, cid, active, is_private, billable, auto_estimates, estimated_hours, date_updated, rate, date_created, hex_color)
 	VALUES
-		(:project_id, :name, :wid, :cid, :active, :is_private, :template, :template_id, :billable, :auto_estimates, :estimated_hours, :date_updated, :color, :rate, :date_created)`
+		(:project_id, :name, :wid, :cid, :active, :is_private, :billable, :auto_estimates, :estimated_hours, :date_updated, :rate, :date_created, :hex_color)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, project); err != nil {
 		return fmt.Errorf("inserting project: %w", err)
@@ -70,15 +70,12 @@ func (s Store) Update(ctx context.Context, project Project) error {
 		"name" = :name,
 		"active" = :active,
 		"is_private" = :is_private,
-		"template" = :template,
-		"template_id" = :template_id,
 		"billable" = :billable,
 		"auto_estimates" = :auto_estimates,
 		"estimated_hours" = :estimated_hours,
-		"date_updated" = :date_updated,
-		"color" = :color,
 		"rate" = :rate,
-		"date_updated" = :date_updated
+		"date_updated" = :date_updated,
+		"hex_color" = :hex_color
 	WHERE
 		project_id = :project_id`
 
@@ -92,9 +89,9 @@ func (s Store) Update(ctx context.Context, project Project) error {
 // Delete removes a project from the database.
 func (s Store) Delete(ctx context.Context, projectID string) error {
 	data := struct {
-		projectID string `db:"project_id"`
+		ProjectID string `db:"project_id"`
 	}{
-		projectID: projectID,
+		ProjectID: projectID,
 	}
 
 	const q = `
@@ -140,9 +137,9 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Pr
 // QueryByID gets the specified project from the database.
 func (s Store) QueryByID(ctx context.Context, projectID string) (Project, error) {
 	data := struct {
-		projectID string `db:"project_id"`
+		ProjectID string `db:"project_id"`
 	}{
-		projectID: projectID,
+		ProjectID: projectID,
 	}
 
 	const q = `
@@ -164,13 +161,13 @@ func (s Store) QueryByID(ctx context.Context, projectID string) (Project, error)
 // QueryUnique gets the specified project from the database.
 func (s Store) QueryUnique(ctx context.Context, name, column, id string) string {
 	data := struct {
-		name   string `db:"name"`
-		column string `db:"column"`
-		id     string `db:"id"`
+		Name   string `db:"name"`
+		Column string `db:"column"`
+		Id     string `db:"id"`
 	}{
-		name:   name,
-		column: column,
-		id:     id,
+		Name:   name,
+		Column: column,
+		Id:     id,
 	}
 
 	const q = `
@@ -192,9 +189,9 @@ func (s Store) QueryUnique(ctx context.Context, name, column, id string) string 
 // QueryTrackedTime gets the specified project from the database.
 func (s Store) QueryTrackedTime(ctx context.Context, projectID string) (time.Duration, error) {
 	data := struct {
-		projectID string `db:"project_id"`
+		ProjectID string `db:"project_id"`
 	}{
-		projectID: projectID,
+		ProjectID: projectID,
 	}
 
 	const q = `
@@ -216,9 +213,9 @@ func (s Store) QueryTrackedTime(ctx context.Context, projectID string) (time.Dur
 // QueryBulkIDs gets all Tasks from the database.
 func (s Store) QueryBulkIDs(ctx context.Context, projectID []string) ([]Project, error) {
 	data := struct {
-		projectID []string `db:"project_id"`
+		ProjectID []string `db:"project_id"`
 	}{
-		projectID: projectID,
+		ProjectID: projectID,
 	}
 
 	const q = `
@@ -273,7 +270,7 @@ func (s Store) QueryWorkspaceProjects(ctx context.Context, workspaceID string, p
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
@@ -286,14 +283,14 @@ func (s Store) QueryWorkspaceProjects(ctx context.Context, workspaceID string, p
 	FROM
 		projects
 	WHERE
-		wid = :wid
+		wid = :workspace_id
 	ORDER BY
 		project_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
 	var projcts []Project
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &projcts); err != nil {
-		return nil, fmt.Errorf("selecting client: %w", err)
+		return nil, fmt.Errorf("selecting project: %w", err)
 	}
 
 	return projcts, nil
