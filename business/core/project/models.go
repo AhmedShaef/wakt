@@ -14,31 +14,27 @@ type Project struct {
 	Cid            string        `json:"cid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
-	Template       bool          `json:"template"`
-	TemplateID     string        `json:"template_id"`
 	Billable       bool          `json:"billable"`
 	AutoEstimates  bool          `json:"auto_estimates"`
 	EstimatedHours time.Duration `json:"estimated_hours"`
 	DateUpdated    time.Time     `json:"date_updated"`
-	Color          int           `json:"color"`
 	Rate           float32       `json:"rate"`
 	DateCreated    time.Time     `json:"date_created"`
+	HexColor       string        `json:"hex_color"`
 }
 
 // NewProject contains information needed to create a new project.
 type NewProject struct {
 	Name           string        `json:"name" validate:"required"`
-	Wid            string        `json:"wid"`
+	Wid            string        `json:"wid" validate:"required"`
 	Cid            string        `json:"cid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
 	AutoEstimates  bool          `json:"auto_estimates"`
 	EstimatedHours time.Duration `json:"estimated_hours"`
-	Template       bool          `json:"template"`
-	TemplateID     string        `json:"template_id"`
 	Billable       bool          `json:"billable"`
-	Color          int           `json:"color"`
 	Rate           float32       `json:"rate"`
+	HexColor       string        `json:"hex_color"`
 }
 
 // UpdateProject defines what information may be provided to modify an existing
@@ -53,11 +49,9 @@ type UpdateProject struct {
 	IsPrivate      *bool          `json:"is_private"`
 	AutoEstimates  *bool          `json:"auto_estimates"`
 	EstimatedHours *time.Duration `json:"estimated_hours"`
-	Template       *bool          `json:"template"`
-	TemplateID     *string        `json:"template_id"`
 	Billable       *bool          `json:"billable"`
-	Color          *int           `json:"color"`
 	Rate           *float32       `json:"rate"`
+	HexColor       *string        `json:"hex_color"`
 }
 
 // =============================================================================
