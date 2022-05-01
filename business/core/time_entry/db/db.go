@@ -1,4 +1,4 @@
-// Package db contains TimeEntrie related CRUD functionality.
+// Package db contains TimeEntry related CRUD functionality.
 package db
 
 import (
@@ -7,6 +7,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"time"
 )
 
 // Store manages the set of APIs for user access.
@@ -44,14 +45,14 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 	}
 }
 
-// Create adds a TimeEntrie to the database. It returns the created TimeEntrie with
+// Create adds a TimeEntry to the database. It returns the created TimeEntry with
 // fields like ID and DateCreated populated.
-func (s Store) Create(ctx context.Context, te TimeEntrie) error {
+func (s Store) Create(ctx context.Context, te TimeEntry) error {
 	const q = `
 	INSERT INTO time_entries
-		(time_entrie_id, description, wid, pid, tid, billable, start, stop, duration, created_with, tags, dur_only, date_created, date_updated)
+		(time_entry_id, description, uid, wid, pid, tid, billable, start, stop, duration,tags, created_with, dur_only, date_created, date_updated)
 	VALUES
-		(:time_entrie_id, :description, :wid, :pid, :tid, :billable, :start, :stop, :duration, :created_with, :tags, :dur_only, :date_created, :date_updated)`
+		(:time_entry_id, :description, :uid, :wid, :pid, :tid, :billable, :start, :stop, :duration, :tags, :created_with, :dur_only, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, te); err != nil {
 		return fmt.Errorf("inserting time_entry: %w", err)
@@ -60,87 +61,61 @@ func (s Store) Create(ctx context.Context, te TimeEntrie) error {
 	return nil
 }
 
-// Update modifies data about a TimeEntrie. It will error if the specified ID is
-// invalid or does not reference an existing TimeEntrie.
-func (s Store) Update(ctx context.Context, te TimeEntrie) error {
+// Update modifies data about a TimeEntry. It will error if the specified ID is
+// invalid or does not reference an existing TimeEntry.
+func (s Store) Update(ctx context.Context, te TimeEntry) error {
 	const q = `
 	UPDATE
 		time_entries
 	SET
 		"description" = :description,
+		"uid" = :uid,
 		"pid" = :pid,
 		"tid" = :tid,
         "billable" = :billable,
         "start" = :start,
         "stop" = :stop,
         "duration" = :duration,
-        "tags" = :tags,
         "dur_only" = :dur_only,
+		"tags" = :tags,
 		"date_updated" = :date_updated
 	WHERE
-		time_entrie_id = :time_entrie_id`
+		time_entry_id = :time_entry_id`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, te); err != nil {
-		return fmt.Errorf("updating time_entry time_entrieID[%s]: %w", te.ID, err)
+		return fmt.Errorf("updating time_entry time_entryID[%s]: %w", te.ID, err)
 	}
 
 	return nil
 }
 
-// Delete removes the TimeEntrie identified by a given ID.
-func (s Store) Delete(ctx context.Context, timeEntrieID string) error {
+// Delete removes the TimeEntry identified by a given ID.
+func (s Store) Delete(ctx context.Context, timeEntryID string) error {
 	data := struct {
-		TimeEntrieID string `db:"time_entrie_id"`
+		TimeEntryID string `db:"time_entry_id"`
 	}{
-		TimeEntrieID: timeEntrieID,
+		TimeEntryID: timeEntryID,
 	}
 
 	const q = `
 	DELETE FROM
 		time_entries
 	WHERE
-		time_entrie_id = :time_entrie_id`
+		time_entry_id = :time_entry_id`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, data); err != nil {
-		return fmt.Errorf("deleting time_entry time_entrieID[%s]: %w", timeEntrieID, err)
+		return fmt.Errorf("deleting time_entry time_entryID[%s]: %w", timeEntryID, err)
 	}
 
 	return nil
 }
 
-// Query gets all TimeEntrie from the database.
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]TimeEntrie, error) {
-	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
-	}{
-		Offset:      (pageNumber - 1) * rowsPerPage,
-		RowsPerPage: rowsPerPage,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		time_entries
-	ORDER BY
-		time_entrie_id
-	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
-
-	var tims []TimeEntrie
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
-		return nil, fmt.Errorf("selecting time_entry: %w", err)
-	}
-
-	return tims, nil
-}
-
 // QueryByID finds the time_entry identified by a given ID.
-func (s Store) QueryByID(ctx context.Context, timeEntrieID string) (TimeEntrie, error) {
+func (s Store) QueryByID(ctx context.Context, timeEntryID string) (TimeEntry, error) {
 	data := struct {
-		TimeEntrieID string `db:"time_entrie_id"`
+		TimeEntryID string `db:"time_entry_id"`
 	}{
-		TimeEntrieID: timeEntrieID,
+		TimeEntryID: timeEntryID,
 	}
 
 	const q = `
@@ -149,24 +124,26 @@ func (s Store) QueryByID(ctx context.Context, timeEntrieID string) (TimeEntrie, 
 	FROM
 		time_entries
 	WHERE 
-		time_entrie_id = :time_entrie_id`
+		time_entry_id = :time_entry_id`
 
-	var tim TimeEntrie
+	var tim TimeEntry
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &tim); err != nil {
-		return TimeEntrie{}, fmt.Errorf("selecting time_entry time_entrieID[%q]: %w", timeEntrieID, err)
+		return TimeEntry{}, fmt.Errorf("selecting time_entry time_entryID[%q]: %w", timeEntryID, err)
 	}
 
 	return tim, nil
 }
 
-// QueryRunning gets all TimeEntrie from the database.
-func (s Store) QueryRunning(ctx context.Context, pageNumber int, rowsPerPage int) ([]TimeEntrie, error) {
+// QueryRunning gets all TimeEntry from the database.
+func (s Store) QueryRunning(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]TimeEntry, error) {
 	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		UserID      string `db:"user_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
+		UserID:      userID,
 	}
 
 	const q = `
@@ -176,11 +153,12 @@ func (s Store) QueryRunning(ctx context.Context, pageNumber int, rowsPerPage int
 		time_entries
 	WHERE 
 		duration < 0
+		AND uid = :user_id
 	ORDER BY
-		time_entrie_id
+		time_entry_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
-	var tims []TimeEntrie
+	var tims []TimeEntry
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
 		return nil, fmt.Errorf("selecting time_entry: %w", err)
 	}
@@ -188,18 +166,20 @@ func (s Store) QueryRunning(ctx context.Context, pageNumber int, rowsPerPage int
 	return tims, nil
 }
 
-// QueryRange gets all TimeEntrie from the database.
-func (s Store) QueryRange(ctx context.Context, pageNumber, rowsPerPage int, start, end string) ([]TimeEntrie, error) {
+// QueryRange gets all TimeEntry from the database.
+func (s Store) QueryRange(ctx context.Context, userID string, pageNumber, rowsPerPage int, start, end time.Time) ([]TimeEntry, error) {
 	data := struct {
-		Offset      int    `db:"offset"`
-		RowsPerPage int    `db:"rows_per_page"`
-		Start       string `db:"start"`
-		End         string `db:"end"`
+		Offset      int       `db:"offset"`
+		RowsPerPage int       `db:"rows_per_page"`
+		Start       time.Time `db:"start"`
+		End         time.Time `db:"end"`
+		UserID      string    `db:"user_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
 		Start:       start,
 		End:         end,
+		UserID:      userID,
 	}
 
 	const q = `
@@ -208,12 +188,13 @@ func (s Store) QueryRange(ctx context.Context, pageNumber, rowsPerPage int, star
 	FROM
 		time_entries
 	WHERE 
-			date_created >= :start AND date_created <= :end
+		date_created >= :start AND date_created <= :end
+		AND uid = :user_id
 	ORDER BY
-		time_entrie_id
+		time_entry_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
-	var tims []TimeEntrie
+	var tims []TimeEntry
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
 		return nil, fmt.Errorf("selecting time_entry: %w", err)
 	}
@@ -221,33 +202,13 @@ func (s Store) QueryRange(ctx context.Context, pageNumber, rowsPerPage int, star
 	return tims, nil
 }
 
-// QueryBulkIDs gets all TimeEntrie from the database.
-func (s Store) QueryBulkIDs(ctx context.Context, timeEntrieID []string) ([]TimeEntrie, error) {
+// QueryMostActive user in all TimeEntry from the database.
+func (s Store) QueryMostActive(ctx context.Context, userID string) ([]TimeEntry, error) {
 	data := struct {
-		TimeEntrieID []string `db:"time_entrie_id"`
+		UserID string `db:"user_id"`
 	}{
-		TimeEntrieID: timeEntrieID,
+		UserID: userID,
 	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		time_entries
-	WHERE 
-		time_entrie_id in :time_entrie_id`
-
-	var tims []TimeEntrie
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
-		return nil, fmt.Errorf("selecting time_entry: %w", err)
-	}
-
-	return tims, nil
-}
-
-// QueryMostActive user in all TimeEntrie from the database.
-func (s Store) QueryMostActive(ctx context.Context) ([]TimeEntrie, error) {
-	data := struct{}{}
 	const q = `
 	SELECT
 		uid, duration
@@ -255,11 +216,12 @@ func (s Store) QueryMostActive(ctx context.Context) ([]TimeEntrie, error) {
 		time_entries
 	WHERE
 		stop >= now() - INTERVAL '1 week'
+		AND uid = :user_id
 	ORDER BY
 		duration
 	LIMIT 5`
 
-	var tims []TimeEntrie
+	var tims []TimeEntry
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
 		return nil, fmt.Errorf("selecting time_entry: %w", err)
 	}
@@ -267,19 +229,25 @@ func (s Store) QueryMostActive(ctx context.Context) ([]TimeEntrie, error) {
 	return tims, nil
 }
 
-// QueryActivity gets last TimeEntrie from the database.
-func (s Store) QueryActivity(ctx context.Context) ([]TimeEntrie, error) {
-	data := struct{}{}
+// QueryActivity gets last TimeEntry from the database.
+func (s Store) QueryActivity(ctx context.Context, userID string) ([]TimeEntry, error) {
+	data := struct {
+		UserID string `db:"user_id"`
+	}{
+		UserID: userID,
+	}
 	const q = `
 	SELECT
 		uid, pid, duration, description, stop, tid
 	FROM
 		time_entries
+	WHERE
+		uid = :user_id
 	ORDER BY
 		start DESC
 	LIMIT 20`
 
-	var tims []TimeEntrie
+	var tims []TimeEntry
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tims); err != nil {
 		return nil, fmt.Errorf("selecting time_entry: %w", err)
 	}
