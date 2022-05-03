@@ -1,4 +1,4 @@
-// Package db contains client related CRUD functionality.
+// Package db contains user related CRUD functionality.
 package db
 
 import (
@@ -48,10 +48,10 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 // Create inserts a new user into the database.
 func (s Store) Create(ctx context.Context, user User) error {
 	const q = `
-	INSERT INTO clients
-		(user_id, api_token, default_wid, email, password_hash, full_name, jquery_time_of_day_format, jquery_date_format, time_of_day_format, date_format, store_start_and_stop_time, beginning_of_week, language, image_url, sidebar_piechart, date_created, date_updated, record_timeline,should_upgrade, new_blog_post, send_product_emails, send_weekly_report, send_timer_notifications, openid_enabled, timezone, invitation, duration_format)
+	INSERT INTO users
+		(user_id, email, roles, password_hash,full_name, date_created, date_updated)
 	VALUES
-		(:user_id, :api_token, :default_wid, :email, :password_hash, :full_name, :jquery_time_of_day_format, :jquery_date_format, :time_of_day_format, :date_format, :store_start_and_stop_time, :beginning_of_week, :language, :image_url, :sidebar_piechart, :date_created, :date_updated, :record_timeline,should_upgrade, :new_blog_post, :send_product_emails, :send_weekly_report, :send_timer_notifications, :openid_enabled, :timezone, :invitation, :duration_format)`
+		(:user_id, :email, :roles, :password_hash, :full_name, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, user); err != nil {
 		return fmt.Errorf("inserting user: %w", err)
@@ -65,30 +65,19 @@ func (s Store) Update(ctx context.Context, user User) error {
 	const q = `
 	UPDATE
 		users
-	SET 
-		api_token = :api_token,
+	SET
 		default_wid = :default_wid,
 		email = :email,
+		roles = :roles,
 		password_hash = :password_hash,
 		full_name = :full_name,
-		jquery_time_of_day_format = :jquery_time_of_day_format,
-		jquery_date_format = :jquery_date_format,
 		time_of_day_format = :time_of_day_format,
 		date_format = :date_format,
-		store_start_and_stop_time = :store_start_and_stop_time,
 		beginning_of_week = :beginning_of_week,
 		language = :language,
 		image_url = :image_url,
-		sidebar_piechart = :sidebar_piechart,
 		date_created = :date_created,
 		date_updated = :date_updated,
-		record_timeline = :record_timeline,
-		should_upgrade = :should_upgrade,
-		new_blog_post = :new_blog_post,
-		send_product_emails = :send_product_emails,
-		send_weekly_report = :send_weekly_report,
-		send_timer_notifications = :send_timer_notifications,
-		openid_enabled = :openid_enabled,
 		timezone = :timezone,
 		invitation = :invitation,
 		duration_format = :duration_format
@@ -102,33 +91,12 @@ func (s Store) Update(ctx context.Context, user User) error {
 	return nil
 }
 
-// Delete removes a user from the database.
-func (s Store) Delete(ctx context.Context, userID string) error {
-	data := struct {
-		userID string `db:"user_id"`
-	}{
-		userID: userID,
-	}
-
-	const q = `
-	DELETE FROM
-		users
-	WHERE
-		user_id = :user_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, data); err != nil {
-		return fmt.Errorf("deleting userID[%s]: %w", userID, err)
-	}
-
-	return nil
-}
-
 // QueryByID gets the specified user from the database.
 func (s Store) QueryByID(ctx context.Context, userID string) (User, error) {
 	data := struct {
-		userID string `db:"user_id"`
+		UserID string `db:"user_id"`
 	}{
-		userID: userID,
+		UserID: userID,
 	}
 
 	const q = `
@@ -196,7 +164,38 @@ func (s Store) QueryWorkspaceUsers(ctx context.Context, workspaceID string, page
 
 	var users []User
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &users); err != nil {
-		return nil, fmt.Errorf("selecting client: %w", err)
+		return nil, fmt.Errorf("selecting user: %w", err)
+	}
+
+	return users, nil
+}
+
+// QueryProjectUsers retrieves a list of existing user from the database.
+func (s Store) QueryProjectUsers(ctx context.Context, projectID string, pageNumber, rowsPerPage int) ([]User, error) {
+	data := struct {
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		ProjectID   string `db:"pid"`
+	}{
+		Offset:      (pageNumber - 1) * rowsPerPage,
+		RowsPerPage: rowsPerPage,
+		ProjectID:   projectID,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		users
+	WHERE
+		pid = :pid
+	ORDER BY
+		user_id
+	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
+
+	var users []User
+	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &users); err != nil {
+		return nil, fmt.Errorf("selecting user: %w", err)
 	}
 
 	return users, nil
