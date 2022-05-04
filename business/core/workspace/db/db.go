@@ -43,13 +43,13 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 	}
 }
 
-// Create inserts a new workspace into the database.
+// Create inserts a new Workspace into the database.
 func (s Store) Create(ctx context.Context, workspace Workspace) error {
 	const q = `
 	INSERT INTO workspaces
-		(workspace_id, name, profile, premium, admin, default_hourly_rate, default_currency, only_admin_may_create_projects, only_admin_see_billable_rates, only_admin_see_team_dashboard, project_billable_by_default, rounding, rounding_minutes, date_updated, logo_url, ical_url, ical_enabled)
+		(workspace_id, name, uid, date_created, date_updated)
 	VALUES
-		(:workspace_id, :name, :profile, :premium, :admin, :default_hourly_rate, :default_currency, :only_admin_may_create_projects, :only_admin_see_billable_rates, :only_admin_see_team_dashboard, :project_billable_by_default, :rounding, :rounding_minutes, :date_updated, :logo_url, :ical_url, :ical_enabled)`
+		(:workspace_id, :name, :uid, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, workspace); err != nil {
 		return fmt.Errorf("inserting workspace: %w", err)
@@ -58,16 +58,13 @@ func (s Store) Create(ctx context.Context, workspace Workspace) error {
 	return nil
 }
 
-// Update replaces a workspace document in the database.
+// Update replaces a Workspace document in the database.
 func (s Store) Update(ctx context.Context, workspace Workspace) error {
 	const q = `
 	UPDATE
-		users
+		workspaces
 	SET
 		name = :name,
-		profile = :profile,
-		premium = :premium,
-		admin = :admin,
 		default_hourly_rate = :default_hourly_rate,
 		default_currency = :default_currency,
 		only_admin_may_create_projects = :only_admin_may_create_projects,
@@ -78,8 +75,6 @@ func (s Store) Update(ctx context.Context, workspace Workspace) error {
 		rounding_minutes = :rounding_minutes,
 		date_updated = :date_updated,
 		logo_url = :logo_url,
-		ical_url = :ical_url,
-		ical_enabled = :ical_enabled
 	WHERE
 		workspace_id = :workspace_id`
 
@@ -91,12 +86,12 @@ func (s Store) Update(ctx context.Context, workspace Workspace) error {
 
 }
 
-// Delete removes a workspace from the database.
+// Delete removes a Workspace from the database.
 func (s Store) Delete(ctx context.Context, workspaceID string) error {
 	data := struct {
-		workspaceID string `db:"workspace_id"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
-		workspaceID: workspaceID,
+		WorkspaceID: workspaceID,
 	}
 
 	const q = `
@@ -113,13 +108,15 @@ func (s Store) Delete(ctx context.Context, workspaceID string) error {
 }
 
 // Query retrieves a list of existing workspaces from the database.
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Workspace, error) {
+func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
 	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		UserID      string `db:"user_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
+		UserID:      userID,
 	}
 
 	const q = `
@@ -127,6 +124,8 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Wo
 		*
 	FROM
 		workspaces
+	WHERE
+		uid = :user_id
 	ORDER BY
 		workspace_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
@@ -139,12 +138,12 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Wo
 	return workspaces, nil
 }
 
-// QueryByID gets the specified workspace from the database.
+// QueryByID gets the specified Workspace from the database.
 func (s Store) QueryByID(ctx context.Context, workspaceID string) (Workspace, error) {
 	data := struct {
-		workspaceID string `db:"workspace_id"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
-		workspaceID: workspaceID,
+		WorkspaceID: workspaceID,
 	}
 
 	const q = `
@@ -161,4 +160,30 @@ func (s Store) QueryByID(ctx context.Context, workspaceID string) (Workspace, er
 	}
 
 	return workspace, nil
+}
+
+// QueryUserWorkspace retrieves a list of existing workspaces from the database.
+func (s Store) QueryUserWorkspace(ctx context.Context, userID string) ([]Workspace, error) {
+	data := struct {
+		UserID string `db:"user_id"`
+	}{
+		UserID: userID,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		workspaces
+	WHERE 
+		user_id = :user_id
+	ORDER BY
+		workspace_id`
+
+	var workspaces []Workspace
+	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &workspaces); err != nil {
+		return nil, fmt.Errorf("selecting workspaces: %w", err)
+	}
+
+	return workspaces, nil
 }
