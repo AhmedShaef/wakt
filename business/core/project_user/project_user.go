@@ -51,6 +51,7 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 			Pid:         npu.Pid,
 			Uid:         uid,
 			Wid:         npu.Wid,
+			Manager:     true,
 			Rate:        npu.Rate,
 			DateCreated: now,
 			DateUpdated: now,
@@ -85,6 +86,9 @@ func (c Core) Update(ctx context.Context, projectUserID string, upu UpdateProjec
 
 	if upu.Rate != nil {
 		dbProjectUser.Rate = *upu.Rate
+	}
+	if upu.Manager != nil {
+		dbProjectUser.Manager = *upu.Manager
 	}
 	dbProjectUser.DateUpdated = now
 
