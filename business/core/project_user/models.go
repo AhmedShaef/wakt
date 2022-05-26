@@ -12,6 +12,7 @@ type ProjectUser struct {
 	Pid         string    `json:"pid"`
 	Uid         string    `json:"uid"`
 	Wid         string    `json:"wid"`
+	Manager     bool      `json:"manager"`
 	Rate        float64   `json:"rate"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
@@ -32,7 +33,8 @@ type NewProjectUser struct {
 // we do not want to use pointers to basic types ,but we make exceptions around
 // marshalling/unmarshalling.
 type UpdateProjectUser struct {
-	Rate *float64 `json:"rate"`
+	Rate    *float64 `json:"rate"`
+	Manager *bool    `json:"manager"`
 }
 
 // =============================================================================
