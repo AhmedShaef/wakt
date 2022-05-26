@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, projectUser ProjectUser) error {
 	const q = `
 	INSERT INTO project_users
-	   (project_user_id, pid, uid, wid, rate, date_created, date_updated)
+	   (project_user_id, pid, uid, wid, manager, rate, date_created, date_updated)
 	VALUES
-	   (:project_user_id, :pid, :uid, :wid, :rate, :date_created, :date_updated)`
+	   (:project_user_id, :pid, :uid, :wid, :manager, :rate, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, projectUser); err != nil {
 		return fmt.Errorf("inserting project user: %w", err)
@@ -67,6 +67,7 @@ func (s Store) Update(ctx context.Context, projectUser ProjectUser) error {
 		project_users
 	SET
 		"rate" = :rate,
+		"manager" = :manager,
 		"date_updated" = :date_updated
 	WHERE
 		"project_user_id" = :project_user_id`
