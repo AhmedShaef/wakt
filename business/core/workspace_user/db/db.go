@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Invite(ctx context.Context, workspaceUser WorkspaceUser) error {
 	const q = `
 	INSERT INTO workspace_users
-		(workspace_id, uid, wid, active, invite_url)
+		(workspace_user_id, uid, wid, admin, active, invite_key, date_created, date_updated)
 	VALUES
-		(:workspace_id, :uid, :wid, :active, :invite_url)`
+		(:workspace_user_id, :uid, :wid, :admin, :active, :invite_key, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, workspaceUser); err != nil {
 		return fmt.Errorf("inserting workspace user: %w", err)
@@ -67,6 +67,8 @@ func (s Store) Update(ctx context.Context, workspaceUser WorkspaceUser) error {
 		workspace_users
 	SET
 		"active" = :active,
+		"admin" = :admin,
+		"date_updated" = :date_updated
 	WHERE
 		workspace_user_id = :workspace_user_id`
 
