@@ -2,16 +2,20 @@ package workspace_user
 
 import (
 	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
+	"time"
 	"unsafe"
 )
 
 // WorkspaceUser represents a workspace user
 type WorkspaceUser struct {
-	Id        string `json:"id"`
-	Uid       string `json:"uid"`
-	Wid       string `json:"wid"`
-	Active    bool   `json:"active"`
-	InviteKey string `json:"invite_key"`
+	Id          string    `json:"id"`
+	Uid         string    `json:"uid"`
+	Wid         string    `json:"wid"`
+	Admin       bool      `json:"admin"`
+	Active      bool      `json:"active"`
+	InviteKey   string    `json:"invite_key"`
+	DateCreated time.Time `db:"date_created"`
+	DateUpdated time.Time `db:"date_updated"`
 }
 
 // InviteUsers contains information to invite users to a workspace.
@@ -27,6 +31,7 @@ type InviteUsers struct {
 // marshalling/unmarshalling.
 type UpdateWorkspaceUser struct {
 	Active *bool `json:"active"`
+	Admin  *bool `json:"admin"`
 }
 
 //==============================================================================
