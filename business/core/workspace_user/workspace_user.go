@@ -12,6 +12,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/smtp"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
+	"github.com/google/go-cmp/cmp"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"time"
@@ -25,46 +26,60 @@ var (
 
 // Core manages the set of APIs for user access.
 type Core struct {
-	store db.Store
+	store     db.Store
+	userStore users.Store
 }
 
 // NewCore constructs a core for user api access.
 func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 	return Core{
-		store: db.NewStore(log, sqlxDB),
+		store:     db.NewStore(log, sqlxDB),
+		userStore: users.NewStore(log, sqlxDB),
 	}
 }
 
 // InviteUser invites a user to a workspace.
-func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers, cfg smtp.Config) ([]WorkspaceUser, error) {
+func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers, cfg smtp.Config, now time.Time) ([]WorkspaceUser, error) {
 	if err := validate.Check(ni); err != nil {
 		return []WorkspaceUser{}, fmt.Errorf("validating data: %w", err)
 	}
 
 	var workspaceUsers []db.WorkspaceUser
 
-	for _, i := range ni.Emails {
-		var userID string
-		usr, err := users.Store{}.QueryByEmail(ctx, i)
-		if err != nil {
-			println(err)
+	// limit the invitation by 10 new user and check
+	//if the input emails is in valid email syntax.
+	var emails []string
+	for i, v := range ni.Emails {
+		if validate.CheckEmail(v) && i < 10 {
+			emails = append(emails, v)
 		}
+	}
 
-		if usr.ID != "" {
-			userID = usr.ID
-		} else {
+	for _, v := range emails {
+		var userID string
+
+		empty := users.User{}
+		usr, _ := c.userStore.QueryByEmail(ctx, v)
+
+		if diff := cmp.Diff(usr, empty); diff != "" {
 			userID = validate.GenerateID()
+		} else {
+			userID = usr.ID
 		}
 
 		dbWorkspaceUser := db.WorkspaceUser{
-			ID:        validate.GenerateID(),
-			Uid:       userID,
-			Wid:       workspaceID,
-			InviteKey: validate.GenerateID(),
+			ID:          validate.GenerateID(),
+			Uid:         userID,
+			Wid:         workspaceID,
+			Admin:       false,
+			Active:      false,
+			InviteKey:   "?invite_key=" + "68hh6542-" + userID + "-9fo5d7l5-" + workspaceID + "-9y6d4y2b5r6o",
+			DateCreated: now,
+			DateUpdated: now,
 		}
 		workspaceUsers = append(workspaceUsers, dbWorkspaceUser)
 
-		if err := smtp.SendEmail(cfg, i, "You have been invited to join WAKT!", ""); err != nil {
+		if err := smtp.SendEmail(cfg, v, "You have been invited to join WAKT!", "www.example.com/signup/"+dbWorkspaceUser.InviteKey); err != nil {
 			return []WorkspaceUser{}, fmt.Errorf("send email: %w", err)
 		}
 		if err := c.store.Invite(ctx, dbWorkspaceUser); err != nil {
@@ -97,6 +112,10 @@ func (c Core) Update(ctx context.Context, workspaceUserID string, uwu UpdateWork
 	if uwu.Active != nil {
 		dbWorkspaceUser.Active = *uwu.Active
 	}
+	if uwu.Admin != nil {
+		dbWorkspaceUser.Admin = *uwu.Admin
+	}
+	//TODO: add time update
 
 	if err := c.store.Update(ctx, dbWorkspaceUser); err != nil {
 		return fmt.Errorf("udpate: %w", err)
