@@ -12,7 +12,6 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/smtp"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
-	"github.com/google/go-cmp/cmp"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"time"
@@ -38,6 +37,31 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 	}
 }
 
+// Create add a user to a workspace.
+func (c Core) Create(ctx context.Context, workspaceID string, userID string, now time.Time) (WorkspaceUser, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return WorkspaceUser{}, ErrInvalidID
+	}
+	if err := validate.CheckID(userID); err != nil {
+		return WorkspaceUser{}, ErrInvalidID
+	}
+	dbWorkspaceUser := db.WorkspaceUser{
+		ID:          validate.GenerateID(),
+		Uid:         userID,
+		Wid:         workspaceID,
+		Admin:       true,
+		Active:      true,
+		DateCreated: now,
+		DateUpdated: now,
+	}
+
+	if err := c.store.Invite(ctx, dbWorkspaceUser); err != nil {
+		return WorkspaceUser{}, fmt.Errorf("invite: %w", err)
+	}
+
+	return toWorkspaceUser(dbWorkspaceUser), nil
+}
+
 // InviteUser invites a user to a workspace.
 func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers, cfg smtp.Config, now time.Time) ([]WorkspaceUser, error) {
 	if err := validate.Check(ni); err != nil {
@@ -58,13 +82,21 @@ func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers
 	for _, v := range emails {
 		var userID string
 
-		empty := users.User{}
-		usr, _ := c.userStore.QueryByEmail(ctx, v)
-
-		if diff := cmp.Diff(usr, empty); diff != "" {
-			userID = validate.GenerateID()
+		usr, err := c.userStore.QueryByEmail(ctx, v)
+		if err != nil {
+			if errors.Is(err, database.ErrDBNotFound) {
+				userID = validate.GenerateID()
+			}
+			return []WorkspaceUser{}, fmt.Errorf("query: %w", err)
 		} else {
 			userID = usr.ID
+			dbUser := users.User{
+				Invitation: append(usr.Invitation, workspaceID),
+			}
+			dbUser.DateUpdated = now
+			if err := c.userStore.Update(ctx, dbUser); err != nil {
+				return []WorkspaceUser{}, fmt.Errorf("udpate: %w", err)
+			}
 		}
 
 		dbWorkspaceUser := db.WorkspaceUser{
@@ -115,7 +147,7 @@ func (c Core) Update(ctx context.Context, workspaceUserID string, uwu UpdateWork
 	if uwu.Admin != nil {
 		dbWorkspaceUser.Admin = *uwu.Admin
 	}
-	//TODO: add time update
+	dbWorkspaceUser.DateUpdated = now
 
 	if err := c.store.Update(ctx, dbWorkspaceUser); err != nil {
 		return fmt.Errorf("udpate: %w", err)
