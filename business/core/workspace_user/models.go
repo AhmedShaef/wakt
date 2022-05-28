@@ -8,19 +8,20 @@ import (
 
 // WorkspaceUser represents a workspace user
 type WorkspaceUser struct {
-	Id          string    `json:"id"`
+	ID          string    `json:"id"`
 	Uid         string    `json:"uid"`
 	Wid         string    `json:"wid"`
 	Admin       bool      `json:"admin"`
 	Active      bool      `json:"active"`
 	InviteKey   string    `json:"invite_key"`
-	DateCreated time.Time `db:"date_created"`
-	DateUpdated time.Time `db:"date_updated"`
+	DateCreated time.Time `json:"date_created"`
+	DateUpdated time.Time `json:"date_updated"`
 }
 
 // InviteUsers contains information to invite users to a workspace.
 type InviteUsers struct {
-	Emails []string `json:"emails" validate:"required"`
+	Emails    []string `json:"emails" validate:"required"`
+	InviterID string   `json:"inviter_id" validate:"required"`
 }
 
 // UpdateWorkspaceUser defines what information may be provided to modify an existing
