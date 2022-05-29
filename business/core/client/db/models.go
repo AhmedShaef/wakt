@@ -11,7 +11,7 @@ type Client struct {
 	Name        string    `db:"name"`
 	Uid         string    `db:"uid"`
 	Wid         string    `db:"wid"`
-	Notes       string    `db:"notes"`
+	Notes       string    `db:"notes" default:""`
 	DateCreated time.Time `db:"date_created"`
 	DateUpdated time.Time `db:"date_updated"`
 }
