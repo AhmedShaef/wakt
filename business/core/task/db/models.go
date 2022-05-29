@@ -11,10 +11,10 @@ type Task struct {
 	Name             string        `db:"name"`
 	Pid              string        `db:"pid"`
 	Wid              string        `db:"wid"`
-	Uid              string        `db:"uid"`
-	EstimatedSeconds time.Duration `db:"estimated_seconds"`
-	Active           bool          `db:"active"`
+	Uid              string        `db:"uid" default:""`
+	EstimatedSeconds time.Duration `db:"estimated_seconds" default:"0"`
+	Active           bool          `db:"active" default:"true"`
 	DateCreated      time.Time     `db:"date_created"`
 	DateUpdated      time.Time     `db:"date_updated"`
-	TrackedSeconds   time.Duration `db:"tracked_seconds"`
+	TrackedSeconds   time.Duration `db:"tracked_seconds" default:""`
 }
