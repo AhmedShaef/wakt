@@ -11,8 +11,8 @@ type ProjectUser struct {
 	Pid         string    `db:"pid"`
 	Uid         string    `db:"uid"`
 	Wid         string    `db:"wid"`
-	Manager     bool      `db:"manager"`
-	Rate        float64   `db:"rate"`
+	Manager     bool      `db:"manager" default:"false"`
+	Rate        float64   `db:"rate" default:""`
 	DateCreated time.Time `db:"date_created"`
 	DateUpdated time.Time `db:"date_updated"`
 }
