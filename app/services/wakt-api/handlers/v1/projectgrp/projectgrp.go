@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/project"
+	"github.com/AhmedShaef/wakt/business/core/project_user"
 	"github.com/AhmedShaef/wakt/business/core/task"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
+	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
@@ -20,10 +22,11 @@ import (
 
 // Handlers manages the set of user endpoints.
 type Handlers struct {
-	Project   project.Core
-	Workspace workspace.Core
-	User      user.Core
-	Task      task.Core
+	Project     project.Core
+	ProjectUser project_user.Core
+	Workspace   workspace.Core
+	User        user.Core
+	Task        task.Core
 }
 
 // Create adds a new user to the system.
@@ -68,6 +71,37 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("user[%+v]: %w", &prj, err)
+		}
+	}
+	npu := project_user.NewProjectUser{
+		Pid: prj.ID,
+		Uid: workspaces.Uid,
+		Wid: prj.Wid,
+	}
+	projectUser, err := h.ProjectUser.Create(ctx, npu, v.Now)
+	if err != nil {
+		switch {
+		case errors.Is(err, project_user.ErrInvalidID):
+			return v1Web.NewRequestError(err, http.StatusBadRequest)
+		case errors.Is(err, project_user.ErrNotFound):
+			return v1Web.NewRequestError(err, http.StatusNotFound)
+		default:
+			return fmt.Errorf("project_user[%+v]: %w", &projectUser, err)
+		}
+	}
+
+	upu := project_user.UpdateProjectUser{
+		Manager: dbtest.BoolPointer(true),
+	}
+
+	if err := h.ProjectUser.Update(ctx, projectUser[0].ID, upu, v.Now); err != nil {
+		switch {
+		case errors.Is(err, project_user.ErrInvalidID):
+			return v1Web.NewRequestError(err, http.StatusBadRequest)
+		case errors.Is(err, project_user.ErrNotFound):
+			return v1Web.NewRequestError(err, http.StatusNotFound)
+		default:
+			return fmt.Errorf("ID[%s] ProjectUser[%+v]: %w", projectUser[0].ID, &upu, err)
 		}
 	}
 
@@ -134,56 +168,6 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return web.Respond(ctx, w, nil, http.StatusNoContent)
 }
 
-// DeleteByID removes a user from the system.
-func (h Handlers) DeleteByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	claims, err := auth.GetClaims(ctx)
-	if err != nil {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	projectID := web.Param(r, "id")
-
-	projects, err := h.Project.QueryByID(ctx, projectID)
-	if err != nil {
-		switch {
-		case errors.Is(err, project.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, project.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", projectID, err)
-		}
-	}
-
-	workspaces, err := h.Workspace.QueryByID(ctx, projects.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", workspaces.ID, err)
-		}
-	}
-
-	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	if err := h.Project.Delete(ctx, projectID); err != nil {
-		switch {
-		case errors.Is(err, user.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		default:
-			return fmt.Errorf("ID[%s]: %w", projectID, err)
-		}
-	}
-
-	return web.Respond(ctx, w, nil, http.StatusNoContent)
-}
-
 // QueryByID returns a user by its ID.
 func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
@@ -237,8 +221,8 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	return web.Respond(ctx, w, prj, http.StatusOK)
 }
 
-// Delete removes a user from the system.
-func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// BulkDelete removes a user from the system.
+func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
