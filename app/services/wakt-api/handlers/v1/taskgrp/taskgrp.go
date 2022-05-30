@@ -95,19 +95,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	tsk, err := h.Task.QueryByID(ctx, taskID)
-	if err != nil {
-		switch {
-		case errors.Is(err, task.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, task.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("ID[%s]: %w", taskID, err)
-		}
-	}
-
-	return web.Respond(ctx, w, tsk, http.StatusOK)
+	return web.Respond(ctx, w, tasks, http.StatusOK)
 }
 
 // BulkUpdate updates a task in the system.
