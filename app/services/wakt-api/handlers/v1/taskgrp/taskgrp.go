@@ -69,94 +69,6 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return web.Respond(ctx, w, tsk, http.StatusCreated)
 }
 
-// UpdateByID updates a task in the system.
-func (h Handlers) UpdateByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	v, err := web.GetValues(ctx)
-	if err != nil {
-		return web.NewShutdownError("web value missing from context")
-	}
-
-	claims, err := auth.GetClaims(ctx)
-	if err != nil {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	var ut task.UpdateTask
-	if err := web.Decode(r, &ut); err != nil {
-		return fmt.Errorf("unable to decode payload: %w", err)
-	}
-
-	taskID := web.Param(r, "id")
-
-	tasks, err := h.Task.QueryByID(ctx, taskID)
-	if err != nil {
-		switch {
-		case errors.Is(err, task.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, task.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", taskID, err)
-		}
-	}
-
-	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != tasks.Uid {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	if err := h.Task.Update(ctx, taskID, ut, v.Now); err != nil {
-		switch {
-		case errors.Is(err, task.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, task.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("ID[%s] task[%+v]: %w", taskID, &ut, err)
-		}
-	}
-
-	return web.Respond(ctx, w, nil, http.StatusNoContent)
-}
-
-// DeleteByID removes a task from the system.
-func (h Handlers) DeleteByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	claims, err := auth.GetClaims(ctx)
-	if err != nil {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	taskID := web.Param(r, "id")
-
-	tasks, err := h.Task.QueryByID(ctx, taskID)
-	if err != nil {
-		switch {
-		case errors.Is(err, task.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, task.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", taskID, err)
-		}
-	}
-
-	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != tasks.Uid {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	if err := h.Task.Delete(ctx, taskID); err != nil {
-		switch {
-		case errors.Is(err, task.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		default:
-			return fmt.Errorf("ID[%s]: %w", taskID, err)
-		}
-	}
-
-	return web.Respond(ctx, w, nil, http.StatusNoContent)
-}
-
 // QueryByID returns a task by its ID.
 func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
@@ -198,8 +110,8 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	return web.Respond(ctx, w, tsk, http.StatusOK)
 }
 
-// Update updates a task in the system.
-func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// BulkUpdate updates a task in the system.
+func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	v, err := web.GetValues(ctx)
 	if err != nil {
 		return web.NewShutdownError("web value missing from context")
@@ -251,8 +163,8 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return web.Respond(ctx, w, nil, http.StatusNoContent)
 }
 
-// Delete removes a task from the system.
-func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// BulkDelete removes a task from the system.
+func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
