@@ -211,19 +211,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	clint, err := h.Client.QueryByID(ctx, clientID)
-	if err != nil {
-		switch {
-		case errors.Is(err, client.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, client.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("ID[%s]: %w", clientID, err)
-		}
-	}
-
-	return web.Respond(ctx, w, clint, http.StatusOK)
+	return web.Respond(ctx, w, clients, http.StatusOK)
 }
 
 // QueryClientProjects returns a list of workspaces with paging.
