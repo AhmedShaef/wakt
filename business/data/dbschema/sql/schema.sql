@@ -1,35 +1,53 @@
--- Version: 1.1
--- Description: Create table workspace
-CREATE TABLE workspaces (
+-- Version: 1.0
+-- Description: Create table users
+CREATE TABLE users (
+    user_id                   uuid   constraint users_pk primary key,
+    default_wid               uuid,
+    email                     text UNIQUE,
+    password_hash             text,
+    full_name                 text,
+    time_of_day_format        text,
+    date_format               text,
+    beginning_of_week         integer,
+    language                  text,
+    image_url                 text,
+    date_created              timestamp,
+    date_updated              timestamp,
+    timezone                  text,
+    invitation                text[],
+    duration_format           text
+);
+-- Description: Create table workspaces
+CREATE TABLE workspaces(
     workspace_id                   uuid constraint workspaces_pk primary key,
     name                           text,
-    profile                        integer          default 0,
-    premium                        boolean          default false,
-    admin                          boolean          default true,
-    default_hourly_rate            double precision default 0,
-    default_currency               text             default 'USD',
-    only_admin_may_create_projects boolean          default false,
-    only_admin_see_billable_rates  boolean          default false,
-    only_admin_see_team_dashboard  boolean          default false,
-    project_billable_by_default    boolean          default true,
+    uid                            uuid,
+    constraint workspaces_uid_fk foreign key (uid) references users (user_id),
+    default_hourly_rate            double precision,
+    default_currency               text,
+    only_admin_may_create_projects boolean,
+    only_admin_see_billable_rates  boolean,
+    only_admin_see_team_dashboard  boolean ,
     rounding                       integer,
     rounding_minutes               integer,
+    date_created                   timestamp,
     date_updated                   timestamp,
-    logo_url                       text,
-    ical_url                       text,
-    ical_enabled                   boolean          default true
+    logo_url                       text
 );
 
--- Description: Create table client
+-- Description: Create table clients
 CREATE TABLE clients(
     client_id uuid constraint client_pk primary key,
     name      text,
+    uid       uuid,
+    constraint  client_uid_fk foreign key (uid) references users(user_id),
     wid       uuid,
     constraint client_wid_fk foreign key (wid) references workspaces(workspace_id),
     notes     text,
+    date_created timestamp,
     date_updated timestamp
 );
--- Description: Create table project
+-- Description: Create table projects
 CREATE TABLE projects(
      project_id uuid constraint project_pk primary key,
      name       text,
@@ -37,51 +55,17 @@ CREATE TABLE projects(
      constraint project_wid_fk foreign key (wid) references workspaces(workspace_id),
      cid        uuid,
      constraint project_cid_fk foreign key (cid) references clients(client_id),
-     active     boolean default true,
-     is_private boolean default true,
-     template   boolean default false,
-     template_id uuid,
-     billable   boolean default true,
-     auto_estimates boolean default false,
+     active     boolean,
+     is_private boolean,
+     billable   boolean,
+     auto_estimates boolean,
      estimated_hours double precision,
+     date_created timestamp,
      date_updated timestamp,
-     color text,
-     rate double precision default 0,
-     date_created timestamp
+     rate double precision,
+     hex_color text
 );
-
--- Description: Create table user
-CREATE TABLE users (
-   user_id                   uuid   constraint users_pk primary key,
-   api_token                 text,
-   default_wid               uuid,
-   email                     text,
-   password_hash             text,
-   roles    text[],
-   full_name                 text,
-   jquery_time_of_day_format text,
-   jquery_date_format        text,
-   time_of_day_format        text,
-   date_format               text,
-   store_start_and_stop_time boolean default false,
-   begining_of_week          integer default 1,
-   language                  text    default 'en_US',
-   image_url                 text,
-   sidebar_piechart          boolean default false,
-   date_created              timestamp,
-   date_updated              timestamp,
-   record_timeline           boolean default false,
-   should_upgrade            boolean default false,
-   send_product_emails       boolean default true,
-   send_weekly_report        boolean default true,
-   send_timer_notification   boolean default true,
-   openid_enabled            boolean default false,
-   timezone                  text,
-   invitation                text[],
-   duration_format           text
-);
-
--- Description: Create table task
+-- Description: Create table tasks
 CREATE TABLE tasks(
   task_id uuid constraint task_pk primary key,
   name    text,
@@ -91,43 +75,45 @@ CREATE TABLE tasks(
   constraint task_wid_fk foreign key (wid) references workspaces(workspace_id),
   uid    uuid,
   constraint task_uid_fk foreign key (uid) references users(user_id),
-  estimated_seconds integer default 0,
-  active  boolean default true,
+  estimated_seconds integer,--TODO: add it
+  active  boolean,
+  date_created timestamp,
   date_updated timestamp,
-  tracked_seconds integer default 0
+  tracked_seconds integer--TODO: add it
 );
 
--- Description: Create table user
+-- Description: Create table time_entries
 CREATE TABLE time_entries(
-     time_entrie_id uuid constraint time_entries_pk primary key,
-     description     text       default '',
-     uid             uuid,
-     constraint time_entries_user_id_fk foreign key (uid) references users (user_id),
-     wid             uuid,
-     constraint time_entries_wid_fk foreign key (wid) references workspaces(workspace_id),
-     pid             uuid,
-     constraint time_entries_pid_fk foreign key (pid) references projects(project_id),
-     tid             uuid,
-     constraint time_entries_tid_fk foreign key (tid) references tasks(task_id),
-     billable        boolean    default false,
-     start           timestamp,
-     stop            timestamp,
-     duration        integer    default -1,
-     created_with    text,
-     tags            text[],
-     dur_only        boolean    default true,
-     date_created    timestamp,
-     date_updated    timestamp
+     time_entry_id UUID constraint time_entry_pk primary key,
+     description     TEXT,
+     uid             UUID,
+     constraint time_entry_user_id_fk foreign key (uid) references users (user_id),
+     wid             UUID,
+     constraint time_entry_wid_fk foreign key (wid) references workspaces(workspace_id),
+     pid             UUID,
+     constraint time_entry_pid_fk foreign key (pid) references projects(project_id),
+     tid             UUID,
+     constraint time_entry_tid_fk foreign key (tid) references tasks(task_id),
+     billable        BOOLEAN,
+     start           TIMESTAMP,
+     stop            TIMESTAMP,
+     duration        INTEGER,
+     created_with    TEXT,
+     tags            TEXT[],
+     dur_only        BOOLEAN,
+     date_created    TIMESTAMP,
+     date_updated    TIMESTAMP
 );
 
 
 
--- Description: Create table group
+-- Description: Create table groups
 CREATE TABLE groups(
     group_id uuid constraint group_pk primary key,
     name     text,
     wid      uuid,
     constraint group_wid_fk foreign key (wid) references workspaces(workspace_id),
+    date_created timestamp,
     date_updated timestamp
 );
 
@@ -136,10 +122,12 @@ CREATE TABLE tags(
      tag_id uuid constraint tags_pk primary key,
      name   text,
      wid    uuid,
-     constraint tags_wid_fk foreign key (wid) references workspaces(workspace_id)
+     constraint tags_wid_fk foreign key (wid) references workspaces(workspace_id),
+     date_created   timestamp,
+     date_updated   timestamp
 );
 
--- Description: Create table project_user
+-- Description: Create table project_users
 CREATE TABLE project_users(
     project_user_id uuid constraint project_user_pk primary key,
     pid      uuid,
@@ -148,18 +136,22 @@ CREATE TABLE project_users(
     constraint project_user_uid_fk foreign key (uid) references users(user_id),
     wid         uuid,
     constraint project_user_wid_fk foreign key (wid) references workspaces(workspace_id),
-    manager     boolean default false,
-    rate    double precision default 0,
+    manager boolean,
+    rate    double precision default 0,--TODO: link to currency - is it needed?
+    date_created    timestamp,
     date_updated    timestamp
 );
 
--- Description: Create table workspace_user
+-- Description: Create table workspace_users
 CREATE TABLE workspace_users(
     workspace_user_id uuid constraint workspace_user_pk primary key,
     uid         uuid,
     constraint workspace_user_uid_fk foreign key (uid) references users(user_id),
-    admin       boolean default false,
-    active      boolean default true,
-    email    text[],
-    invite_url  text
+    wid         uuid,
+    constraint workspace_user_wid_fk foreign key (wid) references workspaces(workspace_id),
+    admin   boolean,
+    active      boolean,
+    invite_url  text,
+    date_created    timestamp,
+    date_updated    timestamp
 );
