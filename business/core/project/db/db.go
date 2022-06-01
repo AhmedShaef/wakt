@@ -283,7 +283,7 @@ func (s Store) QueryWorkspaceProjects(ctx context.Context, workspaceID string, p
 	FROM
 		projects
 	WHERE
-		wid = :workspace_id
+		wid = :workspace_id and is_private = false
 	ORDER BY
 		project_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
