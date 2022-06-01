@@ -24,6 +24,7 @@ type NewProjectUser struct {
 	Uid  string  `json:"uid" validate:"required"`
 	Wid  string  `json:"wid" validate:"required"`
 	Rate float64 `json:"rate"`
+	Puis string  `json:"puis"`
 }
 
 // UpdateProjectUser defines what information may be provided to modify an existing
