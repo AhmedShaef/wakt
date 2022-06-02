@@ -44,16 +44,8 @@ func (c Core) Create(ctx context.Context, nt NewTag, now time.Time) (Tag, error)
 		DateUpdated: now,
 	}
 
-	// This provides an example of how to execute a transaction if required.
-	tran := func(tx sqlx.ExtContext) error {
-		if err := c.store.Tran(tx).Create(ctx, dbtg); err != nil {
-			return fmt.Errorf("create: %w", err)
-		}
-		return nil
-	}
-
-	if err := c.store.WithinTran(ctx, tran); err != nil {
-		return Tag{}, fmt.Errorf("tran: %w", err)
+	if err := c.store.Create(ctx, dbtg); err != nil {
+		return Tag{}, fmt.Errorf("create: %w", err)
 	}
 
 	return toTag(dbtg), nil
