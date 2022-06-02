@@ -47,11 +47,14 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 	for _, uid := range uids {
 
 		dbprojectuser := db.ProjectUser{
+			Rate: 0,
+		}
+		dbprojectuser = db.ProjectUser{
 			ID:          validate.GenerateID(),
 			Pid:         npu.Pid,
 			Uid:         uid,
 			Wid:         npu.Wid,
-			Manager:     true,
+			Manager:     false,
 			Rate:        npu.Rate,
 			DateCreated: now,
 			DateUpdated: now,
