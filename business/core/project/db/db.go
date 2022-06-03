@@ -4,11 +4,9 @@ package db
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
-	"time"
-
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 // Store manages the set of APIs for user access.
@@ -50,9 +48,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, project Project) error {
 	const q = `
 	INSERT INTO projects
-		(project_id, name, wid, cid, active, is_private, billable, auto_estimates, estimated_hours, date_updated, rate, date_created, hex_color)
+		(project_id, name, wid, cid, uid, active, is_private, billable, auto_estimates, estimated_hours, date_updated, rate, date_created, hex_color)
 	VALUES
-		(:project_id, :name, :wid, :cid, :active, :is_private, :billable, :auto_estimates, :estimated_hours, :date_updated, :rate, :date_created, :hex_color)`
+		(:project_id, :name, :wid, :cid, :uid, :active, :is_private, :billable, :auto_estimates, :estimated_hours, :date_updated, :rate, :date_created, :hex_color)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, project); err != nil {
 		return fmt.Errorf("inserting project: %w", err)
@@ -186,30 +184,6 @@ func (s Store) QueryUnique(ctx context.Context, name, column, id string) string 
 	return nam
 }
 
-// QueryTrackedTime gets the specified project from the database.
-func (s Store) QueryTrackedTime(ctx context.Context, projectID string) (time.Duration, error) {
-	data := struct {
-		ProjectID string `db:"project_id"`
-	}{
-		ProjectID: projectID,
-	}
-
-	const q = `
-	SELECT
-		SUM(tracked_seconds) AS tracked_seconds
-	FROM
-		tasks
-	WHERE 
-		pid = :project_id`
-
-	var trackedSeconds time.Duration
-	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &trackedSeconds); err != nil {
-		return 0, fmt.Errorf("selecting projectID[%q]: %w", projectID, err)
-	}
-
-	return trackedSeconds, nil
-}
-
 // QueryBulkIDs gets all Tasks from the database.
 func (s Store) QueryBulkIDs(ctx context.Context, projectID []string) ([]Project, error) {
 	data := struct {
@@ -291,6 +265,37 @@ func (s Store) QueryWorkspaceProjects(ctx context.Context, workspaceID string, p
 	var projcts []Project
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &projcts); err != nil {
 		return nil, fmt.Errorf("selecting project: %w", err)
+	}
+
+	return projcts, nil
+}
+
+// QueryUserProjects retrieves a list of existing projects from the database.
+func (s Store) QueryUserProjects(ctx context.Context, userID string, pageNumber, rowsPerPage int) ([]Project, error) {
+	data := struct {
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
+		UserID      string `db:"user_id"`
+	}{
+		Offset:      (pageNumber - 1) * rowsPerPage,
+		RowsPerPage: rowsPerPage,
+		UserID:      userID,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		projects
+	WHERE 
+		uid = :user_id
+	ORDER BY
+		project_id
+	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
+
+	var projcts []Project
+	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &projcts); err != nil {
+		return nil, fmt.Errorf("selecting projects: %w", err)
 	}
 
 	return projcts, nil
