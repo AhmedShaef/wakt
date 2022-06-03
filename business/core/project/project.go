@@ -35,7 +35,7 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 }
 
 // Create inserts a new project into the database.
-func (c Core) Create(ctx context.Context, np NewProject, now time.Time) (Project, error) {
+func (c Core) Create(ctx context.Context, userID string, np NewProject, now time.Time) (Project, error) {
 	if err := validate.Check(np); err != nil {
 		return Project{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -50,19 +50,30 @@ func (c Core) Create(ctx context.Context, np NewProject, now time.Time) (Project
 		return Project{}, fmt.Errorf("project name is not unique for client")
 	}
 
+	// Set defaults
 	dbprojct := db.Project{
+		IsPrivate:      true,
+		Billable:       true,
+		AutoEstimates:  false,
+		EstimatedHours: 0,
+		Rate:           0.0,
+		HexColor:       "#ffffff",
+	}
+	// Set values from NewProject
+	dbprojct = db.Project{
 		ID:             validate.GenerateID(),
 		Name:           np.Name,
 		Wid:            np.Wid,
 		Cid:            np.Cid,
-		Active:         np.Active,
+		Uid:            userID,
+		Active:         false,
 		IsPrivate:      np.IsPrivate,
 		Billable:       np.Billable,
 		AutoEstimates:  np.AutoEstimates,
 		EstimatedHours: np.EstimatedHours,
+		DateCreated:    now,
 		DateUpdated:    now,
 		Rate:           np.Rate,
-		DateCreated:    now,
 		HexColor:       np.HexColor,
 	}
 
@@ -103,13 +114,7 @@ func (c Core) Update(ctx context.Context, projectID string, up UpdateProject, no
 	if up.AutoEstimates != nil {
 		dbprojct.AutoEstimates = *up.AutoEstimates
 	}
-	if dbprojct.AutoEstimates {
-		sumActive, err := c.store.QueryTrackedTime(ctx, dbprojct.ID)
-		if err != nil {
-			return fmt.Errorf("updating project projectID[%s]: %w", projectID, err)
-		}
-		dbprojct.EstimatedHours = sumActive
-	} else {
+	if !dbprojct.AutoEstimates {
 		if up.EstimatedHours != nil {
 			dbprojct.EstimatedHours = *up.EstimatedHours
 		}
@@ -179,4 +184,17 @@ func (c Core) QueryWorkspaceProjects(ctx context.Context, workspaceID string, pa
 		return nil, fmt.Errorf("query: %w", err)
 	}
 	return toProjectsSlice(dbProjects), nil
+}
+
+// QueryUserProjects retrieves a list of existing projects from the database.
+func (c Core) QueryUserProjects(ctx context.Context, userID string, pageNumber, rowsPerPage int) ([]Project, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return []Project{}, ErrInvalidID
+	}
+	dbprojects, err := c.store.QueryUserProjects(ctx, userID, pageNumber, rowsPerPage)
+	if err != nil {
+		return nil, fmt.Errorf("query: %w", err)
+	}
+
+	return toProjectsSlice(dbprojects), nil
 }
