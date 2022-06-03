@@ -12,14 +12,15 @@ type Project struct {
 	Name           string        `json:"name"`
 	Wid            string        `json:"wid"`
 	Cid            string        `json:"cid"`
+	Uid            string        `json:"uid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
 	Billable       bool          `json:"billable"`
 	AutoEstimates  bool          `json:"auto_estimates"`
 	EstimatedHours time.Duration `json:"estimated_hours"`
+	DateCreated    time.Time     `json:"date_created"`
 	DateUpdated    time.Time     `json:"date_updated"`
 	Rate           float32       `json:"rate"`
-	DateCreated    time.Time     `json:"date_created"`
 	HexColor       string        `json:"hex_color"`
 }
 
