@@ -38,7 +38,7 @@ func TestProject(t *testing.T) {
 		t.Logf("\tTest %d:\tWhen handling a single project.", testID)
 		{
 			ctx := context.Background()
-			now := time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)
+			now := time.Now()
 
 			nc := NewProject{
 				Name: "Ahmed Shaef",
@@ -46,7 +46,7 @@ func TestProject(t *testing.T) {
 				Cid:  "c78db68e-e004-44f5-895b-ba562dc53d9d",
 			}
 
-			project, err := core.Create(ctx, nc, now)
+			project, err := core.Create(ctx, "5cf37266-3473-4006-984f-9325122678b7", nc, now)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to create project : %s.", dbtest.Failed, testID, err)
 			}
@@ -59,7 +59,7 @@ func TestProject(t *testing.T) {
 			t.Logf("\t%s\tTest %d:\tShould be able to retrieve project by ID.", dbtest.Success, testID)
 
 			if diff := cmp.Diff(project, saved); diff != "" {
-				t.Fatalf("\t%s\tTest %d:\tShould get back the same Project. Diff:\n%s", dbtest.Failed, testID, diff)
+				t.Errorf("\t%s\tTest %d:\tShould get back the same Project. Diff:\n%s", dbtest.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same project.", dbtest.Success, testID)
 
@@ -140,6 +140,38 @@ func TestPagingProject(t *testing.T) {
 				t.Fatalf("\t%s\tTest %d:\tShould have different projects : %s.", dbtest.Failed, testID, err)
 			}
 			t.Logf("\t%s\tTest %d:\tShould have different projects.", dbtest.Success, testID)
+
+			//=====================================================================================
+
+			projects3, err := core.QueryUserProjects(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
+			if err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve projects for page 1 : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve projects for page 1.", dbtest.Success, testID)
+
+			if len(projects3) != 1 {
+				t.Fatalf("\t%s\tTest %d:\tShould have a single project : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have a single project.", dbtest.Success, testID)
+
+			projects4, err := core.QueryUserProjects(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
+			if err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve projects for page 2 : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve projects for page 2.", dbtest.Success, testID)
+
+			if len(projects4) != 1 {
+				t.Fatalf("\t%s\tTest %d:\tShould have a single project : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have a single project.", dbtest.Success, testID)
+
+			if projects3[0].ID == projects4[0].ID {
+				t.Logf("\t\tTest %d:\tproject1: %v", testID, projects3[0].ID)
+				t.Logf("\t\tTest %d:\tproject2: %v", testID, projects4[0].ID)
+				t.Fatalf("\t%s\tTest %d:\tShould have different projects : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have different projects.", dbtest.Success, testID)
+
 		}
 	}
 }
