@@ -1,15 +1,9 @@
-# github.com/andybalholm/brotli v1.0.4
-## explicit; go 1.12
-github.com/andybalholm/brotli
 # github.com/ardanlabs/conf/v3 v3.1.2
 ## explicit; go 1.13
 github.com/ardanlabs/conf/v3
 # github.com/ardanlabs/darwin v1.3.0
 ## explicit; go 1.16
 github.com/ardanlabs/darwin
-# github.com/creasty/defaults v1.6.0
-## explicit; go 1.14
-github.com/creasty/defaults
 # github.com/dimfeld/httptreemux/v5 v5.4.0
 ## explicit; go 1.9
 github.com/dimfeld/httptreemux/v5
@@ -37,18 +31,6 @@ github.com/go-playground/validator/v10
 github.com/go-playground/validator/v10/translations/en
 # github.com/go-test/deep v1.0.8
 ## explicit; go 1.16
-# github.com/gofiber/fiber/v2 v2.34.0
-## explicit; go 1.16
-github.com/gofiber/fiber/v2
-github.com/gofiber/fiber/v2/internal/bytebufferpool
-github.com/gofiber/fiber/v2/internal/colorable
-github.com/gofiber/fiber/v2/internal/dictpool
-github.com/gofiber/fiber/v2/internal/fwd
-github.com/gofiber/fiber/v2/internal/isatty
-github.com/gofiber/fiber/v2/internal/msgp
-github.com/gofiber/fiber/v2/internal/schema
-github.com/gofiber/fiber/v2/internal/uuid
-github.com/gofiber/fiber/v2/utils
 # github.com/golang-jwt/jwt/v4 v4.4.0
 ## explicit; go 1.15
 github.com/golang-jwt/jwt/v4
@@ -67,11 +49,6 @@ github.com/google/uuid
 ## explicit; go 1.10
 github.com/jmoiron/sqlx
 github.com/jmoiron/sqlx/reflectx
-# github.com/klauspost/compress v1.15.5
-## explicit; go 1.16
-github.com/klauspost/compress/flate
-github.com/klauspost/compress/gzip
-github.com/klauspost/compress/zlib
 # github.com/leodido/go-urn v1.2.1
 ## explicit; go 1.13
 github.com/leodido/go-urn
@@ -88,18 +65,6 @@ github.com/openzipkin/zipkin-go/model
 # github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208
 ## explicit
 github.com/toorop/go-dkim
-# github.com/valyala/bytebufferpool v1.0.0
-## explicit
-github.com/valyala/bytebufferpool
-# github.com/valyala/fasthttp v1.37.0
-## explicit; go 1.15
-github.com/valyala/fasthttp
-github.com/valyala/fasthttp/fasthttputil
-github.com/valyala/fasthttp/reuseport
-github.com/valyala/fasthttp/stackless
-# github.com/valyala/tcplisten v1.0.0
-## explicit; go 1.12
-github.com/valyala/tcplisten
 # github.com/xhit/go-simple-mail/v2 v2.11.0
 ## explicit; go 1.13
 github.com/xhit/go-simple-mail/v2
