@@ -2,9 +2,8 @@ package mid
 
 import (
 	"context"
-	"net/http"
-
 	"github.com/AhmedShaef/wakt/foundation/web"
+	"net/http"
 )
 
 // Cors sets the response headers needed for Cross-Origin Resource Sharing
