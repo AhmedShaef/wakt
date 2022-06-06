@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wakt-pod
+  namespace: wakt-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wakt
+  template:
+    metadata:
+      labels:
+        app: wakt
+    spec:
+      containers:
+      # wakt-api container configuration
+      - name: wakt-api
+        resources:
+          limits:
+            cpu: "2000m" # Up to 2 full cores
+          requests:
+            cpu: "1000m" # Use 1 full cores
+      # metrics container configuration
+      - name: metrics
+        resources:
+          limits:
+            cpu: "500m" # Up to 1/2 full core
+          requests:
+            cpu: "250m" # Use 1/4 full core
