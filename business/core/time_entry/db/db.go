@@ -4,6 +4,8 @@ package db
 import (
 	"context"
 	"fmt"
+	dbp "github.com/AhmedShaef/wakt/business/core/project/db"
+	"github.com/AhmedShaef/wakt/business/core/task/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -50,7 +52,7 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, te TimeEntry) error {
 	const q = `
 	INSERT INTO time_entries
-		(time_entry_id, description, uid, wid, pid, tid, billable, start, stop, duration,tags, created_with, dur_only, date_created, date_updated)
+		(time_entry_id, description, uid, wid, pid, tid, billable, start, stop, duration, tags, created_with, dur_only, date_created, date_updated)
 	VALUES
 		(:time_entry_id, :description, :uid, :wid, :pid, :tid, :billable, :start, :stop, :duration, :tags, :created_with, :dur_only, :date_created, :date_updated)`
 
@@ -253,4 +255,92 @@ func (s Store) QueryActivity(ctx context.Context, userID string) ([]TimeEntry, e
 	}
 
 	return tims, nil
+}
+
+// QueryProjectTime sync specified project time from the database.
+func (s Store) QueryProjectTime(ctx context.Context, projectID string) (TimeEntry, error) {
+	data := struct {
+		ProjectID string `db:"project_id"`
+	}{
+		ProjectID: projectID,
+	}
+
+	const q = `
+	SELECT
+		SUM(duration) AS duration
+	FROM
+		time_entries
+	WHERE 
+		pid = :project_id`
+
+	var ps TimeEntry
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &ps); err != nil {
+		return TimeEntry{}, fmt.Errorf("selecting tracked time projectID[%q]: %w", projectID, err)
+	}
+
+	return ps, nil
+}
+
+// UpdateProjectTime modifies data about a TimeEntry. It will error if the specified ID is
+// invalid or does not reference an existing TimeEntry.
+func (s Store) UpdateProjectTime(ctx context.Context, data dbp.Project) error {
+
+	const q2 = `
+	UPDATE
+		projects
+	SET
+		"estimated_hours"= :estimated_hours,
+		"date_updated" = :date_updated
+	WHERE
+		"project_id" = :project_id AND "auto_estimates" = true`
+
+	if err := database.NamedExecContext(ctx, s.log, s.db, q2, data); err != nil {
+		return fmt.Errorf("updating tracked_second projectID[%s]: %w", data.ID, err)
+	}
+
+	return nil
+}
+
+// QueryTaskTime sync the specified task time from the database.
+func (s Store) QueryTaskTime(ctx context.Context, taskID string) (TimeEntry, error) {
+	data := struct {
+		TaskID string `db:"task_id"`
+	}{
+		TaskID: taskID,
+	}
+
+	const q = `
+	SELECT
+		SUM(duration) AS duration
+	FROM
+		time_entries
+	WHERE 
+		tid = :task_id`
+
+	var ts TimeEntry
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &ts); err != nil {
+		return TimeEntry{}, fmt.Errorf("selecting tracked time taskID[%q]: %w", taskID, err)
+	}
+
+	return ts, nil
+}
+
+// UpdateTaskTime modifies data about a TimeEntry. It will error if the specified ID is
+// invalid or does not reference an existing TimeEntry.
+func (s Store) UpdateTaskTime(ctx context.Context, data db.Task) error {
+
+	const q2 = `
+	UPDATE
+		tasks
+	SET
+		"tracked_seconds"= :tracked_seconds,
+		"date_updated"=:date_updated
+	WHERE
+		"task_id"= :task_id`
+
+	if err := database.NamedExecContext(ctx, s.log, s.db, q2, data); err != nil {
+		return fmt.Errorf("updating tracked_second taskID[%s]: %w", data.ID, err)
+	}
+
+	return nil
 }
