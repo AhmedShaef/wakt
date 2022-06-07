@@ -9,10 +9,8 @@ import (
 
 // These are the expected values for Claims.Roles.
 const (
-	RoleAdmin = "ADMIN"
 	RoleUser  = "USER"
-	RolePro   = "PRO"
-	RoleFree  = "FREE"
+	RoleAdmin = "ADMIN"
 )
 
 // Claims represents the authorization claims transmitted via a JWT.
