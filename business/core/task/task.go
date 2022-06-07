@@ -46,6 +46,12 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 	}
 
 	dbtask := db.Task{
+		Uid:              "00000000-0000-0000-0000-000000000000",
+		EstimatedSeconds: 0,
+		Active:           true,
+		TrackedSeconds:   0,
+	}
+	dbtask = db.Task{
 		ID:               validate.GenerateID(),
 		Name:             nt.Name,
 		Pid:              nt.Pid,
