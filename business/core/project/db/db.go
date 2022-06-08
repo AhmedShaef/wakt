@@ -226,7 +226,7 @@ func (s Store) QueryClientProjects(ctx context.Context, clientID string, pageNum
 	FROM
 		projects
 	WHERE 
-		client_id = :client_id
+		cid = :client_id
 	ORDER BY
 		name
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
