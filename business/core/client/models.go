@@ -20,7 +20,7 @@ type Client struct {
 // NewClient contains information needed to create a new client.
 type NewClient struct {
 	Name  string `json:"name" validate:"required"`
-	Wid   string `json:"wid" validate:"required"`
+	Wid   string `json:"wid"`
 	Notes string `json:"notes"`
 }
 
