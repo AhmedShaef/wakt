@@ -27,7 +27,7 @@ type Project struct {
 // NewProject contains information needed to create a new project.
 type NewProject struct {
 	Name           string        `json:"name" validate:"required"`
-	Wid            string        `json:"wid" validate:"required"`
+	Wid            string        `json:"wid"`
 	Cid            string        `json:"cid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
