@@ -50,17 +50,8 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		return Project{}, fmt.Errorf("project name is not unique for client")
 	}
 
-	// Set defaults
-	dbprojct := db.Project{
-		IsPrivate:      true,
-		Billable:       true,
-		AutoEstimates:  false,
-		EstimatedHours: 0,
-		Rate:           0.0,
-		HexColor:       "#ffffff",
-	}
 	// Set values from NewProject
-	dbprojct = db.Project{
+	dbprojct := db.Project{
 		ID:             validate.GenerateID(),
 		Name:           np.Name,
 		Wid:            np.Wid,
@@ -75,6 +66,10 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		DateUpdated:    now,
 		Rate:           np.Rate,
 		HexColor:       np.HexColor,
+	}
+
+	if dbprojct.Cid == "" {
+		dbprojct.Cid = "00000000-0000-0000-0000-000000000000"
 	}
 
 	if err := c.store.Create(ctx, dbprojct); err != nil {
