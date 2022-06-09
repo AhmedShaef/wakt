@@ -41,7 +41,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 
 	nameInWorkspace := c.store.QueryUnique(ctx, nc.Name, "wid", nc.Wid)
 	if nameInWorkspace != "" {
-		return Client{}, fmt.Errorf("project name is not unique for workspace")
+		return Client{}, fmt.Errorf("client name is not unique for workspace")
 	}
 
 	dbclint := db.Client{
