@@ -22,7 +22,7 @@ type ProjectUser struct {
 type NewProjectUser struct {
 	Pid  string  `json:"pid" validate:"required"`
 	Uid  string  `json:"uid" validate:"required"`
-	Wid  string  `json:"wid" validate:"required"`
+	Wid  string  `json:"wid"`
 	Rate float64 `json:"rate"`
 	Puis string  `json:"puis"`
 }
