@@ -18,7 +18,7 @@ type Tag struct {
 // NewTag contains information needed to create a new tag.
 type NewTag struct {
 	Name string `json:"name" validate:"required"`
-	Wid  string `json:"wid" validate:"required"`
+	Wid  string `json:"wid"`
 }
 
 // UpdateTag defines what information may be provided to modify an existing
