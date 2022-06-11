@@ -109,7 +109,7 @@ func TestClient(t *testing.T) {
 				Description: dbtest.StringPointer("just Updated"),
 				Billable:    dbtest.BoolPointer(true),
 				Start:       dbtest.TimePointer(time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)),
-				//Tags:        []string{"tags"},
+				Tags:        []string{"tags"},
 			}
 
 			if err := core.Update(ctx, timeEntryCreated.ID, upd, now); err != nil {
@@ -132,29 +132,29 @@ func TestClient(t *testing.T) {
 
 			_, err = core.QueryByID(ctx, savedcreated.ID)
 			if !errors.Is(err, ErrNotFound) {
-				t.Fatalf("\t%s\tTest %d:\tShould NOT be able to retrieve timeEntry : %s.", dbtest.Failed, testID, err)
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve timeEntry : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve timeEntry.", dbtest.Success, testID)
+
+			ut := UpdateTimeEntryTags{
+				Tags:    []string{"tags"},
+				TagMode: "remove",
+			}
+			if err := core.UpdateTags(ctx, savedStart.ID, ut, now); err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to update timeEntry tags : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to update timeEntry tags.", dbtest.Success, testID)
+
+			tu, err := core.QueryByID(ctx, savedStart.ID)
+			if err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve timeEntry : %s.", dbtest.Failed, testID, err)
 			}
 			t.Logf("\t%s\tTest %d:\tShould NOT be able to retrieve timeEntry.", dbtest.Success, testID)
 
-			//ut := UpdateTimeEntryTags{
-			//	Tags:    []string{"tags"},
-			//	TagMode: "remove",
-			//}
-			//if err := core.UpdateTags(ctx, savedStart.ID, ut, now); err != nil {
-			//	t.Fatalf("\t%s\tTest %d:\tShould be able to update timeEntry tags : %s.", dbtest.Failed, testID, err)
-			//}
-			//t.Logf("\t%s\tTest %d:\tShould be able to update timeEntry tags.", dbtest.Success, testID)
-
-			//tu, err := core.QueryByID(ctx, savedStart.ID)
-			//if err != nil {
-			//	t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve timeEntry : %s.", dbtest.Failed, testID, err)
-			//}
-			//t.Logf("\t%s\tTest %d:\tShould NOT be able to retrieve timeEntry.", dbtest.Success, testID)
-			//
-			//if diff := cmp.Diff(tu.Tags, upd.Tags); diff == "" {
-			//	t.Fatalf("\t%s\tTest %d:\tShould get back the same timeEntryStop. Diff:\n%s", dbtest.Failed, testID, diff)
-			//}
-			//t.Logf("\t%s\tTest %d:\tShould get back the same timeEntryStop.", dbtest.Success, testID)
+			if diff := cmp.Diff(tu.Tags, upd.Tags); diff != "" {
+				t.Errorf("\t%s\tTest %d:\tShould get back the same timeEntryStop. Diff:\n%s", dbtest.Failed, testID, diff)
+			}
+			t.Logf("\t%s\tTest %d:\tShould get back the same timeEntryStop.", dbtest.Success, testID)
 
 			_, err = core.QueryDash(ctx, "5cf37266-3473-4006-984f-9325122678b7")
 			if err != nil {
