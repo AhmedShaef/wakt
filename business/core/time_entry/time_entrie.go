@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	dbp "github.com/AhmedShaef/wakt/business/core/project/db"
+	dbt "github.com/AhmedShaef/wakt/business/core/task/db"
 	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/util"
@@ -40,6 +42,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 
 	stop := nt.Start.Add(nt.Duration)
 
+	// set values from request
 	dbTimeEntry := db.TimeEntry{
 		ID:          validate.GenerateID(),
 		Description: nt.Description,
@@ -57,9 +60,26 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		DateCreated: now,
 		DateUpdated: now,
 	}
+	if dbTimeEntry.Pid == "" {
+		dbTimeEntry.Pid = "00000000-0000-0000-0000-000000000000"
+	}
+	if dbTimeEntry.Tid == "" {
+		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
+	}
+	if dbTimeEntry.Tags == nil {
+		dbTimeEntry.Tags = []string{}
+	}
 
 	if err := c.store.Create(ctx, dbTimeEntry); err != nil {
 		return TimeEntry{}, fmt.Errorf("create: %w", err)
+	}
+
+	if err := c.SyncTaskTime(ctx, dbTimeEntry.Tid, now); err != nil {
+		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
+	}
+
+	if err := c.SyncProjectTime(ctx, dbTimeEntry.Pid, now); err != nil {
+		return TimeEntry{}, fmt.Errorf("sync project time: %w", err)
 	}
 
 	return toTimeEntry(dbTimeEntry), nil
@@ -71,6 +91,7 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 		return TimeEntry{}, fmt.Errorf("validating data: %w", err)
 	}
 
+	// set values from request
 	dbTimeEntry := db.TimeEntry{
 		ID:          validate.GenerateID(),
 		Description: st.Description,
@@ -80,12 +101,23 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 		Tid:         st.Tid,
 		Billable:    st.Billable,
 		Start:       now,
+		Stop:        time.Time{},
 		Duration:    -1,
 		CreatedWith: st.CreatedWith,
 		Tags:        st.Tags,
 		DurOnly:     st.DurOnly,
 		DateCreated: now,
 		DateUpdated: now,
+	}
+
+	if dbTimeEntry.Pid == "" {
+		dbTimeEntry.Pid = "00000000-0000-0000-0000-000000000000"
+	}
+	if dbTimeEntry.Tid == "" {
+		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
+	}
+	if dbTimeEntry.Tags == nil {
+		dbTimeEntry.Tags = []string{}
 	}
 
 	if err := c.store.Create(ctx, dbTimeEntry); err != nil {
@@ -115,6 +147,14 @@ func (c Core) Stop(ctx context.Context, TimeEntryID string, now time.Time) (Time
 
 	if err := c.store.Update(ctx, dbTimeEntry); err != nil {
 		return TimeEntry{}, fmt.Errorf("stop: %w", err)
+	}
+
+	if err := c.SyncTaskTime(ctx, dbTimeEntry.Tid, now); err != nil {
+		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
+	}
+
+	if err := c.SyncProjectTime(ctx, dbTimeEntry.Pid, now); err != nil {
+		return TimeEntry{}, fmt.Errorf("sync project time: %w", err)
 	}
 
 	return toTimeEntry(dbTimeEntry), nil
@@ -196,8 +236,57 @@ func (c Core) QueryByID(ctx context.Context, timeEntryID string) (TimeEntry, err
 		}
 		return TimeEntry{}, fmt.Errorf("query: %w", err)
 	}
-
 	return toTimeEntry(dbTimEntry), nil
+}
+
+// SyncProjectTime sync the specified project time from the database.
+func (c Core) SyncProjectTime(ctx context.Context, projectID string, now time.Time) error {
+	if err := validate.CheckID(projectID); err != nil {
+		return ErrInvalidID
+	}
+
+	ProjctTime, err := c.store.QueryProjectTime(ctx, projectID)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return ErrNotFound
+		}
+		return fmt.Errorf("sync: %w", err)
+	}
+
+	dbproject := dbp.Project{
+		ID:             projectID,
+		EstimatedHours: ProjctTime.Duration / 60 / 60,
+		DateUpdated:    now,
+	}
+
+	if err = c.store.UpdateProjectTime(ctx, dbproject); err != nil {
+		return fmt.Errorf("update: %w", err)
+	}
+	return nil
+}
+
+// SyncTaskTime sync the specified task time from the database.
+func (c Core) SyncTaskTime(ctx context.Context, taskID string, now time.Time) error {
+	if err := validate.CheckID(taskID); err != nil {
+		return ErrInvalidID
+	}
+
+	taskTime, err := c.store.QueryTaskTime(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return ErrNotFound
+		}
+		return fmt.Errorf("sync: %w", err)
+	}
+	dbTask := dbt.Task{
+		ID:             taskID,
+		TrackedSeconds: taskTime.Duration,
+		DateUpdated:    now,
+	}
+	if err = c.store.UpdateTaskTime(ctx, dbTask); err != nil {
+		return fmt.Errorf("udpate: %w", err)
+	}
+	return nil
 }
 
 //QueryRunning retrieves a list of existing time entry from the database.
