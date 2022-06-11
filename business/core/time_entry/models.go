@@ -19,16 +19,16 @@ type TimeEntry struct {
 	Stop        time.Time     `json:"stop"`
 	Duration    time.Duration `json:"duration"`
 	CreatedWith string        `json:"created_with"`
-	//Tags        []string      `json:"tags"`
-	DurOnly     bool      `json:"dur_only"`
-	DateCreated time.Time `json:"date_created"`
-	DateUpdated time.Time `json:"date_updated"`
+	Tags        []string      `json:"tags"`
+	DurOnly     bool          `json:"dur_only"`
+	DateCreated time.Time     `json:"date_created"`
+	DateUpdated time.Time     `json:"date_updated"`
 }
 
 // NewTimeEntry contains information needed to create a new time_entry.
 type NewTimeEntry struct {
 	Description string        `json:"description"`
-	Wid         string        `json:"wid"validate:"required"`
+	Wid         string        `json:"wid"`
 	Pid         string        `json:"pid"`
 	Tid         string        `json:"tid"`
 	Billable    bool          `json:"billable"`
@@ -43,7 +43,7 @@ type NewTimeEntry struct {
 //StartTimeEntry contains information needed to start a new time_entry.
 type StartTimeEntry struct {
 	Description string   `json:"description"`
-	Wid         string   `json:"wid" validate:"required"`
+	Wid         string   `json:"wid"`
 	Pid         string   `json:"pid"`
 	Tid         string   `json:"tid"`
 	Billable    bool     `json:"billable"`
@@ -71,7 +71,7 @@ type UpdateTimeEntry struct {
 //UpdateTimeEntryTags contains information needed to update bulk of time_entry tags.
 type UpdateTimeEntryTags struct {
 	Tags    []string `json:"tags" validate:"required"`
-	TagMode string   `json:"tag_mode" validate:"required eq=add|eq=remove"`
+	TagMode string   `json:"tag_mode" validate:"required eq=add | eq=remove"`
 }
 
 // =============================================================================
