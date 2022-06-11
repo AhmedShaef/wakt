@@ -46,19 +46,13 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 	}
 
 	dbtask := db.Task{
-		Uid:              "00000000-0000-0000-0000-000000000000",
-		EstimatedSeconds: 0,
-		Active:           true,
-		TrackedSeconds:   0,
-	}
-	dbtask = db.Task{
 		ID:               validate.GenerateID(),
 		Name:             nt.Name,
 		Pid:              nt.Pid,
 		Wid:              nt.Wid,
 		Uid:              userID,
 		EstimatedSeconds: nt.EstimatedSeconds,
-		Active:           nt.Active,
+		Active:           true,
 		DateCreated:      now,
 		DateUpdated:      now,
 		TrackedSeconds:   nt.TrackedSeconds,
@@ -142,6 +136,9 @@ func (c Core) QueryByID(ctx context.Context, taskID string) (Task, error) {
 
 //QueryProjectTasks retrieves a list of existing projects from the database.
 func (c Core) QueryProjectTasks(ctx context.Context, projectID string, pageNumber, rowsPerPage int) ([]Task, error) {
+	if err := validate.CheckID(projectID); err != nil {
+		return []Task{}, ErrInvalidID
+	}
 	dbprojects, err := c.store.QueryProjectTasks(ctx, projectID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
@@ -152,6 +149,9 @@ func (c Core) QueryProjectTasks(ctx context.Context, projectID string, pageNumbe
 
 // QueryWorkspaceTasks retrieves a list of existing workspace from the database.
 func (c Core) QueryWorkspaceTasks(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Task, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []Task{}, ErrInvalidID
+	}
 	dbTasks, err := c.store.QueryWorkspaceTasks(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
