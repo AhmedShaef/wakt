@@ -54,7 +54,7 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 			Pid:         npu.Pid,
 			Uid:         uid,
 			Wid:         npu.Wid,
-			Manager:     false,
+			Manager:     npu.Manager,
 			Rate:        npu.Rate,
 			DateCreated: now,
 			DateUpdated: now,
