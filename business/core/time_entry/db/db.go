@@ -78,6 +78,7 @@ func (s Store) Update(ctx context.Context, te TimeEntry) error {
         "start" = :start,
         "stop" = :stop,
         "duration" = :duration,
+		"created_with" = :created_with,
         "dur_only" = :dur_only,
 		"tags" = :tags,
 		"date_updated" = :date_updated
