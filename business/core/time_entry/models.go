@@ -71,7 +71,7 @@ type UpdateTimeEntry struct {
 //UpdateTimeEntryTags contains information needed to update bulk of time_entry tags.
 type UpdateTimeEntryTags struct {
 	Tags    []string `json:"tags" validate:"required"`
-	TagMode string   `json:"tag_mode" validate:"required eq=add | eq=remove"`
+	TagMode string   `json:"tag_mode" validate:"required"`
 }
 
 // =============================================================================
