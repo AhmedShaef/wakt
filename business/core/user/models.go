@@ -12,7 +12,6 @@ type User struct {
 	DefaultWid      string    `json:"default_wid"`
 	Email           string    `json:"email"`
 	PasswordHash    []byte    `json:"password_hash"`
-	Roles           []string  `json:"roles"`
 	FullName        string    `json:"full_name"`
 	TimeOfDayFormat string    `json:"time_of_day_format"`
 	DateFormat      string    `json:"date_format"`
@@ -41,7 +40,6 @@ type NewUser struct {
 type UpdateUser struct {
 	DefaultWid      *string    `json:"default_wid"`
 	Email           *string    `json:"email" validate:"omitempty,email"`
-	Roles           []string   `json:"roles"`
 	FullName        *string    `json:"full_name"`
 	TimeOfDayFormat *string    `json:"time_of_day_format" validate:"omitempty,eq=H:mm|eq=h:mm"`
 	DateFormat      *string    `json:"date_format" validate:"omitempty,eq=YYYY-MM-DD|eq=DD.MM.YYYY|eq=DD-MM-YYYY|eq=MM/DD/YYYY|eq=DD/MM/YYYY|eq=MM-DD-YYYY"`
