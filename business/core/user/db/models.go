@@ -12,10 +12,9 @@ type User struct {
 	DefaultWid      string         `db:"default_wid"`
 	Email           string         `db:"email"`
 	PasswordHash    []byte         `db:"password_hash"`
-	Roles           pq.StringArray `db:"roles"`
 	FullName        string         `db:"full_name"`
-	TimeOfDayFormat string         `db:"time_of_day_format"`
-	DateFormat      string         `db:"date_format"`
+	TimeOfDayFormat string         `db:"time_of_day_format" `
+	DateFormat      string         `db:"date_format" `
 	BeginningOfWeek int            `db:"beginning_of_week"`
 	Language        string         `db:"language"`
 	ImageURL        string         `db:"image_url"`
