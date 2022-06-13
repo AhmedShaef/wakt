@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, user User) error {
 	const q = `
 	INSERT INTO users
-		(user_id, email, roles, password_hash,full_name, date_created, date_updated)
+		(user_id, default_wid, email, password_hash,full_name, time_of_day_format, date_format, beginning_of_week, language, image_url, date_created, date_updated, timezone, invitation, duration_format)
 	VALUES
-		(:user_id, :email, :roles, :password_hash, :full_name, :date_created, :date_updated)`
+		(:user_id, :default_wid, :email, :password_hash, :full_name, :time_of_day_format, :date_format, :beginning_of_week, :language, :image_url, :date_created, :date_updated, :timezone, :invitation, :duration_format)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, user); err != nil {
 		return fmt.Errorf("inserting user: %w", err)
@@ -68,7 +68,6 @@ func (s Store) Update(ctx context.Context, user User) error {
 	SET
 		default_wid = :default_wid,
 		email = :email,
-		roles = :roles,
 		password_hash = :password_hash,
 		full_name = :full_name,
 		time_of_day_format = :time_of_day_format,
@@ -137,66 +136,4 @@ func (s Store) QueryByEmail(ctx context.Context, email string) (User, error) {
 	}
 
 	return user, nil
-}
-
-// QueryWorkspaceUsers retrieves a list of existing user from the database.
-func (s Store) QueryWorkspaceUsers(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]User, error) {
-	data := struct {
-		Offset      int    `db:"offset"`
-		RowsPerPage int    `db:"rows_per_page"`
-		WorkspaceID string `db:"wid"`
-	}{
-		Offset:      (pageNumber - 1) * rowsPerPage,
-		RowsPerPage: rowsPerPage,
-		WorkspaceID: workspaceID,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		users
-	WHERE
-		wid = :wid
-	ORDER BY
-		user_id
-	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
-
-	var users []User
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &users); err != nil {
-		return nil, fmt.Errorf("selecting user: %w", err)
-	}
-
-	return users, nil
-}
-
-// QueryProjectUsers retrieves a list of existing user from the database.
-func (s Store) QueryProjectUsers(ctx context.Context, projectID string, pageNumber, rowsPerPage int) ([]User, error) {
-	data := struct {
-		Offset      int    `db:"offset"`
-		RowsPerPage int    `db:"rows_per_page"`
-		ProjectID   string `db:"pid"`
-	}{
-		Offset:      (pageNumber - 1) * rowsPerPage,
-		RowsPerPage: rowsPerPage,
-		ProjectID:   projectID,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		users
-	WHERE
-		pid = :pid
-	ORDER BY
-		user_id
-	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
-
-	var users []User
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &users); err != nil {
-		return nil, fmt.Errorf("selecting user: %w", err)
-	}
-
-	return users, nil
 }
