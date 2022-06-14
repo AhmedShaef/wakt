@@ -2,10 +2,9 @@ package tests
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/foundation/docker"
+	"testing"
 )
 
 var c *docker.Container
