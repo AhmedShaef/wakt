@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/data/dbschema"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
-	"github.com/AhmedShaef/wakt/business/sys/smtp"
 	"github.com/AhmedShaef/wakt/foundation/docker"
 	"github.com/google/go-cmp/cmp"
 	"testing"
@@ -59,17 +58,11 @@ func TestWorkspaceUser(t *testing.T) {
 			t.Logf("\t%s\tTest %d:\tShould get back the same workspace_user.", dbtest.Success, testID)
 
 			iu := InviteUsers{
-				Emails: []string{"hasAccount@example.com", "hasntaccount@example.com"}, //TODO: add emails
-			}
-			cfg := smtp.Config{ //TODO: fill the config
-				Host:     "",
-				Port:     0,
-				Username: "",
-				Password: "",
-				From:     "",
+				Emails:    []string{"hasAccount@example.com", "hasntaccount@example.com"},
+				InviterID: "32c1494f-1c1f-4981-857f-b0526cb654ec",
 			}
 
-			workspace_user, err := core.InviteUser(ctx, "7da3ca14-6366-47cf-b953-f706226567d8", iu, cfg, now)
+			workspace_user, err := core.InviteUser(ctx, "7da3ca14-6366-47cf-b953-f706226567d8", iu, now)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to create workspace_user : %s.", dbtest.Failed, testID, err)
 			}
@@ -82,7 +75,7 @@ func TestWorkspaceUser(t *testing.T) {
 			t.Logf("\t%s\tTest %d:\tShould be able to retrieve workspace_user by ID.", dbtest.Success, testID)
 
 			if diff := cmp.Diff(workspace_user, saved2); diff != "" {
-				t.Fatalf("\t%s\tTest %d:\tShould get back the same workspace_user. Diff:\n%s", dbtest.Failed, testID, diff)
+				t.Errorf("\t%s\tTest %d:\tShould get back the same workspace_user. Diff:\n%s", dbtest.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same workspace_user.", dbtest.Success, testID)
 
@@ -111,6 +104,12 @@ func TestWorkspaceUser(t *testing.T) {
 
 			_, err = core.QueryByID(ctx, workspace_user[0].ID)
 			if !errors.Is(err, ErrNotFound) {
+				t.Fatalf("\t%s\tTest %d:\tShould NOT be able to retrieve workspace_user : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould NOT be able to retrieve workspace_user.", dbtest.Success, testID)
+
+			_, err = core.QueryByuIDwID(ctx, "7da3ca14-6366-47cf-b953-f706226567d8", "5cf37266-3473-4006-984f-9325122678b7")
+			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould NOT be able to retrieve workspace_user : %s.", dbtest.Failed, testID, err)
 			}
 			t.Logf("\t%s\tTest %d:\tShould NOT be able to retrieve workspace_user.", dbtest.Success, testID)
@@ -164,7 +163,6 @@ func TestPagingWorkspaceUser(t *testing.T) {
 				t.Fatalf("\t%s\tTest %d:\tShould have different workspace_users : %s.", dbtest.Failed, testID, err)
 			}
 			t.Logf("\t%s\tTest %d:\tShould have different workspace_users.", dbtest.Success, testID)
-
 		}
 	}
 }
