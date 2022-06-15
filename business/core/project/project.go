@@ -36,6 +36,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 
 // Create inserts a new project into the database.
 func (c Core) Create(ctx context.Context, userID string, np NewProject, now time.Time) (Project, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return Project{}, ErrInvalidID
+	}
+
 	if err := validate.Check(np); err != nil {
 		return Project{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -164,6 +168,9 @@ func (c Core) QueryByID(ctx context.Context, projectID string) (Project, error) 
 
 // QueryClientProjects retrieves a list of existing projects from the database.
 func (c Core) QueryClientProjects(ctx context.Context, clientID string, pageNumber, rowsPerPage int) ([]Project, error) {
+	if err := validate.CheckID(clientID); err != nil {
+		return []Project{}, ErrInvalidID
+	}
 	dbprojects, err := c.store.QueryClientProjects(ctx, clientID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
@@ -174,6 +181,9 @@ func (c Core) QueryClientProjects(ctx context.Context, clientID string, pageNumb
 
 // QueryWorkspaceProjects retrieves a list of existing workspace from the database.
 func (c Core) QueryWorkspaceProjects(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Project, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []Project{}, ErrInvalidID
+	}
 	dbProjects, err := c.store.QueryWorkspaceProjects(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
