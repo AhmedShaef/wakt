@@ -38,7 +38,7 @@ func Migrate(ctx context.Context, db *sqlx.DB) error {
 	return d.Migrate()
 }
 
-// Seed runs the set of seed-data queries against db. The queries are ran in a
+// Seed runs the set of seed-data queries against db. The queries are run in a
 // transaction and rolled back if any fail.
 func Seed(ctx context.Context, db *sqlx.DB) error {
 	if err := database.StatusCheck(ctx, db); err != nil {
@@ -60,7 +60,7 @@ func Seed(ctx context.Context, db *sqlx.DB) error {
 	return tx.Commit()
 }
 
-// DeleteAll runs the set of Drop-table queries against db. The queries are ran in a
+// DeleteAll runs the set of Drop-table queries against db. The queries are run in a
 // transaction and rolled back if any fail.
 func DeleteAll(db *sqlx.DB) error {
 	tx, err := db.Begin()
