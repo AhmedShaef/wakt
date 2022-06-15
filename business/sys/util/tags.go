@@ -3,7 +3,7 @@ package util
 
 // Add bulk tags to a tagSet.
 func Add(oldTag, tags []string) []string {
-	newTags := []string{}
+	var newTags []string
 	for _, tag := range tags {
 		newTags = append(oldTag, tag)
 	}
@@ -12,7 +12,7 @@ func Add(oldTag, tags []string) []string {
 
 // Remove bulk tags from a tagSet.
 func Remove(oldTag, tags []string) []string {
-	newTags := []string{}
+	var newTags []string
 	for _, tag := range tags {
 		for _, oldTag := range oldTag {
 			if oldTag != tag {

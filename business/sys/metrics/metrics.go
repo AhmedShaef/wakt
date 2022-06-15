@@ -26,7 +26,7 @@ type metrics struct {
 
 // init constructs the metrics value that will be used to capture metrics.
 // The metrics value is stored in a package level variable since everything
-// inside of expvar is registered as a singleton. The use of once will make
+// inside expvar is registered as a singleton. The use of once will make
 // sure this initialization only happens once.
 func init() {
 	m = &metrics{
