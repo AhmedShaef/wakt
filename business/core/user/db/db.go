@@ -75,7 +75,6 @@ func (s Store) Update(ctx context.Context, user User) error {
 		beginning_of_week = :beginning_of_week,
 		language = :language,
 		image_url = :image_url,
-		date_created = :date_created,
 		date_updated = :date_updated,
 		timezone = :timezone,
 		invitation = :invitation,
