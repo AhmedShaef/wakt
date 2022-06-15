@@ -9,8 +9,8 @@ import (
 	"fmt"
 	users "github.com/AhmedShaef/wakt/business/core/user/db"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
+	send "github.com/AhmedShaef/wakt/business/send/smtp"
 	"github.com/AhmedShaef/wakt/business/sys/database"
-	"github.com/AhmedShaef/wakt/business/sys/smtp"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -42,9 +42,11 @@ func (c Core) Create(ctx context.Context, workspaceID string, userID string, now
 	if err := validate.CheckID(workspaceID); err != nil {
 		return WorkspaceUser{}, ErrInvalidID
 	}
+
 	if err := validate.CheckID(userID); err != nil {
 		return WorkspaceUser{}, ErrInvalidID
 	}
+
 	dbWorkspaceUser := db.WorkspaceUser{
 		ID:          validate.GenerateID(),
 		Uid:         userID,
@@ -63,7 +65,11 @@ func (c Core) Create(ctx context.Context, workspaceID string, userID string, now
 }
 
 // InviteUser invites a user to a workspace.
-func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers, cfg smtp.Config, now time.Time) ([]WorkspaceUser, error) {
+func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers, now time.Time) ([]WorkspaceUser, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []WorkspaceUser{}, ErrInvalidID
+	}
+
 	if err := validate.Check(ni); err != nil {
 		return []WorkspaceUser{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -86,8 +92,10 @@ func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers
 		if err != nil {
 			if errors.Is(err, database.ErrDBNotFound) {
 				userID = validate.GenerateID()
+			} else {
+				return []WorkspaceUser{}, fmt.Errorf("query: %w", err)
 			}
-			return []WorkspaceUser{}, fmt.Errorf("query: %w", err)
+
 		} else {
 			userID = usr.ID
 			dbUser := users.User{
@@ -111,7 +119,7 @@ func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers
 		}
 		workspaceUsers = append(workspaceUsers, dbWorkspaceUser)
 
-		if err := smtp.SendEmail(cfg, v, "You have been invited to join WAKT!", "www.example.com/signup/"+dbWorkspaceUser.InviteKey); err != nil {
+		if err := send.Email("example@example.com", v, "You have been invited to join WAKT!", "www.example.com/signup/"+dbWorkspaceUser.InviteKey); err != nil {
 			return []WorkspaceUser{}, fmt.Errorf("send email: %w", err)
 		}
 		if err := c.store.Invite(ctx, dbWorkspaceUser); err != nil {
@@ -170,8 +178,11 @@ func (c Core) Delete(ctx context.Context, workspaceUserID string) error {
 }
 
 //Query retrieves a list of existing workspace users from the database.
-func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]WorkspaceUser, error) {
-	dbWorkspaceUsers, err := c.store.Query(ctx, userID, pageNumber, rowsPerPage)
+func (c Core) Query(ctx context.Context, workspaceID string, pageNumber int, rowsPerPage int) ([]WorkspaceUser, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []WorkspaceUser{}, ErrInvalidID
+	}
+	dbWorkspaceUsers, err := c.store.Query(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
@@ -186,6 +197,26 @@ func (c Core) QueryByID(ctx context.Context, workspaceUserID string) (WorkspaceU
 	}
 
 	dbWorkspaceUser, err := c.store.QueryByID(ctx, workspaceUserID)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return WorkspaceUser{}, ErrNotFound
+		}
+		return WorkspaceUser{}, fmt.Errorf("query: %w", err)
+	}
+
+	return toWorkspaceUser(dbWorkspaceUser), nil
+}
+
+// QueryByuIDwID gets the specified workspaceUser from the database.
+func (c Core) QueryByuIDwID(ctx context.Context, workspaceID, userID string) (WorkspaceUser, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return WorkspaceUser{}, ErrInvalidID
+	}
+	if err := validate.CheckID(userID); err != nil {
+		return WorkspaceUser{}, ErrInvalidID
+	}
+
+	dbWorkspaceUser, err := c.store.QueryByuIDwID(ctx, workspaceID, userID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return WorkspaceUser{}, ErrNotFound
