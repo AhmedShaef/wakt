@@ -45,7 +45,7 @@ func TestGroup(t *testing.T) {
 				Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
 			}
 
-			group, err := core.Create(ctx, ng, now)
+			group, err := core.Create(ctx, "5cf37266-3473-4006-984f-9325122678b7", ng, now)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to create group : %s.", dbtest.Failed, testID, err)
 			}
