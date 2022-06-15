@@ -15,7 +15,6 @@ type Workspace struct {
 	OnlyAdminMayCreateProjects bool      `db:"only_admin_may_create_projects"`
 	OnlyAdminSeeBillableRates  bool      `db:"only_admin_see_billable_rates"`
 	OnlyAdminSeeTeamDashboard  bool      `db:"only_admin_see_team_dashboard"`
-	ProjectBillableByDefault   bool      `db:"project_billable_by_default"`
 	Rounding                   int       `db:"rounding"`
 	RoundingMinutes            int       `db:"rounding_minutes"`
 	DateCreated                time.Time `db:"date_created"`
