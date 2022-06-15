@@ -99,8 +99,8 @@ func (s Store) Delete(ctx context.Context, projectUserID string) error {
 	return nil
 }
 
-// QueryInWorkspace retrieves a list of existing project user from the database.
-func (s Store) QueryInWorkspace(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]ProjectUser, error) {
+// QueryWorkspaceProjectUsers retrieves a list of existing project user from the database.
+func (s Store) QueryWorkspaceProjectUsers(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]ProjectUser, error) {
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
