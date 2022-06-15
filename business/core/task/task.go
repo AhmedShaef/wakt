@@ -36,6 +36,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 
 // Create inserts a new task into the database.
 func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Time) (Task, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return Task{}, ErrInvalidID
+	}
+
 	if err := validate.Check(nt); err != nil {
 		return Task{}, fmt.Errorf("validating data: %w", err)
 	}
