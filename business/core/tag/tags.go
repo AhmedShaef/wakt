@@ -112,6 +112,9 @@ func (c Core) QueryByID(ctx context.Context, tagID string) (Tag, error) {
 
 // QueryWorkspaceTags retrieves a list of existing workspace from the database.
 func (c Core) QueryWorkspaceTags(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Tag, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []Tag{}, ErrInvalidID
+	}
 	dbTags, err := c.store.QueryWorkspaceTags(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
