@@ -43,7 +43,7 @@ type UpdateUser struct {
 	FullName        *string    `json:"full_name"`
 	TimeOfDayFormat *string    `json:"time_of_day_format" validate:"omitempty,eq=H:mm|eq=h:mm"`
 	DateFormat      *string    `json:"date_format" validate:"omitempty,eq=YYYY-MM-DD|eq=DD.MM.YYYY|eq=DD-MM-YYYY|eq=MM/DD/YYYY|eq=DD/MM/YYYY|eq=MM-DD-YYYY"`
-	BeginningOfWeek *int       `json:"beginning_of_week" valiate:"omitempty,min=0|max=6"`
+	BeginningOfWeek *int       `json:"beginning_of_week" validate:"omitempty,min=0|max=6"`
 	Language        *string    `json:"language"`
 	DateCreated     *time.Time `json:"date_created"`
 	DateUpdated     *time.Time `json:"date_updated"`
