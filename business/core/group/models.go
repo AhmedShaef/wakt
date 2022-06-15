@@ -11,6 +11,7 @@ type Group struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Wid         string    `json:"wid"`
+	Uid         string    `json:"uid"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
@@ -18,7 +19,7 @@ type Group struct {
 // NewGroup contains information needed to create a new Group.
 type NewGroup struct {
 	Name string `json:"name" validate:"required"`
-	Wid  string `json:"wid" validate:"required"`
+	Wid  string `json:"wid"`
 }
 
 // UpdateGroup defines what information may be provided to modify an existing
