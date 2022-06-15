@@ -31,7 +31,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 }
 
 // Create inserts a new group into the database.
-func (c Core) Create(ctx context.Context, ng NewGroup, now time.Time) (Group, error) {
+func (c Core) Create(ctx context.Context, userID string, ng NewGroup, now time.Time) (Group, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return Group{}, ErrInvalidID
+	}
 	if err := validate.Check(ng); err != nil {
 		return Group{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -40,6 +43,7 @@ func (c Core) Create(ctx context.Context, ng NewGroup, now time.Time) (Group, er
 		ID:          validate.GenerateID(),
 		Name:        ng.Name,
 		Wid:         ng.Wid,
+		Uid:         userID,
 		DateCreated: now,
 		DateUpdated: now,
 	}
@@ -113,6 +117,10 @@ func (c Core) QueryByID(ctx context.Context, groupID string) (Group, error) {
 
 // QueryWorkspaceGroups retrieves a list of existing workspace from the database.
 func (c Core) QueryWorkspaceGroups(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Group, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []Group{}, ErrInvalidID
+	}
+
 	dbGroups, err := c.store.QueryWorkspaceGroups(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
