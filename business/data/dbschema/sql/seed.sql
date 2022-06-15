@@ -50,11 +50,11 @@ VALUES ('57a785f7-aff5-40a6-8b98-fc28e0f0465c', 'Default Time Entry', '5cf37266-
         '4ea20d73-a11e-4e83-b95c-ba8b4b5ff6c1', 'true', '2019-03-24 00:00:00', '2019-03-24 00:00:30', '-1', 'curl',
         '{tags1,tags2}', 'true', '2019-03-24 00:00:00', '2019-03-24 00:00:00')
 ON CONFLICT DO NOTHING;
-INSERT INTO groups (group_id, name, wid, date_created, date_updated)
+INSERT INTO groups (group_id, name, wid, uid, date_created, date_updated)
 values ('ee8a891a-6e2e-4fa3-8f01-d4e559dd5a72', 'Default Group', '7da3ca14-6366-47cf-b953-f706226567d8',
-        '2019-03-24 00:00:00', '2019-03-24 00:00:00'),
+        '5cf37266-3473-4006-984f-9325122678b7', '2019-03-24 00:00:00', '2019-03-24 00:00:00'),
        ('8e95bc44-17dc-4006-961e-1a0bec9ea943', 'User Group', '7da3ca14-6366-47cf-b953-f706226567d8',
-        '2019-03-24 00:00:00', '2019-03-24 00:00:00')
+        '5cf37266-3473-4006-984f-9325122678b7', '2019-03-24 00:00:00', '2019-03-24 00:00:00')
 ON CONFLICT DO NOTHING;
 INSERT INTO tags (tag_id, name, wid, date_created, date_updated)
 VALUES ('82cf01da-4a6c-40fc-98cf-c9987aca40b2', 'Default tag', '7da3ca14-6366-47cf-b953-f706226567d8',
@@ -72,7 +72,7 @@ values ('efcc74aa-86d2-4e11-80f9-3ca912af8269', '45cf87a3-5915-4079-a9af-6c55923
 ON CONFLICT DO NOTHING;
 INSERT INTO workspace_users (workspace_user_id, uid, wid, admin, active, invite_key, date_created, date_updated)
 values ('32c1494f-1c1f-4981-857f-b0526cb654ec', '5cf37266-3473-4006-984f-9325122678b7',
-        '7da3ca14-6366-47cf-b953-f706226567d8', 'true', 'true', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00'),
+        '7da3ca14-6366-47cf-b953-f706226567d8', 'true', 'false', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00'),
        ('604125e7-f368-4ff0-8170-dfd2f428510a', '5cf37266-3473-4006-984f-9325122678b7',
         '6fa2132c-9bdd-428a-b025-5f1a4d6ee683', 'false', 'true', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00')
 ON CONFLICT DO NOTHING;
