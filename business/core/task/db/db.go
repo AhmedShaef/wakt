@@ -102,33 +102,6 @@ func (s Store) Delete(ctx context.Context, taskID string) error {
 	return nil
 }
 
-// Query retrieves a list of existing tasks from the database.
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Task, error) {
-	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
-	}{
-		Offset:      (pageNumber - 1) * rowsPerPage,
-		RowsPerPage: rowsPerPage,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		tasks
-	ORDER BY
-		task_id
-	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
-
-	var tsks []Task
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &tsks); err != nil {
-		return nil, fmt.Errorf("selecting tasks: %w", err)
-	}
-
-	return tsks, nil
-}
-
 // QueryByID gets the specified task from the database.
 func (s Store) QueryByID(ctx context.Context, taskID string) (Task, error) {
 	data := struct {
@@ -179,30 +152,6 @@ func (s Store) QueryUnique(ctx context.Context, name, column, id string) string 
 	}
 
 	return nam
-}
-
-// QueryBulkIDs gets all Tasks from the database.
-func (s Store) QueryBulkIDs(ctx context.Context, taskID []string) ([]Task, error) {
-	data := struct {
-		TaskID []string `db:"task_id"`
-	}{
-		TaskID: taskID,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		tasks
-	WHERE 
-		task_id in :task_id`
-
-	var task []Task
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &task); err != nil {
-		return nil, fmt.Errorf("selecting time_entry: %w", err)
-	}
-
-	return task, nil
 }
 
 //QueryProjectTasks retrieves a list of existing projects from the database.
