@@ -34,7 +34,7 @@ func Metrics() web.Middleware {
 				metrics.AddErrors(ctx)
 			}
 
-			// Return the error so it can be handled further up the chain.
+			// Return the error, so it can be handled further up the chain.
 			return err
 		}
 

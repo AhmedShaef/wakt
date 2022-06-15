@@ -32,7 +32,7 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 			if err := handler(ctx, w, r); err != nil {
 
 				// Log the error.
-				log.Errorw("ERROR", "traceid", v.TraceID, "message", err)
+				log.Errorw("ERROR", "traceID", v.TraceID, "message", err)
 
 				// Build out the error response.
 				var er v1Web.ErrorResponse
@@ -44,6 +44,7 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 						Error:  "data validation error",
 						Fields: fieldErrors.Fields(),
 					}
+
 					status = http.StatusBadRequest
 
 				case v1Web.IsRequestError(err):
@@ -57,6 +58,7 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 					er = v1Web.ErrorResponse{
 						Error: http.StatusText(http.StatusInternalServerError),
 					}
+
 					status = http.StatusInternalServerError
 				}
 
@@ -72,7 +74,7 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 				}
 			}
 
-			// The error has been handled so we can stop propagating it.
+			// The error has been handled, so we can stop propagating it.
 			return nil
 		}
 
