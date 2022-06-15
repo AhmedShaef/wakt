@@ -172,6 +172,37 @@ func TestPagingProject(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould have different projects.", dbtest.Success, testID)
 
+			//=====================================================================================
+
+			projects5, err := core.QueryClientProjects(ctx, "c78db68e-e004-44f5-895b-ba562dc53d9d", 1, 1)
+			if err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve client projects for page 1 : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve client projects for page 1.", dbtest.Success, testID)
+
+			if len(projects5) != 1 {
+				t.Fatalf("\t%s\tTest %d:\tShould have a single client project : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have a single client project.", dbtest.Success, testID)
+
+			projects6, err := core.QueryClientProjects(ctx, "c78db68e-e004-44f5-895b-ba562dc53d9d", 2, 1)
+			if err != nil {
+				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve client projects for page 2 : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve client projects for page 2.", dbtest.Success, testID)
+
+			if len(projects6) != 1 {
+				t.Fatalf("\t%s\tTest %d:\tShould have a single client project : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have a single client project.", dbtest.Success, testID)
+
+			if projects5[0].ID == projects6[0].ID {
+				t.Logf("\t\tTest %d:\tproject1: %v", testID, projects5[0].ID)
+				t.Logf("\t\tTest %d:\tproject2: %v", testID, projects6[0].ID)
+				t.Fatalf("\t%s\tTest %d:\tShould have different client projects : %s.", dbtest.Failed, testID, err)
+			}
+			t.Logf("\t%s\tTest %d:\tShould have different client projects.", dbtest.Success, testID)
+
 		}
 	}
 }
