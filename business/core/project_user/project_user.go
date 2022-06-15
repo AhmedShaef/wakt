@@ -117,7 +117,10 @@ func (c Core) Delete(ctx context.Context, projectUserID string) error {
 
 // QueryWorkspaceProjectUsers retrieves a list of existing project user from the database.
 func (c Core) QueryWorkspaceProjectUsers(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]ProjectUser, error) {
-	dbProjectUser, err := c.store.QueryInWorkspace(ctx, WorkspaceID, pageNumber, rowsPerPage)
+	if err := validate.CheckID(WorkspaceID); err != nil {
+		return []ProjectUser{}, ErrInvalidID
+	}
+	dbProjectUser, err := c.store.QueryWorkspaceProjectUsers(ctx, WorkspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
