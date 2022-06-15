@@ -16,7 +16,6 @@ type Workspace struct {
 	OnlyAdminMayCreateProjects bool      `json:"only_admin_may_create_projects"`
 	OnlyAdminSeeBillableRates  bool      `json:"only_admin_see_billable_rates"`
 	OnlyAdminSeeTeamDashboard  bool      `json:"only_admin_see_team_dashboard"`
-	ProjectBillableByDefault   bool      `json:"project_billable_by_default"`
 	Rounding                   int       `json:"rounding"`
 	RoundingMinutes            int       `json:"rounding_minutes"`
 	DateCreated                time.Time `json:"date_created"`
@@ -43,7 +42,6 @@ type UpdateWorkspace struct {
 	OnlyAdminMayCreateProjects *bool    `json:"only_admin_may_create_projects"`
 	OnlyAdminSeeBillableRates  *bool    `json:"only_admin_see_billable_rates"`
 	OnlyAdminSeeTeamDashboard  *bool    `json:"only_admin_see_team_dashboard"`
-	ProjectBillableByDefault   *bool    `json:"project_billable_by_default"`
 	Rounding                   *int     `json:"rounding" validate:"omitempty,eq=0|eq=1|eq=-1"`
 	RoundingMinutes            *int     `json:"rounding_minutes"`
 	LogoURL                    string   `json:"logo_url"`
