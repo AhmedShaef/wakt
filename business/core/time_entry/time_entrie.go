@@ -36,6 +36,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 
 // Create inserts a new time entry into the database.
 func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now time.Time) (TimeEntry, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return TimeEntry{}, ErrInvalidID
+	}
+
 	if err := validate.Check(nt); err != nil {
 		return TimeEntry{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -87,6 +91,10 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 
 // Start inserts a new time entry into the database.
 func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now time.Time) (TimeEntry, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return TimeEntry{}, ErrInvalidID
+	}
+
 	if err := validate.Check(st); err != nil {
 		return TimeEntry{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -291,6 +299,10 @@ func (c Core) SyncTaskTime(ctx context.Context, taskID string, now time.Time) er
 
 //QueryRunning retrieves a list of existing time entry from the database.
 func (c Core) QueryRunning(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]TimeEntry, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return []TimeEntry{}, ErrInvalidID
+	}
+
 	dbTimeEntry, err := c.store.QueryRunning(ctx, userID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
@@ -301,6 +313,10 @@ func (c Core) QueryRunning(ctx context.Context, userID string, pageNumber int, r
 
 //QueryRange retrieves a list of existing time entry from the database.
 func (c Core) QueryRange(ctx context.Context, userID string, pageNumber, rowsPerPage int, start, end time.Time) ([]TimeEntry, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return []TimeEntry{}, ErrInvalidID
+	}
+
 	dbTimeEntry, err := c.store.QueryRange(ctx, userID, pageNumber, rowsPerPage, start, end)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
@@ -342,6 +358,10 @@ func (c Core) UpdateTags(ctx context.Context, TimeEntryID string, ut UpdateTimeE
 
 //QueryDash retrieves a list of existing time entry from the database.
 func (c Core) QueryDash(ctx context.Context, UserID string) ([]TimeEntry, error) {
+	if err := validate.CheckID(UserID); err != nil {
+		return []TimeEntry{}, ErrInvalidID
+	}
+
 	var dbTimeEntrys []db.TimeEntry
 
 	dbMostActive, err := c.store.QueryMostActive(ctx, UserID)
