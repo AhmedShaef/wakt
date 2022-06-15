@@ -47,9 +47,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, workspace Workspace) error {
 	const q = `
 	INSERT INTO workspaces
-		(workspace_id, name, uid, date_created, date_updated)
+		(workspace_id, name, uid, default_hourly_rate, default_currency, only_admin_may_create_projects, only_admin_see_billable_rates, only_admin_see_team_dashboard, rounding, rounding_minutes, date_created, date_updated, logo_url )
 	VALUES
-		(:workspace_id, :name, :uid, :date_created, :date_updated)`
+		(:workspace_id, :name, :uid, :default_hourly_rate, :default_currency, :only_admin_may_create_projects, :only_admin_see_billable_rates, :only_admin_see_team_dashboard, :rounding, :rounding_minutes, :date_created, :date_updated, :logo_url)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, workspace); err != nil {
 		return fmt.Errorf("inserting workspace: %w", err)
@@ -70,11 +70,10 @@ func (s Store) Update(ctx context.Context, workspace Workspace) error {
 		only_admin_may_create_projects = :only_admin_may_create_projects,
 		only_admin_see_billable_rates = :only_admin_see_billable_rates,
 		only_admin_see_team_dashboard = :only_admin_see_team_dashboard,
-		project_billable_by_default = :project_billable_by_default,
 		rounding = :rounding,
 		rounding_minutes = :rounding_minutes,
 		date_updated = :date_updated,
-		logo_url = :logo_url,
+		logo_url = :logo_url
 	WHERE
 		workspace_id = :workspace_id`
 
@@ -84,27 +83,6 @@ func (s Store) Update(ctx context.Context, workspace Workspace) error {
 
 	return nil
 
-}
-
-// Delete removes a Workspace from the database.
-func (s Store) Delete(ctx context.Context, workspaceID string) error {
-	data := struct {
-		WorkspaceID string `db:"workspace_id"`
-	}{
-		WorkspaceID: workspaceID,
-	}
-
-	const q = `
-	DELETE FROM
-		workspaces
-	WHERE
-		workspace_id = :workspace_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, data); err != nil {
-		return fmt.Errorf("deleting workspaceID[%s]: %w", workspaceID, err)
-	}
-
-	return nil
 }
 
 // Query retrieves a list of existing workspaces from the database.
@@ -160,30 +138,4 @@ func (s Store) QueryByID(ctx context.Context, workspaceID string) (Workspace, er
 	}
 
 	return workspace, nil
-}
-
-// QueryUserWorkspace retrieves a list of existing workspaces from the database.
-func (s Store) QueryUserWorkspace(ctx context.Context, userID string) ([]Workspace, error) {
-	data := struct {
-		UserID string `db:"user_id"`
-	}{
-		UserID: userID,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		workspaces
-	WHERE 
-		user_id = :user_id
-	ORDER BY
-		workspace_id`
-
-	var workspaces []Workspace
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &workspaces); err != nil {
-		return nil, fmt.Errorf("selecting workspaces: %w", err)
-	}
-
-	return workspaces, nil
 }
