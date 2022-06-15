@@ -49,9 +49,9 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 func (s Store) Create(ctx context.Context, group Group) error {
 	const q = `
 	INSERT INTO groups
-		(group_id, name, wid, date_created, date_updated)
+		(group_id, name, wid, uid, date_created, date_updated)
 	VALUES
-		(:group_id, :name, :wid, :date_created, :date_updated)`
+		(:group_id, :name, :wid, :uid, :date_created, :date_updated)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, group); err != nil {
 		return fmt.Errorf("inserting group: %w", err)
