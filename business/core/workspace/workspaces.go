@@ -40,16 +40,25 @@ func (c Core) Create(ctx context.Context, nw NewWorkspace, now time.Time) (Works
 	}
 
 	dbworkspace := db.Workspace{
-		ID:          validate.GenerateID(),
-		Name:        nw.Name,
-		Uid:         nw.Uid,
-		DateCreated: now,
-		DateUpdated: now,
+		ID:                         validate.GenerateID(),
+		Name:                       nw.Name,
+		Uid:                        nw.Uid,
+		DefaultHourlyRate:          50.0,
+		DefaultCurrency:            "USD",
+		OnlyAdminSeeBillableRates:  false,
+		OnlyAdminSeeTeamDashboard:  false,
+		OnlyAdminMayCreateProjects: false,
+		Rounding:                   1,
+		RoundingMinutes:            60,
+		DateCreated:                now,
+		DateUpdated:                now,
+		LogoURL:                    "",
 	}
 
 	if err := c.store.Create(ctx, dbworkspace); err != nil {
 		return Workspace{}, fmt.Errorf("create: %w", err)
 	}
+
 	return toWorkspace(dbworkspace), nil
 }
 
@@ -89,9 +98,6 @@ func (c Core) Update(ctx context.Context, workspaceID string, uw UpdateWorkspace
 	if uw.OnlyAdminSeeTeamDashboard != nil {
 		dbWorkspace.OnlyAdminSeeTeamDashboard = *uw.OnlyAdminSeeTeamDashboard
 	}
-	if uw.ProjectBillableByDefault != nil {
-		dbWorkspace.ProjectBillableByDefault = *uw.ProjectBillableByDefault
-	}
 	if uw.Rounding != nil {
 		dbWorkspace.Rounding = *uw.Rounding
 	}
@@ -110,6 +116,10 @@ func (c Core) Update(ctx context.Context, workspaceID string, uw UpdateWorkspace
 // UpdateLogo replaces a user document in the database.
 func (c Core) UpdateLogo(ctx context.Context, workspaceID string, uw UpdateWorkspace, now time.Time) error {
 	if err := validate.CheckID(workspaceID); err != nil {
+		return ErrInvalidID
+	}
+
+	if err := validate.Check(uw); err != nil {
 		return ErrInvalidID
 	}
 
@@ -134,6 +144,9 @@ func (c Core) UpdateLogo(ctx context.Context, workspaceID string, uw UpdateWorks
 
 //Query retrieves a list of existing workspace from the database.
 func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return []Workspace{}, ErrInvalidID
+	}
 	dbWorkspace, err := c.store.Query(ctx, userID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
