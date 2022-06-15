@@ -101,15 +101,15 @@ func (s Store) Delete(ctx context.Context, workspaceUserID string) error {
 }
 
 // Query retrieves a list of existing workspace users from the database.
-func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]WorkspaceUser, error) {
+func (s Store) Query(ctx context.Context, workspaceID string, pageNumber int, rowsPerPage int) ([]WorkspaceUser, error) {
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
-		UserID      string `db:"user_id"`
+		WorkspaceID string `db:"workspace_id"`
 	}{
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
-		UserID:      userID,
+		WorkspaceID: workspaceID,
 	}
 
 	const q = `
@@ -118,7 +118,7 @@ func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPer
 	FROM
 		workspace_users
 	WHERE
-		uid = :user_id
+		wid = :workspace_id
 	ORDER BY
 		workspace_user_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
@@ -146,6 +146,32 @@ func (s Store) QueryByID(ctx context.Context, workspaceUserID string) (Workspace
 		workspace_users
 	WHERE 
 		workspace_user_id = :workspace_user_id`
+
+	var workspaceUser WorkspaceUser
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &workspaceUser); err != nil {
+		return WorkspaceUser{}, fmt.Errorf("selecting workspaceUserID[%q]: %w", workspaceUser, err)
+	}
+
+	return workspaceUser, nil
+}
+
+// QueryByuIDwID gets the specified workspace user from the database.
+func (s Store) QueryByuIDwID(ctx context.Context, workspaceID, userID string) (WorkspaceUser, error) {
+	data := struct {
+		WorkspaceID string `db:"workspace_id"`
+		UserID      string `db:"user_id"`
+	}{
+		WorkspaceID: workspaceID,
+		UserID:      userID,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		workspace_users
+	WHERE 
+		wid = :workspace_id AND uid = :user_id`
 
 	var workspaceUser WorkspaceUser
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &workspaceUser); err != nil {
