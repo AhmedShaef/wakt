@@ -9,18 +9,18 @@ import (
 // between the app and the database.
 type TimeEntry struct {
 	ID          string         `db:"time_entry_id"`
-	Description string         `db:"description" default:"no description"`
+	Description string         `db:"description"`
 	Uid         string         `db:"uid"`
 	Wid         string         `db:"wid"`
-	Pid         string         `db:"pid" default:""`
-	Tid         string         `db:"tid" default:""`
-	Billable    bool           `db:"billable" default:"false"`
+	Pid         string         `db:"pid"`
+	Tid         string         `db:"tid"`
+	Billable    bool           `db:"billable"`
 	Start       time.Time      `db:"start"`
-	Stop        time.Time      `db:"stop" default:""`
-	Duration    time.Duration  `db:"duration" default:"-1"`
+	Stop        time.Time      `db:"stop"`
+	Duration    time.Duration  `db:"duration"`
 	CreatedWith string         `db:"created_with"`
-	Tags        pq.StringArray `db:"tags" default:"[]"`
-	DurOnly     bool           `db:"dur_only" default:"false"`
+	Tags        pq.StringArray `db:"tags"`
+	DurOnly     bool           `db:"dur_only"`
 	DateCreated time.Time      `db:"date_created"`
 	DateUpdated time.Time      `db:"date_updated"`
 }
