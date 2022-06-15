@@ -35,6 +35,9 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 
 // Create inserts a new client into the database.
 func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.Time) (Client, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return Client{}, ErrInvalidID
+	}
 	if err := validate.Check(nc); err != nil {
 		return Client{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -109,6 +112,9 @@ func (c Core) Delete(ctx context.Context, clientID string) error {
 
 //Query retrieves a list of existing client from the database.
 func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
+	if err := validate.CheckID(userID); err != nil {
+		return []Client{}, ErrInvalidID
+	}
 	dbclient, err := c.store.Query(ctx, userID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
@@ -136,6 +142,9 @@ func (c Core) QueryByID(ctx context.Context, clientID string) (Client, error) {
 
 // QueryWorkspaceClients retrieves a list of existing workspace from the database.
 func (c Core) QueryWorkspaceClients(ctx context.Context, workspaceID string, pageNumber, rowsPerPage int) ([]Client, error) {
+	if err := validate.CheckID(workspaceID); err != nil {
+		return []Client{}, ErrInvalidID
+	}
 	dbClient, err := c.store.QueryWorkspaceClients(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
