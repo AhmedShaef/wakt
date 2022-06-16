@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/task"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -18,6 +19,7 @@ import (
 type Handlers struct {
 	Task      task.Core
 	Workspace workspace.Core
+	User      user.Core
 }
 
 // Create adds a new task to the system.
@@ -37,24 +39,15 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, nt.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", nt.Wid, err)
+	if nt.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to querying user: %w", err)
 		}
+		nt.Wid = users.DefaultWid
 	}
 
-	// If you are not an admin and looking to update a client you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	tsk, err := h.Task.Create(ctx, workspaces.Uid, nt, v.Now)
+	tsk, err := h.Task.Create(ctx, claims.Subject, nt, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, task.ErrInvalidID):
