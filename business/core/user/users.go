@@ -222,7 +222,7 @@ func (c Core) UpdateImage(ctx context.Context, userID string, ui UpdateImage, no
 		return fmt.Errorf("updating user userID[%s]: %w", userID, err)
 	}
 	if ui.ImageName != "" {
-		dbuser.ImageURL = "app/tooling/uploader/assets" + ui.ImageName
+		dbuser.ImageURL = "app/foundation/upload/assets" + ui.ImageName
 	}
 	dbuser.DateUpdated = now
 
