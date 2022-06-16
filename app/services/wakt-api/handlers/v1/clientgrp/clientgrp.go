@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/project"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -19,6 +20,7 @@ import (
 type Handlers struct {
 	Client    client.Core
 	Workspace workspace.Core
+	User      user.Core
 	Project   project.Core
 }
 
@@ -39,24 +41,24 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, nu.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", nu.Wid, err)
+	if nu.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to query user data: %w", err)
+		}
+		nu.Wid = users.DefaultWid
+	} else {
+		workspaces, err := h.Workspace.QueryByID(ctx, nu.Wid)
+		if err != nil {
+			return fmt.Errorf("unable to query workspace data:%w", err)
+		}
+
+		if claims.Subject != workspaces.Uid {
+			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}
 
-	// If you are not an admin and looking to update a client you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	clint, err := h.Client.Create(ctx, nu, workspaces.Uid, v.Now)
+	clint, err := h.Client.Create(ctx, nu, claims.Subject, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, client.ErrInvalidID):
@@ -233,7 +235,7 @@ func (h Handlers) QueryClientProjects(ctx context.Context, w http.ResponseWriter
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
 	}
 
-	clients, err := h.Workspace.QueryByID(ctx, clientID)
+	clients, err := h.Client.QueryByID(ctx, clientID)
 	if err != nil {
 		switch {
 		case errors.Is(err, client.ErrInvalidID):
@@ -252,7 +254,7 @@ func (h Handlers) QueryClientProjects(ctx context.Context, w http.ResponseWriter
 
 	work, err := h.Project.QueryClientProjects(ctx, clientID, pageNumber, rowsPerPage)
 	if err != nil {
-		return fmt.Errorf("unable to query for clients: %w", err)
+		return fmt.Errorf("unable to query for client project: %w", err)
 	}
 
 	return web.Respond(ctx, w, work, http.StatusOK)
