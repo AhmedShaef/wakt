@@ -58,7 +58,7 @@ Check logs
 7. [ ] missing funcalities
 
 ### in UI:
-* Design UI/UX and Code (using solid.js) the following:
+* Design UI/UX and Code (using React.js) the following:
   1. [ ] App Dashboard
   2. [ ] Home Page
   3. [ ] Price Page
