@@ -5,15 +5,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/AhmedShaef/wakt/app/tooling/geolocation"
-	"github.com/AhmedShaef/wakt/app/tooling/uploader"
+	"github.com/AhmedShaef/wakt/business/core/project"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	feed "github.com/AhmedShaef/wakt/business/feed/geolocation"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
+	"github.com/AhmedShaef/wakt/foundation/upload"
 	"github.com/AhmedShaef/wakt/foundation/web"
 	"net/http"
+	"strconv"
 )
 
 // Handlers manages the set of user endpoints.
@@ -22,7 +24,7 @@ type Handlers struct {
 	Workspace     workspace.Core
 	WorkspaceUser workspace_user.Core
 	Auth          *auth.Auth
-	APIKey        *geolocation.Config
+	Project       project.Core
 }
 
 // SignUp adds a new user to the system.
@@ -62,14 +64,16 @@ func (h Handlers) SignUp(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("initWorkspace[%+v]: %w", &initWorkspace, err)
 	}
 
-	geo, err := geolocation.GetGeolocation(r.RemoteAddr, *h.APIKey)
+	geo, err := feed.GetGeolocation(r.RemoteAddr)
 	if err != nil {
-
+		return fmt.Errorf("unable to get geolocation: %w", err)
 	}
+
 	uu := user.UpdateUser{
 		DefaultWid: &initWorkspace.ID,
 		TimeZone:   &geo.TimeZone,
 	}
+
 	err = h.User.Update(ctx, usr.ID, uu, v.Now)
 	if err != nil {
 		return fmt.Errorf("user[%+v]: %w", &usr, err)
@@ -93,11 +97,6 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	me := web.Param(r, "id")
-	if me != "me" {
-		return v1Web.NewRequestError(err, http.StatusBadRequest)
 	}
 
 	var upd user.UpdateUser
@@ -134,7 +133,7 @@ func (h Handlers) UpdateImage(ctx context.Context, w http.ResponseWriter, r *htt
 	}
 	defer file.Close()
 
-	name, err := uploader.UploadImage(file)
+	name, err := upload.Image(file)
 	if err != nil {
 		return fmt.Errorf("unable to upload image: %w", err)
 	}
@@ -180,24 +179,16 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	me := web.Param(r, "id")
-	if me != "me" {
-		return v1Web.NewRequestError(err, http.StatusBadRequest)
-	}
 	usr, err := h.User.QueryByID(ctx, claims.Subject)
 	if err != nil {
 		return fmt.Errorf("ID[%s]: %w", claims.Subject, err)
 	}
-
+	// TODO: add related date
 	return web.Respond(ctx, w, usr, http.StatusOK)
 }
 
 // NewToken provides an API token for the authenticated user.
 func (h Handlers) NewToken(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	v, err := web.GetValues(ctx)
-	if err != nil {
-		return web.NewShutdownError("web value missing from context")
-	}
 
 	email, pass, ok := r.BasicAuth()
 	if !ok {
@@ -205,7 +196,7 @@ func (h Handlers) NewToken(ctx context.Context, w http.ResponseWriter, r *http.R
 		return v1Web.NewRequestError(err, http.StatusUnauthorized)
 	}
 
-	claims, err := h.User.Authenticate(ctx, v.Now, email, pass)
+	claims, err := h.User.Authenticate(ctx, email, pass)
 	if err != nil {
 		switch {
 		case errors.Is(err, user.ErrNotFound):
@@ -226,4 +217,37 @@ func (h Handlers) NewToken(ctx context.Context, w http.ResponseWriter, r *http.R
 	}
 
 	return web.Respond(ctx, w, tkn, http.StatusOK)
+}
+
+// QueryUserProjects returns a list of projects for the user.
+func (h Handlers) QueryUserProjects(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+	}
+
+	page := web.Param(r, "page")
+	pageNumber, err := strconv.Atoi(page)
+	if err != nil {
+		return v1Web.NewRequestError(fmt.Errorf("invalid page format, page[%s]", page), http.StatusBadRequest)
+	}
+	rows := web.Param(r, "rows")
+	rowsPerPage, err := strconv.Atoi(rows)
+	if err != nil {
+		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
+	}
+
+	UserProject, err := h.Project.QueryUserProjects(ctx, claims.Subject, pageNumber, rowsPerPage)
+	if err != nil {
+		switch {
+		case errors.Is(err, user.ErrInvalidID):
+			return v1Web.NewRequestError(err, http.StatusBadRequest)
+		case errors.Is(err, user.ErrNotFound):
+			return v1Web.NewRequestError(err, http.StatusNotFound)
+		default:
+			return fmt.Errorf("querying user project[%s]: %w", claims.Subject, err)
+		}
+	}
+
+	return web.Respond(ctx, w, UserProject, http.StatusOK)
 }
