@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/AhmedShaef/wakt/app/tooling/uploader"
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/group"
 	"github.com/AhmedShaef/wakt/business/core/project"
@@ -17,6 +16,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
+	"github.com/AhmedShaef/wakt/foundation/upload"
 	"github.com/AhmedShaef/wakt/foundation/web"
 	"net/http"
 	"strconv"
@@ -174,7 +174,7 @@ func (h Handlers) UpdateLogo(ctx context.Context, w http.ResponseWriter, r *http
 	}
 	defer file.Close()
 
-	name, err := uploader.UploadImage(file)
+	name, err := upload.Logo(file)
 	if err != nil {
 		return fmt.Errorf("unable to upload logo: %w", err)
 	}
@@ -235,6 +235,24 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 			return fmt.Errorf("querying workspace[%s]: %w", workspaceID, err)
 		}
 	}
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
+	if err != nil {
+		switch {
+		case errors.Is(err, workspace_user.ErrInvalidID):
+			return v1Web.NewRequestError(err, http.StatusBadRequest)
+		case errors.Is(err, workspace_user.ErrNotFound):
+			return v1Web.NewRequestError(err, http.StatusNotFound)
+		default:
+			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)
+		}
+	}
+
+	// If you are not an admin and looking to update a project you don't own.
+	if workspaces.OnlyAdminSeeBillableRates {
+		if !workspaceUser.Admin {
+			workspaces.DefaultHourlyRate = 0
+		}
+	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
 	if claims.Subject != workspaces.Uid {
@@ -275,9 +293,27 @@ func (h Handlers) QueryWorkspaceUsers(ctx context.Context, w http.ResponseWriter
 		}
 	}
 
-	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
+	if err != nil {
+		switch {
+		case errors.Is(err, workspace_user.ErrInvalidID):
+			return v1Web.NewRequestError(err, http.StatusBadRequest)
+		case errors.Is(err, workspace_user.ErrNotFound):
+			return v1Web.NewRequestError(err, http.StatusNotFound)
+		default:
+			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)
+		}
+	}
+
+	// If you are not an admin and looking to update a client you don't own.
+	if workspaces.OnlyAdminSeeTeamDashboard {
+		if !workspaceUser.Admin && workspaces.Uid != claims.Subject {
+			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+		}
+	} else {
+		if workspaces.Uid != claims.Subject {
+			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+		}
 	}
 
 	work, err := h.WorkspaceUser.Query(ctx, workspaceID, pageNumber, rowsPerPage)
