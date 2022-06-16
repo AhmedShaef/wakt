@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/time_entry"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -20,6 +21,7 @@ import (
 type Handlers struct {
 	TimeEntry time_entry.Core
 	Workspace workspace.Core
+	User      user.Core
 }
 
 // Create adds a new timeEntry to the system.
@@ -39,24 +41,15 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, nte.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", nte.Wid, err)
+	if nte.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to querying user: %w", err)
 		}
+		nte.Wid = users.DefaultWid
 	}
 
-	// If you are not an admin and looking to update a time entry you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	usr, err := h.TimeEntry.Create(ctx, nte, workspaces.Uid, v.Now)
+	usr, err := h.TimeEntry.Create(ctx, nte, claims.Subject, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, time_entry.ErrInvalidID):
@@ -88,24 +81,15 @@ func (h Handlers) Start(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, ste.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", ste.Wid, err)
+	if ste.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to querying user: %w", err)
 		}
+		ste.Wid = users.DefaultWid
 	}
 
-	// If you are not an admin and looking to update a time entry you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	usr, err := h.TimeEntry.Start(ctx, ste, workspaces.Uid, v.Now)
+	usr, err := h.TimeEntry.Start(ctx, ste, claims.Subject, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, time_entry.ErrInvalidID):
@@ -263,7 +247,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 
 	timeEntryID := web.Param(r, "id")
 
-	timeEntrys, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
+	timeEntry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
 		case errors.Is(err, time_entry.ErrInvalidID):
@@ -276,23 +260,27 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntrys.Uid {
+	if claims.Subject != timeEntry.Uid {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	usr, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
+	users, err := h.User.QueryByID(ctx, timeEntry.Uid)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, user.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, user.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("ID[%s]: %w", timeEntryID, err)
+			return fmt.Errorf("querying user[%s]: %w", timeEntry.Uid, err)
 		}
 	}
 
-	return web.Respond(ctx, w, usr, http.StatusOK)
+	timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
+	timeEntry.Start.Format(timeSetting)
+	timeEntry.Stop.Format(timeSetting)
+
+	return web.Respond(ctx, w, timeEntry, http.StatusOK)
 }
 
 // QueryRunning returns a list of time entries with paging.
@@ -318,6 +306,24 @@ func (h Handlers) QueryRunning(ctx context.Context, w http.ResponseWriter, r *ht
 		return fmt.Errorf("unable to query for time entries: %w", err)
 	}
 
+	for _, v := range timentry {
+		users, err := h.User.QueryByID(ctx, v.Uid)
+		if err != nil {
+			switch {
+			case errors.Is(err, user.ErrInvalidID):
+				return v1Web.NewRequestError(err, http.StatusBadRequest)
+			case errors.Is(err, user.ErrNotFound):
+				return v1Web.NewRequestError(err, http.StatusNotFound)
+			default:
+				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+			}
+		}
+
+		timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
+		v.Start.Format(timeSetting)
+		v.Stop.Format(timeSetting)
+	}
+
 	return web.Respond(ctx, w, timentry, http.StatusOK)
 }
 
@@ -339,11 +345,11 @@ func (h Handlers) QueryRange(ctx context.Context, w http.ResponseWriter, r *http
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
 	}
 
-	start, err := time.Parse("2006-01-02T15:04:05+20:00", r.URL.Query().Get("start_date"))
+	start, err := time.Parse(time.RFC3339, r.URL.Query().Get("start_date"))
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid start_date format, start_date[%s]", start), http.StatusBadRequest)
 	}
-	end, err := time.Parse("2006-01-02T15:04:05+20:00", r.URL.Query().Get("end_date"))
+	end, err := time.Parse(time.RFC3339, r.URL.Query().Get("end_date"))
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid end_date format, end_date[%s]", end), http.StatusBadRequest)
 	}
@@ -351,6 +357,24 @@ func (h Handlers) QueryRange(ctx context.Context, w http.ResponseWriter, r *http
 	timentry, err := h.TimeEntry.QueryRange(ctx, claims.Subject, pageNumber, rowsPerPage, start, end)
 	if err != nil {
 		return fmt.Errorf("unable to query for time entries: %w", err)
+	}
+
+	for _, v := range timentry {
+		users, err := h.User.QueryByID(ctx, v.Uid)
+		if err != nil {
+			switch {
+			case errors.Is(err, user.ErrInvalidID):
+				return v1Web.NewRequestError(err, http.StatusBadRequest)
+			case errors.Is(err, user.ErrNotFound):
+				return v1Web.NewRequestError(err, http.StatusNotFound)
+			default:
+				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+			}
+		}
+
+		timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
+		v.Start.Format(timeSetting)
+		v.Stop.Format(timeSetting)
 	}
 
 	return web.Respond(ctx, w, timentry, http.StatusOK)
@@ -410,7 +434,7 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 }
 
 // QueryDash returns a list of time entries with paging.
-func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
@@ -419,6 +443,24 @@ func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter, r *http.
 	timentry, err := h.TimeEntry.QueryDash(ctx, claims.Subject)
 	if err != nil {
 		return fmt.Errorf("unable to query for time entries: %w", err)
+	}
+
+	for _, v := range timentry {
+		users, err := h.User.QueryByID(ctx, v.Uid)
+		if err != nil {
+			switch {
+			case errors.Is(err, user.ErrInvalidID):
+				return v1Web.NewRequestError(err, http.StatusBadRequest)
+			case errors.Is(err, user.ErrNotFound):
+				return v1Web.NewRequestError(err, http.StatusNotFound)
+			default:
+				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+			}
+		}
+
+		timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
+		v.Start.Format(timeSetting)
+		v.Stop.Format(timeSetting)
 	}
 
 	return web.Respond(ctx, w, timentry, http.StatusOK)
