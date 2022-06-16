@@ -131,7 +131,7 @@ func (c Core) UpdateLogo(ctx context.Context, workspaceID string, uw UpdateWorks
 		return fmt.Errorf("updating user workspaceID[%s]: %w", workspaceID, err)
 	}
 	if uw.LogoURL != "" {
-		dbuser.LogoURL = "app/tooling/uploader/assets" + uw.LogoURL
+		dbuser.LogoURL = "app/foundation/upload/assets" + uw.LogoURL
 	}
 	dbuser.DateUpdated = now
 
