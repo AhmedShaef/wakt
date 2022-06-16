@@ -5,8 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/tag"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -18,6 +18,7 @@ import (
 type Handlers struct {
 	Tag       tag.Core
 	Workspace workspace.Core
+	User      user.Core
 }
 
 // Create adds a new tag to the system.
@@ -37,21 +38,29 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, nt.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", nt.Wid, err)
+	if nt.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to querying user: %w", err)
 		}
-	}
+		nt.Wid = users.DefaultWid
+	} else {
+		workspaces, err := h.Workspace.QueryByID(ctx, nt.Wid)
+		if err != nil {
+			switch {
+			case errors.Is(err, workspace.ErrInvalidID):
+				return v1Web.NewRequestError(err, http.StatusBadRequest)
+			case errors.Is(err, workspace.ErrNotFound):
+				return v1Web.NewRequestError(err, http.StatusNotFound)
+			default:
+				return fmt.Errorf("querying workspace[%s]: %w", workspaces.ID, err)
+			}
+		}
 
-	// If you are not an admin and looking to update a tag you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+		// If you are not an admin and looking to retrieve someone other than yourself.
+		if claims.Subject != workspaces.Uid {
+			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
+		}
 	}
 
 	tags, err := h.Tag.Create(ctx, nt, v.Now)
@@ -65,7 +74,6 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("tag[%+v]: %w", &tags, err)
 		}
 	}
-
 	return web.Respond(ctx, w, tags, http.StatusCreated)
 }
 
@@ -91,9 +99,9 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	tags, err := h.Tag.QueryByID(ctx, tagID)
 	if err != nil {
 		switch {
-		case errors.Is(err, client.ErrInvalidID):
+		case errors.Is(err, tag.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, client.ErrNotFound):
+		case errors.Is(err, tag.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", tagID, err)
@@ -142,9 +150,9 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	tags, err := h.Tag.QueryByID(ctx, tagID)
 	if err != nil {
 		switch {
-		case errors.Is(err, client.ErrInvalidID):
+		case errors.Is(err, tag.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, client.ErrNotFound):
+		case errors.Is(err, tag.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", tagID, err)
