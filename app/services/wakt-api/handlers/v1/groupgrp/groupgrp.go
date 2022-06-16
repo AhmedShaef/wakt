@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/group"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -17,6 +18,7 @@ import (
 type Handlers struct {
 	Group     group.Core
 	Workspace workspace.Core
+	User      user.Core
 }
 
 // Create adds a new group to the system.
@@ -36,24 +38,25 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, ng.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", ng.Wid, err)
+	if ng.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to query user:%w", err)
+		}
+		ng.Wid = users.DefaultWid
+	} else {
+		workspaces, err := h.Workspace.QueryByID(ctx, ng.Wid)
+		if err != nil {
+			return fmt.Errorf("unable to query workspace:%w", err)
+		}
+
+		// If you are not an admin and looking to update a tag you don't own.
+		if workspaces.Uid != claims.Subject {
+			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}
 
-	// If you are not an admin and looking to update a tag you don't own.
-	if workspaces.Uid != claims.Subject {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	groups, err := h.Group.Create(ctx, ng, v.Now)
+	groups, err := h.Group.Create(ctx, claims.Subject, ng, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, group.ErrInvalidID):
@@ -99,20 +102,8 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, groups.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", groupID, err)
-		}
-	}
-
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != groups.Uid {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -151,20 +142,8 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, groups.Wid)
-	if err != nil {
-		switch {
-		case errors.Is(err, workspace.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying workspace[%s]: %w", groupID, err)
-		}
-	}
-
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != groups.Uid {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
