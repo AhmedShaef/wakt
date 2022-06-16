@@ -74,5 +74,5 @@ INSERT INTO workspace_users (workspace_user_id, uid, wid, admin, active, invite_
 values ('32c1494f-1c1f-4981-857f-b0526cb654ec', '5cf37266-3473-4006-984f-9325122678b7',
         '7da3ca14-6366-47cf-b953-f706226567d8', 'true', 'false', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00'),
        ('604125e7-f368-4ff0-8170-dfd2f428510a', '5cf37266-3473-4006-984f-9325122678b7',
-        '6fa2132c-9bdd-428a-b025-5f1a4d6ee683', 'false', 'true', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00')
+        '7da3ca14-6366-47cf-b953-f706226567d8', 'false', 'true', '', '2019-03-24 00:00:00', '2019-03-24 00:00:00')
 ON CONFLICT DO NOTHING;
