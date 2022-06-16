@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AhmedShaef/wakt/business/core/project_user"
+	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -18,6 +19,7 @@ import (
 type Handlers struct {
 	ProjectUser project_user.Core
 	Workspace   workspace.Core
+	User        user.Core
 }
 
 // Add adds a new project_user to the system.
@@ -37,6 +39,14 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
+	if npu.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to querying user: %w", err)
+		}
+		npu.Wid = users.DefaultWid
+	}
+
 	projectUser, err := h.ProjectUser.QueryByID(ctx, npu.Puis)
 	if err != nil {
 		switch {
@@ -50,7 +60,7 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	}
 
 	// If you are not an admin and looking to update a project_user you don't own.
-	if !projectUser.Manager && npu.Uid != claims.Subject {
+	if !projectUser.Manager || npu.Uid != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -103,7 +113,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if !projectUsers.Manager && claims.Subject != projectUsers.Uid {
+		if !projectUsers.Manager || claims.Subject != projectUsers.Uid {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
@@ -146,7 +156,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if !projectUsers.Manager && claims.Subject != projectUsers.Uid {
+		if !projectUsers.Manager || claims.Subject != projectUsers.Uid {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
