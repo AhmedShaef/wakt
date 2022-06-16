@@ -47,6 +47,14 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
+	if np.Wid == "" {
+		users, err := h.User.QueryByID(ctx, claims.Subject)
+		if err != nil {
+			return fmt.Errorf("unable to query user: %w", err)
+		}
+		np.Wid = users.DefaultWid
+	}
+
 	workspaces, err := h.Workspace.QueryByID(ctx, np.Wid)
 	if err != nil {
 		switch {
@@ -59,7 +67,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.Uid, workspaces.ID)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, np.Wid, claims.Subject)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -73,7 +81,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	// If you are not an admin and looking to update a project you don't own.
 	if workspaces.OnlyAdminMayCreateProjects {
-		if !workspaceUser.Admin && workspaces.Uid != claims.Subject {
+		if !workspaceUser.Admin || workspaces.Uid != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	} else {
@@ -82,7 +90,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	prj, err := h.Project.Create(ctx, np, v.Now)
+	prj, err := h.Project.Create(ctx, claims.Subject, np, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, project.ErrInvalidID):
@@ -221,7 +229,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.Uid, workspaces.ID)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -306,7 +314,7 @@ func (h Handlers) QueryProjectTasks(ctx context.Context, w http.ResponseWriter, 
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	taskID := web.Param(r, "id")
+	projectID := web.Param(r, "id")
 	page := web.Param(r, "page")
 	pageNumber, err := strconv.Atoi(page)
 	if err != nil {
@@ -318,7 +326,7 @@ func (h Handlers) QueryProjectTasks(ctx context.Context, w http.ResponseWriter, 
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
 	}
 
-	tasks, err := h.Workspace.QueryByID(ctx, taskID)
+	projects, err := h.Project.QueryByID(ctx, projectID)
 	if err != nil {
 		switch {
 		case errors.Is(err, task.ErrInvalidID):
@@ -326,63 +334,19 @@ func (h Handlers) QueryProjectTasks(ctx context.Context, w http.ResponseWriter, 
 		case errors.Is(err, task.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying task[%s]: %w", taskID, err)
+			return fmt.Errorf("querying task[%s]: %w", projectID, err)
 		}
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != tasks.Uid {
+	if claims.Subject != projects.Uid {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	tsk, err := h.Task.QueryProjectTasks(ctx, taskID, pageNumber, rowsPerPage)
+	tsk, err := h.Task.QueryProjectTasks(ctx, projectID, pageNumber, rowsPerPage)
 	if err != nil {
 		return fmt.Errorf("unable to query for task: %w", err)
 	}
 
 	return web.Respond(ctx, w, tsk, http.StatusOK)
-}
-
-// QueryProjectUsers returns a list of workspaces with paging.
-func (h Handlers) QueryProjectUsers(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	claims, err := auth.GetClaims(ctx)
-	if err != nil {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	userID := web.Param(r, "id")
-	page := web.Param(r, "page")
-	pageNumber, err := strconv.Atoi(page)
-	if err != nil {
-		return v1Web.NewRequestError(fmt.Errorf("invalid page format, page[%s]", page), http.StatusBadRequest)
-	}
-	rows := web.Param(r, "rows")
-	rowsPerPage, err := strconv.Atoi(rows)
-	if err != nil {
-		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
-	}
-
-	users, err := h.Workspace.QueryByID(ctx, userID)
-	if err != nil {
-		switch {
-		case errors.Is(err, user.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, user.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("querying user[%s]: %w", userID, err)
-		}
-	}
-
-	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != users.Uid {
-		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
-	}
-
-	usr, err := h.User.QueryProjectUsers(ctx, userID, pageNumber, rowsPerPage)
-	if err != nil {
-		return fmt.Errorf("unable to query for users: %w", err)
-	}
-
-	return web.Respond(ctx, w, usr, http.StatusOK)
 }
