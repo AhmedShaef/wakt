@@ -434,7 +434,7 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 }
 
 // QueryDash returns a list of time entries with paging.
-func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter) error {
+func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
