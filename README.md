@@ -3,6 +3,7 @@
 
 ----
 [![go.mod Go version](https://img.shields.io/github/go-mod/go-version/AhmedShaef/wakt)](https://github.com/AhmedShaef/wakt)
+[![Go Report Card](https://goreportcard.com/badge/github.com/AhmedShaef/wakt)](https://goreportcard.com/report/github.com/AhmedShaef/wakt)
 [![Wiki](https://img.shields.io/badge/wiki-wakt-blue.svg)](https://github.com/AhmedShaef/wakt/wiki)
 ![License](https://img.shields.io/badge/license-GNU%3A%20General%20Public%20License-blue.svg)
 
