@@ -79,13 +79,13 @@ Liveness is in [locakhost:4000/debug/liveness](http://locakhost/400/debug/livene
 ----
 ## TODO for v1.0.0
 ### in API :
-1. [ ] Decrase number of db cooniction per request
-2. [ ] Improve notufcation system
+1. [ ] Decrease number of db connection per request
+2. [ ] Improve notification system
 3. [ ] Report package
-4. [ ] invoce and payment
+4. [ ] invoice and payment
 5. [ ] Oauth2
 6. [ ] improve comments
-7. [ ] missing funcalities
+7. [ ] missing functionalities
 
 ### in UI:
 * Design UI/UX and Code (using React.js) the following:
