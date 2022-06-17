@@ -156,12 +156,11 @@ func TestTimeEntry(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same timeEntryStop.", dbtest.Success, testID)
 
-			_, err = core.QueryDash(ctx, "5cf37266-3473-4006-984f-9325122678b7")
+			dash, err := core.QueryDash(ctx, "5cf37266-3473-4006-984f-9325122678b7")
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve timeEntry : %s.", dbtest.Failed, testID, err)
 			}
-			t.Logf("\t%s\tTest %d:\tShould be able to retrieve timeEntry.", dbtest.Success, testID)
-			//TODO: check dash
+			t.Logf("\t%s\tTest %d:\tShould be able to retrieve timeEntry dash: %v", dbtest.Success, testID, dash)
 		}
 	}
 }
