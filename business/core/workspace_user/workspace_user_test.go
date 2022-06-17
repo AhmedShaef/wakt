@@ -74,7 +74,7 @@ func TestWorkspaceUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould be able to retrieve workspace_user by ID.", dbtest.Success, testID)
 
-			if diff := cmp.Diff(workspace_user, saved2); diff != "" {
+			if diff := cmp.Diff(workspace_user[0], saved2); diff != "" {
 				t.Errorf("\t%s\tTest %d:\tShould get back the same workspace_user. Diff:\n%s", dbtest.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same workspace_user.", dbtest.Success, testID)
@@ -135,7 +135,7 @@ func TestPagingWorkspaceUser(t *testing.T) {
 		{
 			ctx := context.Background()
 
-			workspaceUsers1, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
+			workspaceUsers1, err := core.Query(ctx, "7da3ca14-6366-47cf-b953-f706226567d8", 1, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve workspace_users for page 1 : %s.", dbtest.Failed, testID, err)
 			}
@@ -146,7 +146,7 @@ func TestPagingWorkspaceUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould have a single workspace_user.", dbtest.Success, testID)
 
-			workspaceUsers2, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
+			workspaceUsers2, err := core.Query(ctx, "7da3ca14-6366-47cf-b953-f706226567d8", 2, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve workspace_users for page 2 : %s.", dbtest.Failed, testID, err)
 			}
