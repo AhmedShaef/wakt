@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func TestClient(t *testing.T) {
+func TestTimeEntry(t *testing.T) {
 	log, db, teardown := dbtest.NewUnit(t, c, "testtimeentry")
 	t.Cleanup(teardown)
 
@@ -166,7 +166,7 @@ func TestClient(t *testing.T) {
 	}
 }
 
-func TestPagingClient(t *testing.T) {
+func TestPagingTimeEntry(t *testing.T) {
 	log, db, teardown := dbtest.NewUnit(t, c, "testpaging")
 	t.Cleanup(teardown)
 
