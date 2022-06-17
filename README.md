@@ -8,6 +8,17 @@
 
 # Getting Started
 Wakt is an open-source time tracking Microservice, based on [Ardanlabs service 3](https://github.com/ardanlabs/service) and inspired by [Toggl track](https://toggl.com/track/).
+
+## fast run (this just run wakt api)
+1- the Go 1.18 + and postgres 14.2 is requred.
+2- use commend to run main.go with fmt logs.
+```shell
+make runfmt
+```
+3- apply the scemma and seed demo data.
+```shell
+make seed
+```
 ### Prerequisites
 
 * [Go 1.18 +](https://golang.org/doc/install)
@@ -57,7 +68,7 @@ Liveness is in [locakhost:4000/debug/liveness](http://locakhost/400/debug/livene
 ```shell
     make kind-down
 ```
-## Run tests
+## Run tests (that support unit and integrated test)
 ```shell
     make test
 ```
