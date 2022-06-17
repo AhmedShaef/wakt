@@ -11,7 +11,6 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
-	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
@@ -102,9 +101,10 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 	npu := project_user.NewProjectUser{
-		Pid: prj.ID,
-		Uid: workspaces.Uid,
-		Wid: prj.Wid,
+		Pid:     prj.ID,
+		Uid:     workspaces.Uid,
+		Wid:     prj.Wid,
+		Manager: true,
 	}
 	projectUser, err := h.ProjectUser.Create(ctx, npu, v.Now)
 	if err != nil {
@@ -115,21 +115,6 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("project_user[%+v]: %w", &projectUser, err)
-		}
-	}
-
-	upu := project_user.UpdateProjectUser{
-		Manager: dbtest.BoolPointer(true),
-	}
-
-	if err := h.ProjectUser.Update(ctx, projectUser[0].ID, upu, v.Now); err != nil {
-		switch {
-		case errors.Is(err, project_user.ErrInvalidID):
-			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, project_user.ErrNotFound):
-			return v1Web.NewRequestError(err, http.StatusNotFound)
-		default:
-			return fmt.Errorf("ID[%s] ProjectUser[%+v]: %w", projectUser[0].ID, &upu, err)
 		}
 	}
 
