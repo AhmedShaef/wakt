@@ -11,6 +11,7 @@ Wakt is an open-source time tracking Microservice, based on [Ardanlabs service 3
 
 ## fast run (this just run wakt api)
 1- the Go 1.18 + and postgres 14.2 is requred.
+
 2- use commend to run main.go with fmt logs.
 ```shell
 make runfmt
