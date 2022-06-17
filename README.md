@@ -25,19 +25,33 @@ make dev.setup.mac
     make all
     make kind-up
     make kind-load
-    make kind-apply
-```    
-Check status
+    make kind-apply  
+```   
+## Check services status  
+
+### Check status
 ```shell
     make kind-status 
 ```
-Check logs
+### Check logs
 ```shell
     make kind-logs
 ```
-Check traces
+also you can log specific service ex.
+```shell
+    make kind-logs-wakt
+```
+### Check traces
 
 Use Zipkin to query traces in [localhost:9411](http://localhost:9411)
+
+### Check metrics
+
+use the expvar sidecar service in port 4000
+
+Ckeck readiness in [localhost:4000/debug/readiness](http://localhost:4000/debug/readiness) the status ok mean the api up and running
+
+Liveness is in [locakhost:4000/debug/liveness](http://locakhost/400/debug/liveness) if you get data that's mean the db is running and connected
     
 ## To stop using wakt
 ```shell
