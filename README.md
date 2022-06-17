@@ -35,6 +35,10 @@ Check logs
 ```shell
     make kind-logs
 ```
+Check traces
+
+Use Zipkin to query traces in [localhost:9411](http://localhost:9411)
+    
 ## To stop using wakt
 ```shell
     make kind-down
