@@ -170,7 +170,7 @@ func (h Handlers) UpdateLogo(ctx context.Context, w http.ResponseWriter, r *http
 
 	file, handler, err := r.FormFile("profileLogo")
 	if err != nil {
-		return fmt.Errorf("unable to get file %S: %w", handler.Filename, err)
+		return fmt.Errorf("unable to get file %v: %w", handler.Filename, err)
 	}
 	defer file.Close()
 

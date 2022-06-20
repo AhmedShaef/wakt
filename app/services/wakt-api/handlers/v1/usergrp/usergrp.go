@@ -129,7 +129,7 @@ func (h Handlers) UpdateImage(ctx context.Context, w http.ResponseWriter, r *htt
 
 	file, handler, err := r.FormFile("profileImage")
 	if err != nil {
-		return fmt.Errorf("unable to get file %S: %w", handler.Filename, err)
+		return fmt.Errorf("unable to get file %v: %w", handler.Filename, err)
 	}
 	defer file.Close()
 

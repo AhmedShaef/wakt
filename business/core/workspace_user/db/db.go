@@ -149,7 +149,7 @@ func (s Store) QueryByID(ctx context.Context, workspaceUserID string) (Workspace
 
 	var workspaceUser WorkspaceUser
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &workspaceUser); err != nil {
-		return WorkspaceUser{}, fmt.Errorf("selecting workspaceUserID[%q]: %w", workspaceUser, err)
+		return WorkspaceUser{}, fmt.Errorf("selecting workspaceUserID[%v]: %w", workspaceUser, err)
 	}
 
 	return workspaceUser, nil
@@ -175,7 +175,7 @@ func (s Store) QueryByuIDwID(ctx context.Context, workspaceID, userID string) (W
 
 	var workspaceUser WorkspaceUser
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &workspaceUser); err != nil {
-		return WorkspaceUser{}, fmt.Errorf("selecting workspaceUserID[%q]: %w", workspaceUser, err)
+		return WorkspaceUser{}, fmt.Errorf("selecting workspaceUserID[%v]: %w", workspaceUser, err)
 	}
 
 	return workspaceUser, nil
