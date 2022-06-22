@@ -1,16 +1,17 @@
-package project_user
+package team
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/project_user/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/project_user/db"
 )
 
 // ProjectUser represents an individual ProjectUser.
 type ProjectUser struct {
 	ID          string    `json:"project_user_id"`
 	Pid         string    `json:"pid"`
-	Uid         string    `json:"uid"`
+	UID         string    `json:"uid"`
 	Wid         string    `json:"wid"`
 	Manager     bool      `json:"manager"`
 	Rate        float64   `json:"rate"`
@@ -21,7 +22,7 @@ type ProjectUser struct {
 // NewProjectUser contains information needed to create a new ProjectUser.
 type NewProjectUser struct {
 	Pid     string  `json:"pid" validate:"required"`
-	Uid     string  `json:"uid" validate:"required"`
+	UID     string  `json:"uid" validate:"required"`
 	Wid     string  `json:"wid"`
 	Manager bool    `json:"manager"`
 	Rate    float64 `json:"rate"`

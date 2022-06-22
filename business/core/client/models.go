@@ -1,16 +1,17 @@
 package client
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/client/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/client/db"
 )
 
 // Client represents an individual client.
 type Client struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
-	Uid         string    `json:"uid"`
+	UID         string    `json:"uid"`
 	Wid         string    `json:"wid"`
 	Notes       string    `json:"notes"`
 	DateCreated time.Time `json:"date_created"`

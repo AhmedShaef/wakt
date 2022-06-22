@@ -1,19 +1,20 @@
 // Package project_user provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
-package project_user
+package team
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/project_user/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"strings"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -40,7 +41,7 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 		return []ProjectUser{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	uids := strings.Split(npu.Uid, ",")
+	uids := strings.Split(npu.UID, ",")
 
 	var ProjectUsers []db.ProjectUser
 
@@ -52,7 +53,7 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 		dbprojectuser = db.ProjectUser{
 			ID:          validate.GenerateID(),
 			Pid:         npu.Pid,
-			Uid:         uid,
+			UID:         uid,
 			Wid:         npu.Wid,
 			Manager:     npu.Manager,
 			Rate:        npu.Rate,

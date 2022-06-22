@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
-	"github.com/AhmedShaef/wakt/business/core/project_user"
+	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -18,13 +18,12 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-// ProjectUserTests holds methods for each project_user subtest. This type allows
+// ProjectUserTests holds methods for each team subtest. This type allows
 // passing dependencies for tests while still providing a convenient syntax
 // when subtests are registered.
 type ProjectUserTests struct {
 	app        http.Handler
 	adminToken string
-	userToken  string
 }
 
 // TestProjectUsers runs a series of tests to exercise ProjectUser behavior from the
@@ -36,7 +35,7 @@ type ProjectUserTests struct {
 func TestProjectUsers(t *testing.T) {
 	t.Parallel()
 
-	test := dbtest.NewIntegration(t, c, "inttestproject_user")
+	test := dbtest.NewIntegration(t, c, "inttestteam")
 	t.Cleanup(test.Teardown)
 
 	shutdown := make(chan os.Signal, 1)
@@ -58,8 +57,8 @@ func TestProjectUsers(t *testing.T) {
 	t.Run("crudProjectUsers", tests.crudProjectUser)
 }
 
-// postProjectUser400 validates a project_user can't be created with the endpoint
-// unless a valid project_user document is submitted.
+// postProjectUser400 validates a team can't be created with the endpoint
+// unless a valid team document is submitted.
 func (pt *ProjectUserTests) postProjectUser400(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/v1/team", strings.NewReader(`{}`))
 	w := httptest.NewRecorder()
@@ -67,10 +66,10 @@ func (pt *ProjectUserTests) postProjectUser400(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new project_user can't be created with an invalid document.")
+	t.Log("Given the need to validate a new team can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete project_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete team value.", testID)
 		{
 			if w.Code != http.StatusBadRequest {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 400 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -102,10 +101,10 @@ func (pt *ProjectUserTests) postProjectUser400(t *testing.T) {
 	}
 }
 
-// postProjectUser403 validates a project_user can't be created with the endpoint
+// postProjectUser403 validates a team can't be created with the endpoint
 // unless the user is authenticated
 func (pt *ProjectUserTests) postProjectUser403(t *testing.T) {
-	np := project_user.NewProjectUser{
+	np := team.NewProjectUser{
 		Pid:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		Uid:  "5cf37266-3473-4006-984f-9325122678b7",
 		Puis: "c7142720-91d3-4d1e-841d-680042b6500c",
@@ -122,10 +121,10 @@ func (pt *ProjectUserTests) postProjectUser403(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new project_user can't be created with an invalid document.")
+	t.Log("Given the need to validate a new team can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete project_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete team value.", testID)
 		{
 			if w.Code != http.StatusForbidden {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 403 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -135,10 +134,10 @@ func (pt *ProjectUserTests) postProjectUser403(t *testing.T) {
 	}
 }
 
-// postProjectUser401 validates a project_user can't be created with the endpoint
+// postProjectUser401 validates a team can't be created with the endpoint
 // unless the user is authenticated
 func (pt *ProjectUserTests) postProjectUser401(t *testing.T) {
-	np := project_user.NewProjectUser{
+	np := team.NewProjectUser{
 		Pid: "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		Uid: "5cf37266-3473-4006-984f-9325122678b7",
 	}
@@ -154,10 +153,10 @@ func (pt *ProjectUserTests) postProjectUser401(t *testing.T) {
 	// Not setting an authorization header.
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new project_user can't be created with an invalid document.")
+	t.Log("Given the need to validate a new team can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete project_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete team value.", testID)
 		{
 			if w.Code != http.StatusUnauthorized {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 401 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -167,7 +166,7 @@ func (pt *ProjectUserTests) postProjectUser401(t *testing.T) {
 	}
 }
 
-// deleteProjectUserNotFound validates deleting a project_user that does not exist is not a failure.
+// deleteProjectUserNotFound validates deleting a team that does not exist is not a failure.
 func (pt *ProjectUserTests) deleteProjectUserNotFound(t *testing.T) {
 	id := "112262f1-1a77-4374-9f22-39e575aa6348"
 
@@ -177,10 +176,10 @@ func (pt *ProjectUserTests) deleteProjectUserNotFound(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a project_user that does not exist.")
+	t.Log("Given the need to validate deleting a team that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new project_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new team %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -190,11 +189,11 @@ func (pt *ProjectUserTests) deleteProjectUserNotFound(t *testing.T) {
 	}
 }
 
-// putProjectUser404 validates updating a project_user that does not exist.
+// putProjectUser404 validates updating a team that does not exist.
 func (pt *ProjectUserTests) putProjectUser404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := project_user.UpdateProjectUser{
+	up := team.UpdateProjectUser{
 		Manager: dbtest.BoolPointer(true),
 	}
 	body, err := json.Marshal(&up)
@@ -208,10 +207,10 @@ func (pt *ProjectUserTests) putProjectUser404(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate updating a project_user that does not exist.")
+	t.Log("Given the need to validate updating a team that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new project_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new team %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -238,9 +237,9 @@ func (pt *ProjectUserTests) crudProjectUser(t *testing.T) {
 	pt.putProjectUser204(t, p[0].ID)
 }
 
-// postProjectUser201 validates a project_user can be created with the endpoint.
-func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []project_user.ProjectUser {
-	np := project_user.NewProjectUser{
+// postProjectUser201 validates a team can be created with the endpoint.
+func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []team.ProjectUser {
+	np := team.NewProjectUser{
 		Pid:     "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		Uid:     "5cf37266-3473-4006-984f-9325122678b7",
 		Puis:    "efcc74aa-86d2-4e11-80f9-3ca912af8269",
@@ -259,12 +258,12 @@ func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []project_user.Proj
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got []project_user.ProjectUser
+	var got []team.ProjectUser
 
-	t.Log("Given the need to create a new project_user with the project_users endpoint.")
+	t.Log("Given the need to create a new team with the teams endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the declared project_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using the declared team value.", testID)
 		{
 			if w.Code != http.StatusCreated {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 201 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -292,7 +291,7 @@ func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []project_user.Proj
 	return got
 }
 
-// deleteProjectUser200 validates deleting a project_user that does exist.
+// deleteProjectUser200 validates deleting a team that does exist.
 func (pt *ProjectUserTests) deleteProjectUser204(t *testing.T, id string) {
 	r := httptest.NewRequest(http.MethodDelete, "/v1/team/"+id, nil)
 	w := httptest.NewRecorder()
@@ -300,10 +299,10 @@ func (pt *ProjectUserTests) deleteProjectUser204(t *testing.T, id string) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a project_user that does exist.")
+	t.Log("Given the need to validate deleting a team that does exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new project_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new team %s.", testID, id)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -313,7 +312,7 @@ func (pt *ProjectUserTests) deleteProjectUser204(t *testing.T, id string) {
 	}
 }
 
-// putProjectUser204 validates updating a project_user that does exist.
+// putProjectUser204 validates updating a team that does exist.
 func (pt *ProjectUserTests) putProjectUser204(t *testing.T, id string) {
 	body := `{"rate": 10}`
 	r := httptest.NewRequest(http.MethodPut, "/v1/team/"+id, strings.NewReader(body))
@@ -322,10 +321,10 @@ func (pt *ProjectUserTests) putProjectUser204(t *testing.T, id string) {
 	r.Header.Set("Authorization", "Bearer "+pt.adminToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to update a project_user with the project_users endpoint.")
+	t.Log("Given the need to update a team with the teams endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the modified project_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using the modified team value.", testID)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)

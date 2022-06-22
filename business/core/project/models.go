@@ -12,7 +12,7 @@ type Project struct {
 	Name           string        `json:"name"`
 	Wid            string        `json:"wid"`
 	Cid            string        `json:"cid"`
-	Uid            string        `json:"uid"`
+	UID            string        `json:"uid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
 	Billable       bool          `json:"billable"`

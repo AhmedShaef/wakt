@@ -1,9 +1,10 @@
 package group
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/group/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/group/db"
 )
 
 // Group represents an individual Group.
@@ -11,7 +12,7 @@ type Group struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Wid         string    `json:"wid"`
-	Uid         string    `json:"uid"`
+	UID         string    `json:"uid"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }

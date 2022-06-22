@@ -5,12 +5,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/group"
 	"github.com/AhmedShaef/wakt/business/core/project"
-	"github.com/AhmedShaef/wakt/business/core/project_user"
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
+	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
@@ -18,8 +21,6 @@ import (
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/upload"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strconv"
 )
 
 // Handlers manages the set of workspace endpoints.
@@ -31,7 +32,7 @@ type Handlers struct {
 	Project       project.Core
 	Task          task.Core
 	Tag           tag.Core
-	ProjectUser   project_user.Core
+	ProjectUser   team.Core
 	WorkspaceUser workspace_user.Core
 }
 

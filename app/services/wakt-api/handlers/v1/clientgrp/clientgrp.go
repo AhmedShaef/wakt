@@ -105,7 +105,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != clients.Uid {
+	if claims.Subject != clients.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -145,7 +145,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != clients.Uid {
+	if claims.Subject != clients.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -209,7 +209,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != clients.Uid {
+	if claims.Subject != clients.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -248,7 +248,7 @@ func (h Handlers) QueryClientProjects(ctx context.Context, w http.ResponseWriter
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != clients.Uid {
+	if claims.Subject != clients.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 

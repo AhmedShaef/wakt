@@ -7,12 +7,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/client/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -50,7 +51,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 	dbclint := db.Client{
 		ID:          validate.GenerateID(),
 		Name:        nc.Name,
-		Uid:         userID,
+		UID:         userID,
 		Wid:         nc.Wid,
 		Notes:       nc.Notes,
 		DateCreated: now,
