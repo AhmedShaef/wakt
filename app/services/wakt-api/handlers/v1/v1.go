@@ -6,18 +6,18 @@ import (
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/clientgrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/groupgrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/projectgrp"
-	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/projectusergrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/taggrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/taskgrp"
+	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/teamgrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/timeentrygrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/workspacegrp"
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/workspaceusergrp"
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/group"
 	"github.com/AhmedShaef/wakt/business/core/project"
-	"github.com/AhmedShaef/wakt/business/core/project_user"
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
+	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/time_entry"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
@@ -78,7 +78,7 @@ func Routes(app *web.App, cfg Config) {
 		User:          user.NewCore(cfg.Log, cfg.DB),
 		Task:          task.NewCore(cfg.Log, cfg.DB),
 		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
-		ProjectUser:   project_user.NewCore(cfg.Log, cfg.DB),
+		Team:          team.NewCore(cfg.Log, cfg.DB),
 	}
 
 	app.Handle(http.MethodPost, version, "/project", pgh.Create, authen)
@@ -87,11 +87,11 @@ func Routes(app *web.App, cfg Config) {
 	app.Handle(http.MethodGet, version, "/project/:id", pgh.QueryByID, authen)
 	app.Handle(http.MethodGet, version, "/project/:id/task/:page/:rows", pgh.QueryProjectTasks, authen)
 
-	// Register project user management endpoints.
-	pugh := projectusergrp.Handlers{
-		ProjectUser: project_user.NewCore(cfg.Log, cfg.DB),
-		Workspace:   workspace.NewCore(cfg.Log, cfg.DB),
-		User:        user.NewCore(cfg.Log, cfg.DB),
+	// Register team management endpoints.
+	pugh := teamgrp.Handlers{
+		Team:      team.NewCore(cfg.Log, cfg.DB),
+		Workspace: workspace.NewCore(cfg.Log, cfg.DB),
+		User:      user.NewCore(cfg.Log, cfg.DB),
 	}
 
 	app.Handle(http.MethodPost, version, "/team", pugh.Add, authen)
@@ -165,7 +165,7 @@ func Routes(app *web.App, cfg Config) {
 		Project:       project.NewCore(cfg.Log, cfg.DB),
 		Task:          task.NewCore(cfg.Log, cfg.DB),
 		Tag:           tag.NewCore(cfg.Log, cfg.DB),
-		ProjectUser:   project_user.NewCore(cfg.Log, cfg.DB),
+		Team:          team.NewCore(cfg.Log, cfg.DB),
 		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
 	}
 
@@ -180,7 +180,7 @@ func Routes(app *web.App, cfg Config) {
 	app.Handle(http.MethodGet, version, "/workspace/:id/projects/:page/:rows", wgh.QueryWorkspaceProjects, authen)
 	app.Handle(http.MethodGet, version, "/workspace/:id/tasks/:page/:rows", wgh.QueryWorkspaceTasks, authen)
 	app.Handle(http.MethodGet, version, "/workspace/:id/tags/:page/:rows", wgh.QueryWorkspaceTags, authen)
-	app.Handle(http.MethodGet, version, "/workspace/:id/project_users/:page/:rows", wgh.QueryWorkspaceProjectUsers, authen)
+	app.Handle(http.MethodGet, version, "/workspace/:id/teams/:page/:rows", wgh.QueryWorkspaceTeams, authen)
 
 	// Register workspace user management endpoints.
 	wugh := workspaceusergrp.Handlers{

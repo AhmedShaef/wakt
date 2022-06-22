@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-// ProjectUser represent the structure we need for moving data
+// Team represent the structure we need for moving data
 // between the app and the database.
-type ProjectUser struct {
-	ID          string    `db:"project_user_id"`
+type Team struct {
+	ID          string    `db:"team_id"`
 	Pid         string    `db:"pid"`
 	UID         string    `db:"uid"`
 	Wid         string    `db:"wid"`

@@ -1,5 +1,5 @@
-// Package projectusergrp maintains the group of handlers for projectuser access.
-package projectusergrp
+// Package teamgrp maintains the group of handlers for projectuser access.
+package teamgrp
 
 import (
 	"context"
@@ -18,9 +18,9 @@ import (
 
 // Handlers manages the set of projectuser endpoints.
 type Handlers struct {
-	ProjectUser team.Core
-	Workspace   workspace.Core
-	User        user.Core
+	Team      team.Core
+	Workspace workspace.Core
+	User      user.Core
 }
 
 // Add adds a new team to the system.
@@ -35,7 +35,7 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var npu team.NewProjectUser
+	var npu team.NewTeam
 	if err := web.Decode(r, &npu); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -48,7 +48,7 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		npu.Wid = users.DefaultWid
 	}
 
-	projectUser, err := h.ProjectUser.QueryByID(ctx, npu.Puis)
+	projectUser, err := h.Team.QueryByID(ctx, npu.Puis)
 	if err != nil {
 		switch {
 		case errors.Is(err, team.ErrInvalidID):
@@ -56,16 +56,16 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		case errors.Is(err, team.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying ProjectUser[%s]: %w", projectUser.ID, err)
+			return fmt.Errorf("querying Team[%s]: %w", projectUser.ID, err)
 		}
 	}
 
 	// If you are not an admin and looking to update a team you don't own.
-	if !projectUser.Manager || npu.Uid != claims.Subject {
+	if !projectUser.Manager || npu.UID != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	clint, err := h.ProjectUser.Create(ctx, npu, v.Now)
+	clint, err := h.Team.Create(ctx, npu, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, team.ErrInvalidID):
@@ -92,7 +92,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var upd team.UpdateProjectUser
+	var upd team.UpdateTeam
 	if err := web.Decode(r, &upd); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -101,7 +101,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 	projectUserIDs := strings.Split(projctUserID, ",")
 
 	for _, projectUserID := range projectUserIDs {
-		projectUsers, err := h.ProjectUser.QueryByID(ctx, projectUserID)
+		projectUsers, err := h.Team.QueryByID(ctx, projectUserID)
 		if err != nil {
 			switch {
 			case errors.Is(err, team.ErrInvalidID):
@@ -114,18 +114,18 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if !projectUsers.Manager || claims.Subject != projectUsers.Uid {
+		if !projectUsers.Manager || claims.Subject != projectUsers.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
-		if err := h.ProjectUser.Update(ctx, projectUserID, upd, v.Now); err != nil {
+		if err := h.Team.Update(ctx, projectUserID, upd, v.Now); err != nil {
 			switch {
 			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
 			case errors.Is(err, team.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
-				return fmt.Errorf("ID[%s] ProjectUser[%+v]: %w", projectUserID, &upd, err)
+				return fmt.Errorf("ID[%s] Team[%+v]: %w", projectUserID, &upd, err)
 			}
 		}
 	}
@@ -144,7 +144,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 	projectUserIDs := strings.Split(projctUserID, ",")
 
 	for _, projectUserID := range projectUserIDs {
-		projectUsers, err := h.ProjectUser.QueryByID(ctx, projectUserID)
+		projectUsers, err := h.Team.QueryByID(ctx, projectUserID)
 		if err != nil {
 			switch {
 			case errors.Is(err, team.ErrInvalidID):
@@ -157,11 +157,11 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if !projectUsers.Manager || claims.Subject != projectUsers.Uid {
+		if !projectUsers.Manager || claims.Subject != projectUsers.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
-		if err := h.ProjectUser.Delete(ctx, projectUserID); err != nil {
+		if err := h.Team.Delete(ctx, projectUserID); err != nil {
 			switch {
 			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)

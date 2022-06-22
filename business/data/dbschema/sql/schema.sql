@@ -130,11 +130,11 @@ CREATE TABLE tags
     date_updated timestamp
 );
 
--- Description: Create table project_users
-CREATE TABLE project_users
+-- Description: Create table team
+CREATE TABLE teams
 (
-    project_user_id uuid
-        constraint project_user_pk primary key,
+    team_id uuid
+        constraint team_pk primary key,
     pid             uuid,
     uid             uuid,
     wid             uuid,

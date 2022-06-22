@@ -23,7 +23,7 @@ import (
 // Handlers manages the set of project endpoints.
 type Handlers struct {
 	Project       project.Core
-	ProjectUser   team.Core
+	Team          team.Core
 	Workspace     workspace.Core
 	WorkspaceUser workspace_user.Core
 	User          user.Core
@@ -101,13 +101,13 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("project[%+v]: %w", &prj, err)
 		}
 	}
-	npu := team.NewProjectUser{
+	npu := team.NewTeam{
 		Pid:     prj.ID,
-		Uid:     workspaces.Uid,
+		UID:     workspaces.Uid,
 		Wid:     prj.Wid,
 		Manager: true,
 	}
-	projectUser, err := h.ProjectUser.Create(ctx, npu, v.Now)
+	projectUser, err := h.Team.Create(ctx, npu, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, team.ErrInvalidID):

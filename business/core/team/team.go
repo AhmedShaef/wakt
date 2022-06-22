@@ -1,4 +1,4 @@
-// Package project_user provides an example of a core business API. Right now these
+// Package team provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
 package team
@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AhmedShaef/wakt/business/core/project_user/db"
+	"github.com/AhmedShaef/wakt/business/core/team/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -36,21 +36,21 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 }
 
 // Create inserts a new project user into the database.
-func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]ProjectUser, error) {
+func (c Core) Create(ctx context.Context, npu NewTeam, now time.Time) ([]Team, error) {
 	if err := validate.Check(npu); err != nil {
-		return []ProjectUser{}, fmt.Errorf("validating data: %w", err)
+		return []Team{}, fmt.Errorf("validating data: %w", err)
 	}
 
 	uids := strings.Split(npu.UID, ",")
 
-	var ProjectUsers []db.ProjectUser
+	var Teams []db.Team
 
 	for _, uid := range uids {
 
-		dbprojectuser := db.ProjectUser{
+		dbprojectuser := db.Team{
 			Rate: 0,
 		}
-		dbprojectuser = db.ProjectUser{
+		dbprojectuser = db.Team{
 			ID:          validate.GenerateID(),
 			Pid:         npu.Pid,
 			UID:         uid,
@@ -62,16 +62,16 @@ func (c Core) Create(ctx context.Context, npu NewProjectUser, now time.Time) ([]
 		}
 
 		if err := c.store.Create(ctx, dbprojectuser); err != nil {
-			return []ProjectUser{}, fmt.Errorf("create: %w", err)
+			return []Team{}, fmt.Errorf("create: %w", err)
 		}
-		ProjectUsers = append(ProjectUsers, dbprojectuser)
+		Teams = append(Teams, dbprojectuser)
 	}
 
-	return toProjectUserSlice(ProjectUsers), nil
+	return toTeamSlice(Teams), nil
 }
 
 // Update replaces a project user document in the database.
-func (c Core) Update(ctx context.Context, projectUserID string, upu UpdateProjectUser, now time.Time) error {
+func (c Core) Update(ctx context.Context, projectUserID string, upu UpdateTeam, now time.Time) error {
 	if err := validate.CheckID(projectUserID); err != nil {
 		return ErrInvalidID
 	}
@@ -80,7 +80,7 @@ func (c Core) Update(ctx context.Context, projectUserID string, upu UpdateProjec
 		return fmt.Errorf("validating data: %w", err)
 	}
 
-	dbProjectUser, err := c.store.QueryByID(ctx, projectUserID)
+	dbTeam, err := c.store.QueryByID(ctx, projectUserID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return ErrNotFound
@@ -89,14 +89,14 @@ func (c Core) Update(ctx context.Context, projectUserID string, upu UpdateProjec
 	}
 
 	if upu.Rate != nil {
-		dbProjectUser.Rate = *upu.Rate
+		dbTeam.Rate = *upu.Rate
 	}
 	if upu.Manager != nil {
-		dbProjectUser.Manager = *upu.Manager
+		dbTeam.Manager = *upu.Manager
 	}
-	dbProjectUser.DateUpdated = now
+	dbTeam.DateUpdated = now
 
-	if err := c.store.Update(ctx, dbProjectUser); err != nil {
+	if err := c.store.Update(ctx, dbTeam); err != nil {
 		return fmt.Errorf("udpate: %w", err)
 	}
 
@@ -116,32 +116,32 @@ func (c Core) Delete(ctx context.Context, projectUserID string) error {
 	return nil
 }
 
-// QueryWorkspaceProjectUsers retrieves a list of existing project user from the database.
-func (c Core) QueryWorkspaceProjectUsers(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]ProjectUser, error) {
+// QueryWorkspaceTeams retrieves a list of existing project user from the database.
+func (c Core) QueryWorkspaceTeams(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]Team, error) {
 	if err := validate.CheckID(WorkspaceID); err != nil {
-		return []ProjectUser{}, ErrInvalidID
+		return []Team{}, ErrInvalidID
 	}
-	dbProjectUser, err := c.store.QueryWorkspaceProjectUsers(ctx, WorkspaceID, pageNumber, rowsPerPage)
+	dbTeam, err := c.store.QueryWorkspaceTeams(ctx, WorkspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
 
-	return toProjectUserSlice(dbProjectUser), nil
+	return toTeamSlice(dbTeam), nil
 }
 
 // QueryByID gets the specified project user from the database.
-func (c Core) QueryByID(ctx context.Context, projectUserID string) (ProjectUser, error) {
+func (c Core) QueryByID(ctx context.Context, projectUserID string) (Team, error) {
 	if err := validate.CheckID(projectUserID); err != nil {
-		return ProjectUser{}, ErrInvalidID
+		return Team{}, ErrInvalidID
 	}
 
-	dbProjectUser, err := c.store.QueryByID(ctx, projectUserID)
+	dbTeam, err := c.store.QueryByID(ctx, projectUserID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
-			return ProjectUser{}, ErrNotFound
+			return Team{}, ErrNotFound
 		}
-		return ProjectUser{}, fmt.Errorf("query: %w", err)
+		return Team{}, fmt.Errorf("query: %w", err)
 	}
 
-	return toProjectUser(dbProjectUser), nil
+	return toTeam(dbTeam), nil
 }

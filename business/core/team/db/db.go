@@ -45,15 +45,15 @@ func (s Store) Tran(tx sqlx.ExtContext) Store {
 	}
 }
 
-// Create inserts a new projectUser into the database.
-func (s Store) Create(ctx context.Context, projectUser ProjectUser) error {
+// Create inserts a new team into the database.
+func (s Store) Create(ctx context.Context, team Team) error {
 	const q = `
-	INSERT INTO project_users
-	   (project_user_id, pid, uid, wid, manager, date_created, date_updated)
+	INSERT INTO teams
+	   (team_id, pid, uid, wid, manager, date_created, date_updated)
 	VALUES
-	   (:project_user_id, :pid, :uid, :wid, :manager, :date_created, :date_updated)`
+	   (:team_id, :pid, :uid, :wid, :manager, :date_created, :date_updated)`
 
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, projectUser); err != nil {
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, team); err != nil {
 		return fmt.Errorf("inserting project user: %w", err)
 	}
 
@@ -61,46 +61,46 @@ func (s Store) Create(ctx context.Context, projectUser ProjectUser) error {
 }
 
 // Update replaces a project user document in the database.
-func (s Store) Update(ctx context.Context, projectUser ProjectUser) error {
+func (s Store) Update(ctx context.Context, team Team) error {
 	const q = `
 	UPDATE
-		project_users
+		teams
 	SET
 		"manager" = :manager,
 		"date_updated" = :date_updated
 	WHERE
-		"project_user_id" = :project_user_id`
+		"team_id" = :team_id`
 
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, projectUser); err != nil {
-		return fmt.Errorf("updating projectUserID[%s]: %w", projectUser.ID, err)
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, team); err != nil {
+		return fmt.Errorf("updating teamID[%s]: %w", team.ID, err)
 	}
 
 	return nil
 }
 
 // Delete removes a project user from the database.
-func (s Store) Delete(ctx context.Context, projectUserID string) error {
+func (s Store) Delete(ctx context.Context, teamID string) error {
 	data := struct {
-		ProjectUserID string `db:"project_user_id"`
+		TeamID string `db:"team_id"`
 	}{
-		ProjectUserID: projectUserID,
+		TeamID: teamID,
 	}
 
 	const q = `
 	DELETE FROM
-		project_users
+		teams
 	WHERE
-		project_user_id = :project_user_id`
+		team_id = :team_id`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, data); err != nil {
-		return fmt.Errorf("deleting projectUserID[%s]: %w", projectUserID, err)
+		return fmt.Errorf("deleting teamID[%s]: %w", teamID, err)
 	}
 
 	return nil
 }
 
-// QueryWorkspaceProjectUsers retrieves a list of existing project user from the database.
-func (s Store) QueryWorkspaceProjectUsers(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]ProjectUser, error) {
+// QueryWorkspaceTeams retrieves a list of existing project user from the database.
+func (s Store) QueryWorkspaceTeams(ctx context.Context, WorkspaceID string, pageNumber, rowsPerPage int) ([]Team, error) {
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
@@ -115,41 +115,41 @@ func (s Store) QueryWorkspaceProjectUsers(ctx context.Context, WorkspaceID strin
 	SELECT
 		*
 	FROM
-		project_users
+		teams
 	WHERE
 		wid = :workspace_id
 	ORDER BY
-		project_user_id
+		team_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
-	var projectUsers []ProjectUser
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &projectUsers); err != nil {
+	var teams []Team
+	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &teams); err != nil {
 		return nil, fmt.Errorf("selecting project user: %w", err)
 	}
 
-	return projectUsers, nil
+	return teams, nil
 }
 
 // QueryByID gets the specified project user from the database.
-func (s Store) QueryByID(ctx context.Context, projectUserID string) (ProjectUser, error) {
+func (s Store) QueryByID(ctx context.Context, teamID string) (Team, error) {
 	data := struct {
-		ProjectUserID string `db:"project_user_id"`
+		TeamID string `db:"team_id"`
 	}{
-		ProjectUserID: projectUserID,
+		TeamID: teamID,
 	}
 
 	const q = `
 	SELECT
 		*
 	FROM
-		project_users
+		teams
 	WHERE
-		project_user_id = :project_user_id`
+		team_id = :team_id`
 
-	var projectUser ProjectUser
-	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &projectUser); err != nil {
-		return ProjectUser{}, fmt.Errorf("selecting projectUserID[%q]: %w", projectUserID, err)
+	var team Team
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &team); err != nil {
+		return Team{}, fmt.Errorf("selecting teamID[%q]: %w", teamID, err)
 	}
 
-	return projectUser, nil
+	return team, nil
 }

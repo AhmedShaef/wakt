@@ -18,28 +18,28 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-// ProjectUserTests holds methods for each team subtest. This type allows
+// TeamTests holds methods for each team subtest. This type allows
 // passing dependencies for tests while still providing a convenient syntax
 // when subtests are registered.
-type ProjectUserTests struct {
+type TeamTests struct {
 	app        http.Handler
 	adminToken string
 }
 
-// TestProjectUsers runs a series of tests to exercise ProjectUser behavior from the
+// TestTeams runs a series of tests to exercise Team behavior from the
 // API level. The subtests all share the same database and application for
 // speed and convenience. The downside is the order the tests are ran matters
 // and one test may break if other tests are not ran before it. If a particular
 // subtest needs a fresh instance of the application it can make it or it
 // should be its own Test* function.
-func TestProjectUsers(t *testing.T) {
+func TestTeams(t *testing.T) {
 	t.Parallel()
 
 	test := dbtest.NewIntegration(t, c, "inttestteam")
 	t.Cleanup(test.Teardown)
 
 	shutdown := make(chan os.Signal, 1)
-	tests := ProjectUserTests{
+	tests := TeamTests{
 		app: handlers.APIMux(handlers.APIMuxConfig{
 			Shutdown: shutdown,
 			Log:      test.Log,
@@ -49,17 +49,17 @@ func TestProjectUsers(t *testing.T) {
 		adminToken: test.Token("admin@example.com", "gophers"),
 	}
 
-	t.Run("postProjectUser400", tests.postProjectUser400)
-	t.Run("postProjectUser403", tests.postProjectUser403)
-	t.Run("postProjectUser401", tests.postProjectUser401)
-	t.Run("deleteProjectUserNotFound", tests.deleteProjectUserNotFound)
-	t.Run("putProjectUser404", tests.putProjectUser404)
-	t.Run("crudProjectUsers", tests.crudProjectUser)
+	t.Run("postTeam400", tests.postTeam400)
+	t.Run("postTeam403", tests.postTeam403)
+	t.Run("postTeam401", tests.postTeam401)
+	t.Run("deleteTeamNotFound", tests.deleteTeamNotFound)
+	t.Run("putTeam404", tests.putTeam404)
+	t.Run("crudTeams", tests.crudTeam)
 }
 
-// postProjectUser400 validates a team can't be created with the endpoint
+// postTeam400 validates a team can't be created with the endpoint
 // unless a valid team document is submitted.
-func (pt *ProjectUserTests) postProjectUser400(t *testing.T) {
+func (pt *TeamTests) postTeam400(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/v1/team", strings.NewReader(`{}`))
 	w := httptest.NewRecorder()
 
@@ -101,12 +101,12 @@ func (pt *ProjectUserTests) postProjectUser400(t *testing.T) {
 	}
 }
 
-// postProjectUser403 validates a team can't be created with the endpoint
+// postTeam403 validates a team can't be created with the endpoint
 // unless the user is authenticated
-func (pt *ProjectUserTests) postProjectUser403(t *testing.T) {
-	np := team.NewProjectUser{
+func (pt *TeamTests) postTeam403(t *testing.T) {
+	np := team.NewTeam{
 		Pid:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
-		Uid:  "5cf37266-3473-4006-984f-9325122678b7",
+		UID:  "5cf37266-3473-4006-984f-9325122678b7",
 		Puis: "c7142720-91d3-4d1e-841d-680042b6500c",
 	}
 
@@ -134,12 +134,12 @@ func (pt *ProjectUserTests) postProjectUser403(t *testing.T) {
 	}
 }
 
-// postProjectUser401 validates a team can't be created with the endpoint
+// postTeam401 validates a team can't be created with the endpoint
 // unless the user is authenticated
-func (pt *ProjectUserTests) postProjectUser401(t *testing.T) {
-	np := team.NewProjectUser{
+func (pt *TeamTests) postTeam401(t *testing.T) {
+	np := team.NewTeam{
 		Pid: "45cf87a3-5915-4079-a9af-6c559239ddbf",
-		Uid: "5cf37266-3473-4006-984f-9325122678b7",
+		UID: "5cf37266-3473-4006-984f-9325122678b7",
 	}
 
 	body, err := json.Marshal(&np)
@@ -166,8 +166,8 @@ func (pt *ProjectUserTests) postProjectUser401(t *testing.T) {
 	}
 }
 
-// deleteProjectUserNotFound validates deleting a team that does not exist is not a failure.
-func (pt *ProjectUserTests) deleteProjectUserNotFound(t *testing.T) {
+// deleteTeamNotFound validates deleting a team that does not exist is not a failure.
+func (pt *TeamTests) deleteTeamNotFound(t *testing.T) {
 	id := "112262f1-1a77-4374-9f22-39e575aa6348"
 
 	r := httptest.NewRequest(http.MethodDelete, "/v1/team/"+id, nil)
@@ -189,11 +189,11 @@ func (pt *ProjectUserTests) deleteProjectUserNotFound(t *testing.T) {
 	}
 }
 
-// putProjectUser404 validates updating a team that does not exist.
-func (pt *ProjectUserTests) putProjectUser404(t *testing.T) {
+// putTeam404 validates updating a team that does not exist.
+func (pt *TeamTests) putTeam404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := team.UpdateProjectUser{
+	up := team.UpdateTeam{
 		Manager: dbtest.BoolPointer(true),
 	}
 	body, err := json.Marshal(&up)
@@ -229,19 +229,19 @@ func (pt *ProjectUserTests) putProjectUser404(t *testing.T) {
 	}
 }
 
-// crudProjectUser performs a complete test of CRUD against the api.
-func (pt *ProjectUserTests) crudProjectUser(t *testing.T) {
-	p := pt.postProjectUser201(t)
-	defer pt.deleteProjectUser204(t, p[0].ID)
+// crudTeam performs a complete test of CRUD against the api.
+func (pt *TeamTests) crudTeam(t *testing.T) {
+	p := pt.postTeam201(t)
+	defer pt.deleteTeam204(t, p[0].ID)
 
-	pt.putProjectUser204(t, p[0].ID)
+	pt.putTeam204(t, p[0].ID)
 }
 
-// postProjectUser201 validates a team can be created with the endpoint.
-func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []team.ProjectUser {
-	np := team.NewProjectUser{
+// postTeam201 validates a team can be created with the endpoint.
+func (pt *TeamTests) postTeam201(t *testing.T) []team.Team {
+	np := team.NewTeam{
 		Pid:     "45cf87a3-5915-4079-a9af-6c559239ddbf",
-		Uid:     "5cf37266-3473-4006-984f-9325122678b7",
+		UID:     "5cf37266-3473-4006-984f-9325122678b7",
 		Puis:    "efcc74aa-86d2-4e11-80f9-3ca912af8269",
 		Manager: true,
 	}
@@ -258,7 +258,7 @@ func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []team.ProjectUser 
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got []team.ProjectUser
+	var got []team.Team
 
 	t.Log("Given the need to create a new team with the teams endpoint.")
 	{
@@ -278,7 +278,7 @@ func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []team.ProjectUser 
 			// fields like ID and Dates so we copy p.
 			exp := got
 			exp[0].Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
-			exp[0].Uid = "5cf37266-3473-4006-984f-9325122678b7"
+			exp[0].UID = "5cf37266-3473-4006-984f-9325122678b7"
 			exp[0].Pid = "45cf87a3-5915-4079-a9af-6c559239ddbf"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
@@ -291,8 +291,8 @@ func (pt *ProjectUserTests) postProjectUser201(t *testing.T) []team.ProjectUser 
 	return got
 }
 
-// deleteProjectUser200 validates deleting a team that does exist.
-func (pt *ProjectUserTests) deleteProjectUser204(t *testing.T, id string) {
+// deleteTeam200 validates deleting a team that does exist.
+func (pt *TeamTests) deleteTeam204(t *testing.T, id string) {
 	r := httptest.NewRequest(http.MethodDelete, "/v1/team/"+id, nil)
 	w := httptest.NewRecorder()
 
@@ -312,8 +312,8 @@ func (pt *ProjectUserTests) deleteProjectUser204(t *testing.T, id string) {
 	}
 }
 
-// putProjectUser204 validates updating a team that does exist.
-func (pt *ProjectUserTests) putProjectUser204(t *testing.T, id string) {
+// putTeam204 validates updating a team that does exist.
+func (pt *TeamTests) putTeam204(t *testing.T, id string) {
 	body := `{"rate": 10}`
 	r := httptest.NewRequest(http.MethodPut, "/v1/team/"+id, strings.NewReader(body))
 	w := httptest.NewRecorder()

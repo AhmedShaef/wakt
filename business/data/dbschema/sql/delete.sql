@@ -1,5 +1,5 @@
 DROP TABLE workspace_users;
-DROP TABLE project_users;
+DROP TABLE teams;
 DROP TABLE tags;
 DROP TABLE groups;
 DROP TABLE time_entries;

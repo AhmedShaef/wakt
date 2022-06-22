@@ -1,6 +1,6 @@
 TRUNCATE
     workspace_users,
-    project_users,
+    teams,
     tags,
     groups,
     time_entries,

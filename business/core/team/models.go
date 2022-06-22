@@ -4,12 +4,12 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/AhmedShaef/wakt/business/core/project_user/db"
+	"github.com/AhmedShaef/wakt/business/core/team/db"
 )
 
-// ProjectUser represents an individual ProjectUser.
-type ProjectUser struct {
-	ID          string    `json:"project_user_id"`
+// Team represents an individual Team.
+type Team struct {
+	ID          string    `json:"team_id"`
 	Pid         string    `json:"pid"`
 	UID         string    `json:"uid"`
 	Wid         string    `json:"wid"`
@@ -19,8 +19,8 @@ type ProjectUser struct {
 	DateUpdated time.Time `json:"date_updated"`
 }
 
-// NewProjectUser contains information needed to create a new ProjectUser.
-type NewProjectUser struct {
+// NewTeam contains information needed to create a new Team.
+type NewTeam struct {
 	Pid     string  `json:"pid" validate:"required"`
 	UID     string  `json:"uid" validate:"required"`
 	Wid     string  `json:"wid"`
@@ -29,28 +29,28 @@ type NewProjectUser struct {
 	Puis    string  `json:"puis"`
 }
 
-// UpdateProjectUser defines what information may be provided to modify an existing
+// UpdateTeam defines what information may be provided to modify an existing
 // project user. All fields are optional so project users can send just the fields they want
 // changed. It uses pointer fields ,so we can differentiate between a field that
 // was not provided and a field that was provided as explicitly blank. Normally
 // we do not want to use pointers to basic types ,but we make exceptions around
 // marshalling/unmarshalling.
-type UpdateProjectUser struct {
+type UpdateTeam struct {
 	Rate    *float64 `json:"rate"`
 	Manager *bool    `json:"manager"`
 }
 
 // =============================================================================
 
-func toProjectUser(dbProjectUser db.ProjectUser) ProjectUser {
-	pu := (*ProjectUser)(unsafe.Pointer(&dbProjectUser))
+func toTeam(dbTeam db.Team) Team {
+	pu := (*Team)(unsafe.Pointer(&dbTeam))
 	return *pu
 }
 
-func toProjectUserSlice(dbProjectUser []db.ProjectUser) []ProjectUser {
-	projectUsers := make([]ProjectUser, len(dbProjectUser))
-	for i, dbProjectUser := range dbProjectUser {
-		projectUsers[i] = toProjectUser(dbProjectUser)
+func toTeamSlice(dbTeam []db.Team) []Team {
+	teams := make([]Team, len(dbTeam))
+	for i, dbTeam := range dbTeam {
+		teams[i] = toTeam(dbTeam)
 	}
-	return projectUsers
+	return teams
 }

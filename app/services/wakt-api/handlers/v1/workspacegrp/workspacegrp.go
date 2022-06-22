@@ -32,7 +32,7 @@ type Handlers struct {
 	Project       project.Core
 	Task          task.Core
 	Tag           tag.Core
-	ProjectUser   team.Core
+	Team          team.Core
 	WorkspaceUser workspace_user.Core
 }
 
@@ -545,8 +545,8 @@ func (h Handlers) QueryWorkspaceTags(ctx context.Context, w http.ResponseWriter,
 	return web.Respond(ctx, w, work, http.StatusOK)
 }
 
-// QueryWorkspaceProjectUsers returns a list of workspaces with paging.
-func (h Handlers) QueryWorkspaceProjectUsers(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+// QueryWorkspaceTeams returns a list of workspaces with paging.
+func (h Handlers) QueryWorkspaceTeams(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
@@ -581,7 +581,7 @@ func (h Handlers) QueryWorkspaceProjectUsers(ctx context.Context, w http.Respons
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	work, err := h.ProjectUser.QueryWorkspaceProjectUsers(ctx, workspaceID, pageNumber, rowsPerPage)
+	work, err := h.Team.QueryWorkspaceTeams(ctx, workspaceID, pageNumber, rowsPerPage)
 	if err != nil {
 		return fmt.Errorf("unable to query for workspaces: %w", err)
 	}

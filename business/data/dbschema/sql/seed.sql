@@ -62,7 +62,7 @@ VALUES ('82cf01da-4a6c-40fc-98cf-c9987aca40b2', 'Default tag', '7da3ca14-6366-47
        ('4c698e19-8cb9-47de-a496-1f8ef724218d', 'User tag', '7da3ca14-6366-47cf-b953-f706226567d8',
         '2019-03-24 00:00:00', '2019-03-24 00:00:00')
 ON CONFLICT DO NOTHING;
-INSERT INTO project_users (project_user_id, pid, uid, wid, manager, date_created, date_updated)
+INSERT INTO teams (team_id, pid, uid, wid, manager, date_created, date_updated)
 values ('efcc74aa-86d2-4e11-80f9-3ca912af8269', '45cf87a3-5915-4079-a9af-6c559239ddbf',
         '5cf37266-3473-4006-984f-9325122678b7', '7da3ca14-6366-47cf-b953-f706226567d8', 'true', '2019-03-24 00:00:00',
         '2019-03-24 00:00:00'),
