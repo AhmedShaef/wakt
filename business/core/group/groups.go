@@ -1,15 +1,19 @@
+// Package group provides an example of a core business API. Right now these
+// calls are just wrapping the data/data layer. But at some point you will
+// want auditing or something that isn't specific to the data/store layer.
 package group
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/group/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -43,7 +47,7 @@ func (c Core) Create(ctx context.Context, userID string, ng NewGroup, now time.T
 		ID:          validate.GenerateID(),
 		Name:        ng.Name,
 		Wid:         ng.Wid,
-		Uid:         userID,
+		UID:         userID,
 		DateCreated: now,
 		DateUpdated: now,
 	}

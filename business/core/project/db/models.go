@@ -9,7 +9,7 @@ type Project struct {
 	Name           string        `db:"name"`
 	Wid            string        `db:"wid"`
 	Cid            string        `db:"cid"`
-	Uid            string        `db:"uid"`
+	UID            string        `db:"uid"`
 	Active         bool          `db:"active"`
 	IsPrivate      bool          `db:"is_private"`
 	Billable       bool          `db:"billable"`

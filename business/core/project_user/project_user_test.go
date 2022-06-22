@@ -1,15 +1,16 @@
-package project_user
+package team
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/data/dbschema"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/foundation/docker"
 	"github.com/google/go-cmp/cmp"
-	"testing"
-	"time"
 )
 
 var c *docker.Container
@@ -41,7 +42,7 @@ func TestProjectUser(t *testing.T) {
 			now := time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 			npu := NewProjectUser{
-				Uid: "5cf37266-3473-4006-984f-9325122678b7",
+				UID: "5cf37266-3473-4006-984f-9325122678b7",
 				Pid: "45cf87a3-5915-4079-a9af-6c559239ddbf",
 				Wid: "7da3ca14-6366-47cf-b953-f706226567d8",
 			}

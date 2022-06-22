@@ -5,24 +5,25 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/AhmedShaef/wakt/business/core/project_user"
+	"net/http"
+	"strings"
+
+	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strings"
 )
 
 // Handlers manages the set of projectuser endpoints.
 type Handlers struct {
-	ProjectUser project_user.Core
+	ProjectUser team.Core
 	Workspace   workspace.Core
 	User        user.Core
 }
 
-// Add adds a new project_user to the system.
+// Add adds a new team to the system.
 func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	v, err := web.GetValues(ctx)
 	if err != nil {
@@ -34,7 +35,7 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var npu project_user.NewProjectUser
+	var npu team.NewProjectUser
 	if err := web.Decode(r, &npu); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -50,16 +51,16 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	projectUser, err := h.ProjectUser.QueryByID(ctx, npu.Puis)
 	if err != nil {
 		switch {
-		case errors.Is(err, project_user.ErrInvalidID):
+		case errors.Is(err, team.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, project_user.ErrNotFound):
+		case errors.Is(err, team.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying ProjectUser[%s]: %w", projectUser.ID, err)
 		}
 	}
 
-	// If you are not an admin and looking to update a project_user you don't own.
+	// If you are not an admin and looking to update a team you don't own.
 	if !projectUser.Manager || npu.Uid != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
@@ -67,19 +68,19 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	clint, err := h.ProjectUser.Create(ctx, npu, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, project_user.ErrInvalidID):
+		case errors.Is(err, team.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, project_user.ErrNotFound):
+		case errors.Is(err, team.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("project_user[%+v]: %w", &clint, err)
+			return fmt.Errorf("team[%+v]: %w", &clint, err)
 		}
 	}
 
 	return web.Respond(ctx, w, clint, http.StatusCreated)
 }
 
-// BulkUpdate updates a project_user in the system.
+// BulkUpdate updates a team in the system.
 func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	v, err := web.GetValues(ctx)
 	if err != nil {
@@ -91,7 +92,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var upd project_user.UpdateProjectUser
+	var upd team.UpdateProjectUser
 	if err := web.Decode(r, &upd); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -103,9 +104,9 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		projectUsers, err := h.ProjectUser.QueryByID(ctx, projectUserID)
 		if err != nil {
 			switch {
-			case errors.Is(err, project_user.ErrInvalidID):
+			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
-			case errors.Is(err, project_user.ErrNotFound):
+			case errors.Is(err, team.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
 				return fmt.Errorf("querying workspace[%s]: %w", projectUserID, err)
@@ -119,9 +120,9 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 
 		if err := h.ProjectUser.Update(ctx, projectUserID, upd, v.Now); err != nil {
 			switch {
-			case errors.Is(err, project_user.ErrInvalidID):
+			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
-			case errors.Is(err, project_user.ErrNotFound):
+			case errors.Is(err, team.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
 				return fmt.Errorf("ID[%s] ProjectUser[%+v]: %w", projectUserID, &upd, err)
@@ -132,7 +133,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 	return web.Respond(ctx, w, nil, http.StatusNoContent)
 }
 
-// BulkDelete removes a project_user from the system.
+// BulkDelete removes a team from the system.
 func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
@@ -146,9 +147,9 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 		projectUsers, err := h.ProjectUser.QueryByID(ctx, projectUserID)
 		if err != nil {
 			switch {
-			case errors.Is(err, project_user.ErrInvalidID):
+			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
-			case errors.Is(err, project_user.ErrNotFound):
+			case errors.Is(err, team.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
 				return fmt.Errorf("querying workspace[%s]: %w", projectUserID, err)
@@ -162,7 +163,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 
 		if err := h.ProjectUser.Delete(ctx, projectUserID); err != nil {
 			switch {
-			case errors.Is(err, project_user.ErrInvalidID):
+			case errors.Is(err, team.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
 			default:
 				return fmt.Errorf("ID[%s]: %w", projectUserID, err)

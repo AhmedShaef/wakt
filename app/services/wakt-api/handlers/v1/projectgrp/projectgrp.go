@@ -5,24 +5,25 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/AhmedShaef/wakt/business/core/project"
-	"github.com/AhmedShaef/wakt/business/core/project_user"
 	"github.com/AhmedShaef/wakt/business/core/task"
+	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // Handlers manages the set of project endpoints.
 type Handlers struct {
 	Project       project.Core
-	ProjectUser   project_user.Core
+	ProjectUser   team.Core
 	Workspace     workspace.Core
 	WorkspaceUser workspace_user.Core
 	User          user.Core
@@ -100,7 +101,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("project[%+v]: %w", &prj, err)
 		}
 	}
-	npu := project_user.NewProjectUser{
+	npu := team.NewProjectUser{
 		Pid:     prj.ID,
 		Uid:     workspaces.Uid,
 		Wid:     prj.Wid,
@@ -109,12 +110,12 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	projectUser, err := h.ProjectUser.Create(ctx, npu, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, project_user.ErrInvalidID):
+		case errors.Is(err, team.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, project_user.ErrNotFound):
+		case errors.Is(err, team.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("project_user[%+v]: %w", &projectUser, err)
+			return fmt.Errorf("team[%+v]: %w", &projectUser, err)
 		}
 	}
 
@@ -324,7 +325,7 @@ func (h Handlers) QueryProjectTasks(ctx context.Context, w http.ResponseWriter, 
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != projects.Uid {
+	if claims.Subject != projects.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 

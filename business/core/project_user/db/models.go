@@ -9,7 +9,7 @@ import (
 type ProjectUser struct {
 	ID          string    `db:"project_user_id"`
 	Pid         string    `db:"pid"`
-	Uid         string    `db:"uid"`
+	UID         string    `db:"uid"`
 	Wid         string    `db:"wid"`
 	Manager     bool      `db:"manager"`
 	Rate        float64   `db:"rate"`

@@ -9,7 +9,7 @@ import (
 type Client struct {
 	ID          string    `db:"client_id"`
 	Name        string    `db:"name"`
-	Uid         string    `db:"uid"`
+	UID         string    `db:"uid"`
 	Wid         string    `db:"wid"`
 	Notes       string    `db:"notes"`
 	DateCreated time.Time `db:"date_created"`

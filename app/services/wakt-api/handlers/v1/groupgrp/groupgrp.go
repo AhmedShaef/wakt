@@ -5,13 +5,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/AhmedShaef/wakt/business/core/group"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
 )
 
 // Handlers manages the set of group endpoints.
@@ -103,7 +104,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != groups.Uid {
+	if claims.Subject != groups.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -143,7 +144,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != groups.Uid {
+	if claims.Subject != groups.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 

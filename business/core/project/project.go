@@ -1,7 +1,6 @@
 // Package projects provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
-
 package project
 
 import (
@@ -60,7 +59,7 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		Name:           np.Name,
 		Wid:            np.Wid,
 		Cid:            np.Cid,
-		Uid:            userID,
+		UID:            userID,
 		Active:         false,
 		IsPrivate:      np.IsPrivate,
 		Billable:       np.Billable,
