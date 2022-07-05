@@ -134,11 +134,11 @@ func (s Store) QueryUnique(ctx context.Context, name, column, id string) string 
 	data := struct {
 		Name   string `db:"name"`
 		Column string `db:"column"`
-		Id     string `db:"id"`
+		ID     string `db:"id"`
 	}{
 		Name:   name,
 		Column: column,
-		Id:     id,
+		ID:     id,
 	}
 
 	const q = `
