@@ -8,12 +8,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/task/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -54,7 +55,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		Name:             nt.Name,
 		Pid:              nt.Pid,
 		Wid:              nt.Wid,
-		Uid:              userID,
+		UID:              userID,
 		EstimatedSeconds: nt.EstimatedSeconds,
 		Active:           true,
 		DateCreated:      now,

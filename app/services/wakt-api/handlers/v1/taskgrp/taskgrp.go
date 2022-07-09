@@ -5,14 +5,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/AhmedShaef/wakt/business/core/task"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strings"
 )
 
 // Handlers manages the set of task endpoints.
@@ -84,7 +85,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != tasks.Uid {
+	if claims.Subject != tasks.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -125,7 +126,7 @@ func (h Handlers) BulkUpdate(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if claims.Subject != tasks.Uid {
+		if claims.Subject != tasks.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
@@ -168,7 +169,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if claims.Subject != tasks.Uid {
+		if claims.Subject != tasks.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
