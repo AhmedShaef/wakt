@@ -1,9 +1,10 @@
 package task
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/task/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/task/db"
 )
 
 // Task represents an individual task.
@@ -12,7 +13,7 @@ type Task struct {
 	Name             string        `json:"name"`
 	Pid              string        `json:"pid"`
 	Wid              string        `json:"wid"`
-	Uid              string        `json:"uid"`
+	UID              string        `json:"uid"`
 	EstimatedSeconds time.Duration `json:"estimated_seconds"`
 	Active           bool          `json:"active"`
 	DateCreated      time.Time     `json:"date_created"`
@@ -25,7 +26,7 @@ type NewTask struct {
 	Name             string        `json:"name" validate:"required"`
 	Pid              string        `json:"pid" validate:"required"`
 	Wid              string        `json:"wid"`
-	Uid              string        `json:"uid"`
+	UID              string        `json:"uid"`
 	EstimatedSeconds time.Duration `json:"estimated_seconds"`
 	TrackedSeconds   time.Duration `json:"tracked_seconds"`
 }
