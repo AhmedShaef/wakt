@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	dbp "github.com/AhmedShaef/wakt/business/core/project/db"
 	dbt "github.com/AhmedShaef/wakt/business/core/task/db"
 	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
@@ -12,8 +13,9 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // Set of error variables for CRUD operations.
@@ -50,7 +52,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 	dbTimeEntry := db.TimeEntry{
 		ID:          validate.GenerateID(),
 		Description: nt.Description,
-		Uid:         userID,
+		UID:         userID,
 		Wid:         nt.Wid,
 		Pid:         nt.Pid,
 		Tid:         nt.Tid,
@@ -103,7 +105,7 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 	dbTimeEntry := db.TimeEntry{
 		ID:          validate.GenerateID(),
 		Description: st.Description,
-		Uid:         userID,
+		UID:         userID,
 		Wid:         st.Wid,
 		Pid:         st.Pid,
 		Tid:         st.Tid,
