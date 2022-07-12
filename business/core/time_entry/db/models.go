@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/lib/pq"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 // TimeEntry represent the structure we need for moving data
@@ -10,7 +11,7 @@ import (
 type TimeEntry struct {
 	ID          string         `db:"time_entry_id"`
 	Description string         `db:"description"`
-	Uid         string         `db:"uid"`
+	UID         string         `db:"uid"`
 	Wid         string         `db:"wid"`
 	Pid         string         `db:"pid"`
 	Tid         string         `db:"tid"`
