@@ -1,16 +1,17 @@
 package time_entry
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
 )
 
 // TimeEntry represents an individual time_entry.
 type TimeEntry struct {
 	ID          string        `json:"id"`
 	Description string        `json:"description"`
-	Uid         string        `json:"uid"`
+	UID         string        `json:"uid"`
 	Wid         string        `json:"wid"`
 	Pid         string        `json:"pid"`
 	Tid         string        `json:"tid"`
