@@ -5,16 +5,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/time_entry"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // Handlers manages the set of timeEntry endpoints.
@@ -131,7 +132,7 @@ func (h Handlers) Stop(ctx context.Context, w http.ResponseWriter, r *http.Reque
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntrys.Uid {
+	if claims.Subject != timeEntrys.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -182,7 +183,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntrys.Uid {
+	if claims.Subject != timeEntrys.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -222,7 +223,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntrys.Uid {
+	if claims.Subject != timeEntrys.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -260,11 +261,11 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntry.Uid {
+	if claims.Subject != timeEntry.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	users, err := h.User.QueryByID(ctx, timeEntry.Uid)
+	users, err := h.User.QueryByID(ctx, timeEntry.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, user.ErrInvalidID):
@@ -272,7 +273,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		case errors.Is(err, user.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying user[%s]: %w", timeEntry.Uid, err)
+			return fmt.Errorf("querying user[%s]: %w", timeEntry.UID, err)
 		}
 	}
 
@@ -307,7 +308,7 @@ func (h Handlers) QueryRunning(ctx context.Context, w http.ResponseWriter, r *ht
 	}
 
 	for _, v := range timentry {
-		users, err := h.User.QueryByID(ctx, v.Uid)
+		users, err := h.User.QueryByID(ctx, v.UID)
 		if err != nil {
 			switch {
 			case errors.Is(err, user.ErrInvalidID):
@@ -315,7 +316,7 @@ func (h Handlers) QueryRunning(ctx context.Context, w http.ResponseWriter, r *ht
 			case errors.Is(err, user.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
-				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+				return fmt.Errorf("querying user[%s]: %w", v.UID, err)
 			}
 		}
 
@@ -360,7 +361,7 @@ func (h Handlers) QueryRange(ctx context.Context, w http.ResponseWriter, r *http
 	}
 
 	for _, v := range timentry {
-		users, err := h.User.QueryByID(ctx, v.Uid)
+		users, err := h.User.QueryByID(ctx, v.UID)
 		if err != nil {
 			switch {
 			case errors.Is(err, user.ErrInvalidID):
@@ -368,7 +369,7 @@ func (h Handlers) QueryRange(ctx context.Context, w http.ResponseWriter, r *http
 			case errors.Is(err, user.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
-				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+				return fmt.Errorf("querying user[%s]: %w", v.UID, err)
 			}
 		}
 
@@ -414,7 +415,7 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if claims.Subject != timeEntries.Uid {
+		if claims.Subject != timeEntries.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 
@@ -446,7 +447,7 @@ func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	for _, v := range timentry {
-		users, err := h.User.QueryByID(ctx, v.Uid)
+		users, err := h.User.QueryByID(ctx, v.UID)
 		if err != nil {
 			switch {
 			case errors.Is(err, user.ErrInvalidID):
@@ -454,7 +455,7 @@ func (h Handlers) QueryDash(ctx context.Context, w http.ResponseWriter, r *http.
 			case errors.Is(err, user.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
-				return fmt.Errorf("querying user[%s]: %w", v.Uid, err)
+				return fmt.Errorf("querying user[%s]: %w", v.UID, err)
 			}
 		}
 
