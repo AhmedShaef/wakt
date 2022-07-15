@@ -1,9 +1,10 @@
 package user
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/user/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/user/db"
 )
 
 // User represents an individual user.
@@ -70,12 +71,4 @@ type UpdateImage struct {
 func toUser(dbUser db.User) User {
 	pu := (*User)(unsafe.Pointer(&dbUser))
 	return *pu
-}
-
-func toUsersSlice(dbUser []db.User) []User {
-	users := make([]User, len(dbUser))
-	for i, dbusr := range dbUser {
-		users[i] = toUser(dbusr)
-	}
-	return users
 }
