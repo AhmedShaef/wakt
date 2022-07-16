@@ -1,8 +1,10 @@
+// Package db contains client related CRUD functionality.
 package db
 
 import (
 	"context"
 	"fmt"
+
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
