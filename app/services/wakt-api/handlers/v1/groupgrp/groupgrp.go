@@ -52,7 +52,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 
 		// If you are not an admin and looking to update a tag you don't own.
-		if workspaces.Uid != claims.Subject {
+		if workspaces.UID != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}

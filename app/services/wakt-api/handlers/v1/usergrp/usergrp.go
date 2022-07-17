@@ -57,7 +57,7 @@ func (h Handlers) SignUp(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 	nw := workspace.NewWorkspace{
 		Name: usr.FullName,
-		Uid:  usr.ID,
+		UID:  usr.ID,
 	}
 	initWorkspace, err := h.Workspace.Create(ctx, nw, v.Now)
 	if err != nil {

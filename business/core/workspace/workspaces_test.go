@@ -3,12 +3,13 @@ package workspace
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/data/dbschema"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/foundation/docker"
 	"github.com/google/go-cmp/cmp"
-	"testing"
-	"time"
 )
 
 var c *docker.Container
@@ -41,7 +42,7 @@ func TestWorkspace(t *testing.T) {
 
 			nt := NewWorkspace{
 				Name: "Ahmed Shaef",
-				Uid:  "5cf37266-3473-4006-984f-9325122678b7",
+				UID:  "5cf37266-3473-4006-984f-9325122678b7",
 			}
 
 			workspace, err := core.Create(ctx, nt, now)

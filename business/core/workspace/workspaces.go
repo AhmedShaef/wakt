@@ -7,12 +7,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/workspace/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -42,7 +43,7 @@ func (c Core) Create(ctx context.Context, nw NewWorkspace, now time.Time) (Works
 	dbworkspace := db.Workspace{
 		ID:                         validate.GenerateID(),
 		Name:                       nw.Name,
-		Uid:                        nw.Uid,
+		Uid:                        nw.UID,
 		DefaultHourlyRate:          50.0,
 		DefaultCurrency:            "USD",
 		OnlyAdminSeeBillableRates:  false,

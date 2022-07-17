@@ -10,7 +10,7 @@ import (
 type Workspace struct {
 	ID                         string    `json:"id"`
 	Name                       string    `json:"name"`
-	Uid                        string    `json:"uid"`
+	UID                        string    `json:"uid"`
 	DefaultHourlyRate          float32   `json:"default_hourly_rate"`
 	DefaultCurrency            string    `json:"default_currency"`
 	OnlyAdminMayCreateProjects bool      `json:"only_admin_may_create_projects"`
@@ -26,7 +26,7 @@ type Workspace struct {
 // NewWorkspace contains information needed to create a new Group.
 type NewWorkspace struct {
 	Name string `json:"name" validate:"required"`
-	Uid  string `json:"uid" validate:"required"`
+	UID  string `json:"uid" validate:"required"`
 }
 
 // UpdateWorkspace defines what information may be provided to modify an existing
