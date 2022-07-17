@@ -3,17 +3,18 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"testing"
+
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/group"
 	"github.com/AhmedShaef/wakt/business/core/project"
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"strings"
-	"testing"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
@@ -116,7 +117,7 @@ func (pt *WorkspaceTests) postWorkspace400(t *testing.T) {
 func (pt *WorkspaceTests) postWorkspace401(t *testing.T) {
 	np := workspace.NewWorkspace{
 		Name: "Comic Books",
-		Uid:  "5cf37266-3473-4006-984f-9325122678b7",
+		UID:  "5cf37266-3473-4006-984f-9325122678b7",
 	}
 
 	body, err := json.Marshal(&np)
@@ -266,7 +267,7 @@ func (pt *WorkspaceTests) crudWorkspace(t *testing.T) {
 func (pt *WorkspaceTests) postWorkspace201(t *testing.T) workspace.Workspace {
 	np := workspace.NewWorkspace{
 		Name: "Comic Books",
-		Uid:  "5cf37266-3473-4006-984f-9325122678b7",
+		UID:  "5cf37266-3473-4006-984f-9325122678b7",
 	}
 
 	body, err := json.Marshal(&np)
@@ -301,7 +302,7 @@ func (pt *WorkspaceTests) postWorkspace201(t *testing.T) workspace.Workspace {
 			// fields like ID and Dates so we copy p.
 			exp := got
 			exp.Name = "Comic Books"
-			exp.Uid = "5cf37266-3473-4006-984f-9325122678b7"
+			exp.UID = "5cf37266-3473-4006-984f-9325122678b7"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)

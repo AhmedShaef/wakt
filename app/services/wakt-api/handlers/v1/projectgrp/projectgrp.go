@@ -81,11 +81,11 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	// If you are not an admin and looking to update a project you don't own.
 	if workspaces.OnlyAdminMayCreateProjects {
-		if !workspaceUser.Admin || workspaces.Uid != claims.Subject {
+		if !workspaceUser.Admin || workspaces.UID != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	} else {
-		if workspaces.Uid != claims.Subject {
+		if workspaces.UID != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}
@@ -103,7 +103,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 	npu := team.NewTeam{
 		Pid:     prj.ID,
-		UID:     workspaces.Uid,
+		UID:     workspaces.UID,
 		Wid:     prj.Wid,
 		Manager: true,
 	}
@@ -164,7 +164,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -215,7 +215,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -233,7 +233,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 			projects.Rate = 0.0
 		}
 	}
-	if workspaces.Uid != claims.Subject {
+	if workspaces.UID != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -276,7 +276,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		// If you are not an admin and looking to retrieve someone other than yourself.
-		if claims.Subject != workspaces.Uid {
+		if claims.Subject != workspaces.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 

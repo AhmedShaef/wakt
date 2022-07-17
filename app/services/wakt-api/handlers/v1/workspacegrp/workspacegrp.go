@@ -54,7 +54,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to update a workspace you don't own.
-	if nw.Uid != claims.Subject {
+	if nw.UID != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -70,7 +70,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.Create(ctx, work.ID, work.Uid, v.Now)
+	workspaceUser, err := h.WorkspaceUser.Create(ctx, work.ID, work.UID, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -116,7 +116,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -165,7 +165,7 @@ func (h Handlers) UpdateLogo(ctx context.Context, w http.ResponseWriter, r *http
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -236,7 +236,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 			return fmt.Errorf("querying workspace[%s]: %w", workspaceID, err)
 		}
 	}
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -256,7 +256,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -294,7 +294,7 @@ func (h Handlers) QueryWorkspaceUsers(ctx context.Context, w http.ResponseWriter
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.Uid)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace_user.ErrInvalidID):
@@ -308,11 +308,11 @@ func (h Handlers) QueryWorkspaceUsers(ctx context.Context, w http.ResponseWriter
 
 	// If you are not an admin and looking to update a client you don't own.
 	if workspaces.OnlyAdminSeeTeamDashboard {
-		if !workspaceUser.Admin && workspaces.Uid != claims.Subject {
+		if !workspaceUser.Admin && workspaces.UID != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	} else {
-		if workspaces.Uid != claims.Subject {
+		if workspaces.UID != claims.Subject {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}
@@ -357,7 +357,7 @@ func (h Handlers) QueryWorkspaceClients(ctx context.Context, w http.ResponseWrit
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -401,7 +401,7 @@ func (h Handlers) QueryWorkspaceGroups(ctx context.Context, w http.ResponseWrite
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -445,7 +445,7 @@ func (h Handlers) QueryWorkspaceProjects(ctx context.Context, w http.ResponseWri
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -489,7 +489,7 @@ func (h Handlers) QueryWorkspaceTasks(ctx context.Context, w http.ResponseWriter
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -533,7 +533,7 @@ func (h Handlers) QueryWorkspaceTags(ctx context.Context, w http.ResponseWriter,
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -577,7 +577,7 @@ func (h Handlers) QueryWorkspaceTeams(ctx context.Context, w http.ResponseWriter
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != workspaces.Uid {
+	if claims.Subject != workspaces.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 

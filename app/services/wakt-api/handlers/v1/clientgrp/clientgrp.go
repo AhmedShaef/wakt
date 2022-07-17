@@ -5,6 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/AhmedShaef/wakt/business/core/client"
 	"github.com/AhmedShaef/wakt/business/core/project"
 	"github.com/AhmedShaef/wakt/business/core/user"
@@ -12,8 +15,6 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
-	"strconv"
 )
 
 // Handlers manages the set of client endpoints.
@@ -53,7 +54,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("unable to query workspace data:%w", err)
 		}
 
-		if claims.Subject != workspaces.Uid {
+		if claims.Subject != workspaces.UID {
 			return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 		}
 	}
