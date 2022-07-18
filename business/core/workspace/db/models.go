@@ -9,7 +9,7 @@ import (
 type Workspace struct {
 	ID                         string    `db:"workspace_id"`
 	Name                       string    `db:"name"`
-	Uid                        string    `db:"uid"`
+	UID                        string    `db:"uid"`
 	DefaultHourlyRate          float32   `db:"default_hourly_rate"`
 	DefaultCurrency            string    `db:"default_currency"`
 	OnlyAdminMayCreateProjects bool      `db:"only_admin_may_create_projects"`

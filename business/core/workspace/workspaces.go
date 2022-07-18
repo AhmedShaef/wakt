@@ -43,7 +43,7 @@ func (c Core) Create(ctx context.Context, nw NewWorkspace, now time.Time) (Works
 	dbworkspace := db.Workspace{
 		ID:                         validate.GenerateID(),
 		Name:                       nw.Name,
-		Uid:                        nw.UID,
+		UID:                        nw.UID,
 		DefaultHourlyRate:          50.0,
 		DefaultCurrency:            "USD",
 		OnlyAdminSeeBillableRates:  false,
