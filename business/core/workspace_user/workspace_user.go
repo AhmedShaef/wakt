@@ -7,6 +7,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	users "github.com/AhmedShaef/wakt/business/core/user/db"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
 	send "github.com/AhmedShaef/wakt/business/send/smtp"
@@ -14,7 +16,6 @@ import (
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
@@ -49,7 +50,7 @@ func (c Core) Create(ctx context.Context, workspaceID string, userID string, now
 
 	dbWorkspaceUser := db.WorkspaceUser{
 		ID:          validate.GenerateID(),
-		Uid:         userID,
+		UID:         userID,
 		Wid:         workspaceID,
 		Admin:       true,
 		Active:      true,
@@ -109,7 +110,7 @@ func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers
 
 		dbWorkspaceUser := db.WorkspaceUser{
 			ID:          validate.GenerateID(),
-			Uid:         userID,
+			UID:         userID,
 			Wid:         workspaceID,
 			Admin:       false,
 			Active:      false,
