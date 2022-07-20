@@ -1,7 +1,6 @@
-// package task provides an example of a core business API. Right now these
+// Package task provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
-
 package task
 
 import (
