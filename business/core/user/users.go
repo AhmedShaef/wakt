@@ -1,4 +1,4 @@
-// Package users provides an example of a core business API. Right now these
+// Package user provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
 package user
@@ -7,6 +7,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/core/user/db"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	"github.com/AhmedShaef/wakt/business/sys/database"
@@ -15,8 +18,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
-	"time"
 )
 
 // Set of error variables for CRUD operations.
