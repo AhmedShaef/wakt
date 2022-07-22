@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
-	"net/http"
 )
 
 // Handlers manages the set of workspaceUser endpoints.
@@ -47,7 +48,7 @@ func (h Handlers) Invite(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to update a workspaceUser you don't own.
-	if !workspaceUser.Admin && workspaceUser.Uid != claims.Subject {
+	if !workspaceUser.Admin && workspaceUser.UID != claims.Subject {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -98,7 +99,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if !workspaceUsers.Admin && claims.Subject != workspaceUsers.Uid {
+	if !workspaceUsers.Admin && claims.Subject != workspaceUsers.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
@@ -138,7 +139,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if !workspaceUsers.Admin && claims.Subject != workspaceUsers.Uid {
+	if !workspaceUsers.Admin && claims.Subject != workspaceUsers.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 

@@ -1,15 +1,16 @@
 package workspace_user
 
 import (
-	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
 	"time"
 	"unsafe"
+
+	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
 )
 
 // WorkspaceUser represents a workspace user
 type WorkspaceUser struct {
 	ID          string    `json:"id"`
-	Uid         string    `json:"uid"`
+	UID         string    `json:"uid"`
 	Wid         string    `json:"wid"`
 	Admin       bool      `json:"admin"`
 	Active      bool      `json:"active"`
