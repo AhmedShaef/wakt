@@ -451,7 +451,7 @@ func (pt *WorkspaceTests) getWorkspaceUser200(t *testing.T, id string) {
 			// Define what we wanted to receive. We will just trust the generated
 			// fields like Dates so we copy p.
 			exp := got
-			exp[0].Uid = "5cf37266-3473-4006-984f-9325122678b7"
+			exp[0].UID = "5cf37266-3473-4006-984f-9325122678b7"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Errorf("\t%s\tTest : %d\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)
