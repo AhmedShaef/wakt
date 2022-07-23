@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
-	"github.com/AhmedShaef/wakt/business/core/time_entry"
+	"github.com/AhmedShaef/wakt/business/core/timeEntry"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -19,7 +19,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-// TimeEntryTests holds methods for each time_entry subtest. This type allows
+// TimeEntryTests holds methods for each timeEntry subtest. This type allows
 // passing dependencies for tests while still providing a convenient syntax
 // when subtests are registered.
 type TimeEntryTests struct {
@@ -62,19 +62,19 @@ func TestTimeEntry(t *testing.T) {
 	t.Run("crudTimeEntry", tests.crudTimeEntry)
 }
 
-// postTimeEntry400 validates a time_entry can't be created with the endpoint
-// unless a valid time_entry document is submitted.
+// postTimeEntry400 validates a timeEntry can't be created with the endpoint
+// unless a valid timeEntry document is submitted.
 func (pt *TimeEntryTests) postTimeEntry400(t *testing.T) {
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry", strings.NewReader(`{}`))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry", strings.NewReader(`{}`))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new time_entry can't be created with an invalid document.")
+	t.Log("Given the need to validate a new timeEntry can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete timeEntry value.", testID)
 		{
 			if w.Code != http.StatusBadRequest {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 400 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -112,19 +112,19 @@ func (pt *TimeEntryTests) postTimeEntry400(t *testing.T) {
 	}
 }
 
-// startTimeEntry400 validates a time_entry can't be created with the endpoint
-// unless a valid time_entry document is submitted.
+// startTimeEntry400 validates a timeEntry can't be created with the endpoint
+// unless a valid timeEntry document is submitted.
 func (pt *TimeEntryTests) startTimeEntry400(t *testing.T) {
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry/start", strings.NewReader(`{}`))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry/start", strings.NewReader(`{}`))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new time_entry can't be created with an invalid document.")
+	t.Log("Given the need to validate a new timeEntry can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete timeEntry value.", testID)
 		{
 			if w.Code != http.StatusBadRequest {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 400 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -160,10 +160,10 @@ func (pt *TimeEntryTests) startTimeEntry400(t *testing.T) {
 	}
 }
 
-// postTimeEntry401 validates a time_entry can't be created with the endpoint
+// postTimeEntry401 validates a timeEntry can't be created with the endpoint
 // unless the user is authenticated
 func (pt *TimeEntryTests) postTimeEntry401(t *testing.T) {
-	np := time_entry.NewTimeEntry{
+	np := timeEntry.NewTimeEntry{
 		Start:       time.Now(),
 		Duration:    time.Duration(60),
 		CreatedWith: "API",
@@ -174,16 +174,16 @@ func (pt *TimeEntryTests) postTimeEntry401(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	// Not setting an authorization header.
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new time_entry can't be created with an invalid document.")
+	t.Log("Given the need to validate a new timeEntry can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete timeEntry value.", testID)
 		{
 			if w.Code != http.StatusUnauthorized {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 401 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -193,10 +193,10 @@ func (pt *TimeEntryTests) postTimeEntry401(t *testing.T) {
 	}
 }
 
-// startTimeEntry401 validates a time_entry can't be created with the endpoint
+// startTimeEntry401 validates a timeEntry can't be created with the endpoint
 // unless the user is authenticated
 func (pt *TimeEntryTests) startTimeEntry401(t *testing.T) {
-	np := time_entry.StartTimeEntry{
+	np := timeEntry.StartTimeEntry{
 		CreatedWith: "API",
 	}
 
@@ -205,16 +205,16 @@ func (pt *TimeEntryTests) startTimeEntry401(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	// Not setting an authorization header.
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new time_entry can't be created with an invalid document.")
+	t.Log("Given the need to validate a new timeEntry can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete timeEntry value.", testID)
 		{
 			if w.Code != http.StatusUnauthorized {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 401 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -224,20 +224,20 @@ func (pt *TimeEntryTests) startTimeEntry401(t *testing.T) {
 	}
 }
 
-// getTimeEntry400 validates a time_entry request for a malformed id.
+// getTimeEntry400 validates a timeEntry request for a malformed id.
 func (pt *TimeEntryTests) getTimeEntry400(t *testing.T) {
 	id := "12345"
 
-	r := httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry with a malformed id.")
+	t.Log("Given the need to validate getting a timeEntry with a malformed id.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusBadRequest {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 400 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -256,20 +256,20 @@ func (pt *TimeEntryTests) getTimeEntry400(t *testing.T) {
 	}
 }
 
-// getTimeEntry404 validates a time_entry request for a time_entry that does not exist with the endpoint.
+// getTimeEntry404 validates a timeEntry request for a timeEntry that does not exist with the endpoint.
 func (pt *TimeEntryTests) getTimeEntry404(t *testing.T) {
 	id := "45cf87a3-5915-4079-a9af-6c559239ddbf"
 
-	r := httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry with an unknown id.")
+	t.Log("Given the need to validate getting a timeEntry with an unknown id.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -288,20 +288,20 @@ func (pt *TimeEntryTests) getTimeEntry404(t *testing.T) {
 	}
 }
 
-// deleteTimeEntryNotFound validates deleting a time_entry that does not exist is not a failure.
+// deleteTimeEntryNotFound validates deleting a timeEntry that does not exist is not a failure.
 func (pt *TimeEntryTests) deleteTimeEntryNotFound(t *testing.T) {
 	id := "112262f1-1a77-4374-9f22-39e575aa6348"
 
-	r := httptest.NewRequest(http.MethodDelete, "/v1/time_entry/delete/"+id, nil)
+	r := httptest.NewRequest(http.MethodDelete, "/v1/timeEntry/delete/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a time_entry that does not exist.")
+	t.Log("Given the need to validate deleting a timeEntry that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -311,11 +311,11 @@ func (pt *TimeEntryTests) deleteTimeEntryNotFound(t *testing.T) {
 	}
 }
 
-// putTimeEntry404 validates updating a time_entry that does not exist.
+// putTimeEntry404 validates updating a timeEntry that does not exist.
 func (pt *TimeEntryTests) putTimeEntry404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := time_entry.UpdateTimeEntry{
+	up := timeEntry.UpdateTimeEntry{
 		Start: dbtest.TimePointer(time.Now()),
 	}
 	body, err := json.Marshal(&up)
@@ -323,16 +323,16 @@ func (pt *TimeEntryTests) putTimeEntry404(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/update/"+id, bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/update/"+id, bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate updating a time_entry that does not exist.")
+	t.Log("Given the need to validate updating a timeEntry that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -351,11 +351,11 @@ func (pt *TimeEntryTests) putTimeEntry404(t *testing.T) {
 	}
 }
 
-// putTags404 validates updating a time_entry that does not exist.
+// putTags404 validates updating a timeEntry that does not exist.
 func (pt *TimeEntryTests) putTags404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := time_entry.UpdateTimeEntryTags{
+	up := timeEntry.UpdateTimeEntryTags{
 		Tags:    []string{"tags", "project"},
 		TagMode: "add",
 	}
@@ -364,16 +364,16 @@ func (pt *TimeEntryTests) putTags404(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/"+id, bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/"+id, bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate updating a time_entry that does not exist.")
+	t.Log("Given the need to validate updating a timeEntry that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -392,20 +392,20 @@ func (pt *TimeEntryTests) putTags404(t *testing.T) {
 	}
 }
 
-// stopTimeEntry404 validates updating a time_entry that does not exist.
+// stopTimeEntry404 validates updating a timeEntry that does not exist.
 func (pt *TimeEntryTests) stopTimeEntry404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/"+id+"/stop", nil)
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/"+id+"/stop", nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate updating a time_entry that does not exist.")
+	t.Log("Given the need to validate updating a timeEntry that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -439,9 +439,9 @@ func (pt *TimeEntryTests) crudTimeEntry(t *testing.T) {
 	pt.stopTimeEntry204(t, S.ID)
 }
 
-// postTimeEntry201 validates a time_entry can be created with the endpoint.
-func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) time_entry.TimeEntry {
-	np := time_entry.NewTimeEntry{
+// postTimeEntry201 validates a timeEntry can be created with the endpoint.
+func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeEntry.TimeEntry {
+	np := timeEntry.NewTimeEntry{
 		Start:       time.Now(),
 		Duration:    time.Duration(60),
 		CreatedWith: "API",
@@ -452,19 +452,19 @@ func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) time_entry.TimeEntry {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got time_entry.TimeEntry
+	var got timeEntry.TimeEntry
 
-	t.Log("Given the need to create a new time_entry with the time_entry endpoint.")
+	t.Log("Given the need to create a new timeEntry with the timeEntry endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the declared time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using the declared timeEntry value.", testID)
 		{
 			if w.Code != http.StatusCreated {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 201 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -490,9 +490,9 @@ func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) time_entry.TimeEntry {
 	return got
 }
 
-// startTimeEntry201 validates a time_entry can be created with the endpoint.
-func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) time_entry.TimeEntry {
-	np := time_entry.StartTimeEntry{
+// startTimeEntry201 validates a timeEntry can be created with the endpoint.
+func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) timeEntry.TimeEntry {
+	np := timeEntry.StartTimeEntry{
 		CreatedWith: "API",
 	}
 
@@ -501,19 +501,19 @@ func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) time_entry.TimeEntry {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/time_entry/start", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/timeEntry/start", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got time_entry.TimeEntry
+	var got timeEntry.TimeEntry
 
-	t.Log("Given the need to create a new time_entry with the time_entry endpoint.")
+	t.Log("Given the need to create a new timeEntry with the timeEntry endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the declared time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using the declared timeEntry value.", testID)
 		{
 			if w.Code != http.StatusCreated {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 201 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -539,18 +539,18 @@ func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) time_entry.TimeEntry {
 	return got
 }
 
-// deleteTimeEntry200 validates deleting a time_entry that does exist.
+// deleteTimeEntry200 validates deleting a timeEntry that does exist.
 func (pt *TimeEntryTests) deleteTimeEntry204(t *testing.T, id string) {
-	r := httptest.NewRequest(http.MethodDelete, "/v1/time_entry/delete/"+id, nil)
+	r := httptest.NewRequest(http.MethodDelete, "/v1/timeEntry/delete/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a time_entry that does exist.")
+	t.Log("Given the need to validate deleting a timeEntry that does exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -560,25 +560,25 @@ func (pt *TimeEntryTests) deleteTimeEntry204(t *testing.T, id string) {
 	}
 }
 
-// getTimeEntry200 validates a time_entry request for an existing id.
+// getTimeEntry200 validates a timeEntry request for an existing id.
 func (pt *TimeEntryTests) getTimeEntry200(t *testing.T, id string) {
-	r := httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry that exists.")
+	t.Log("Given the need to validate getting a timeEntry that exists.")
 	{
 		testID := 0
-		t.Logf("\tTest : %d\tWhen using the new time_entry %s.", testID, id)
+		t.Logf("\tTest : %d\tWhen using the new timeEntry %s.", testID, id)
 		{
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tTest : %d\tShould receive a status code of 200 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got time_entry.TimeEntry
+			var got timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -596,25 +596,25 @@ func (pt *TimeEntryTests) getTimeEntry200(t *testing.T, id string) {
 	}
 }
 
-// getRunTimeEntry200 validates a time_entry request for an existing id.
+// getRunTimeEntry200 validates a timeEntry request for an existing id.
 func (pt *TimeEntryTests) getRunTimeEntry200(t *testing.T, id string) {
-	r := httptest.NewRequest(http.MethodGet, "/v1/time_entry/running/1/20", nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/timeEntry/running/1/20", nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry that exists.")
+	t.Log("Given the need to validate getting a timeEntry that exists.")
 	{
 		testID := 0
-		t.Logf("\tTest : %d\tWhen using the new time_entrys.", testID)
+		t.Logf("\tTest : %d\tWhen using the new timeEntrys.", testID)
 		{
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tTest : %d\tShould receive a status code of 200 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []time_entry.TimeEntry
+			var got []timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -632,7 +632,7 @@ func (pt *TimeEntryTests) getRunTimeEntry200(t *testing.T, id string) {
 	}
 }
 
-// getRangeTimeEntry200 validates a time_entry request for an existing id.
+// getRangeTimeEntry200 validates a timeEntry request for an existing id.
 func (pt *TimeEntryTests) getRangeTimeEntry200(t *testing.T, id string) {
 
 	start := time.Date(2010, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -640,23 +640,23 @@ func (pt *TimeEntryTests) getRangeTimeEntry200(t *testing.T, id string) {
 
 	ranges := "?start_date=" + start.Format(time.RFC3339) + "&end_date=" + end.Format(time.RFC3339)
 
-	r := httptest.NewRequest(http.MethodGet, "/v1/time_entry/1/20"+ranges, nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/timeEntry/1/20"+ranges, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry that exists.")
+	t.Log("Given the need to validate getting a timeEntry that exists.")
 	{
 		testID := 0
-		t.Logf("\tTest : %d\tWhen using the new time_entrys.", testID)
+		t.Logf("\tTest : %d\tWhen using the new timeEntrys.", testID)
 		{
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tTest : %d\tShould receive a status code of 200 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []time_entry.TimeEntry
+			var got []timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -674,7 +674,7 @@ func (pt *TimeEntryTests) getRangeTimeEntry200(t *testing.T, id string) {
 	}
 }
 
-// getDash200 validates a time_entry request for an existing id.
+// getDash200 validates a timeEntry request for an existing id.
 func (pt *TimeEntryTests) getDash200(t *testing.T) {
 	r := httptest.NewRequest(http.MethodGet, "/v1/dashboard", nil)
 	w := httptest.NewRecorder()
@@ -682,17 +682,17 @@ func (pt *TimeEntryTests) getDash200(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate getting a time_entry that exists.")
+	t.Log("Given the need to validate getting a timeEntry that exists.")
 	{
 		testID := 0
-		t.Logf("\tTest : %d\tWhen using the new time_entrys.", testID)
+		t.Logf("\tTest : %d\tWhen using the new timeEntrys.", testID)
 		{
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tTest : %d\tShould receive a status code of 200 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []time_entry.TimeEntry
+			var got []timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -709,26 +709,26 @@ func (pt *TimeEntryTests) getDash200(t *testing.T) {
 	}
 }
 
-// putTimeEntry204 validates updating a time_entry that does exist.
+// putTimeEntry204 validates updating a timeEntry that does exist.
 func (pt *TimeEntryTests) putTimeEntry204(t *testing.T, id string) {
 	body := `{"created_with": "cURL"}`
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/update/"+id, strings.NewReader(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/update/"+id, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to update a time_entry with the time_entry endpoint.")
+	t.Log("Given the need to update a timeEntry with the timeEntry endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the modified time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using the modified timeEntry value.", testID)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 204 for the response.", dbtest.Success, testID)
 
-			r = httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+			r = httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 			w = httptest.NewRecorder()
 
 			r.Header.Set("Authorization", "Bearer "+pt.userToken)
@@ -739,7 +739,7 @@ func (pt *TimeEntryTests) putTimeEntry204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru time_entry.TimeEntry
+			var ru timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -752,26 +752,26 @@ func (pt *TimeEntryTests) putTimeEntry204(t *testing.T, id string) {
 	}
 }
 
-// putTags204 validates updating a time_entry that does exist.
+// putTags204 validates updating a timeEntry that does exist.
 func (pt *TimeEntryTests) putTags204(t *testing.T, id string) {
 	body := `{"tags": ["cURL", "golang"], "tag_mode": "add"}`
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/tags/"+id, strings.NewReader(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/tags/"+id, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to update a time_entry with the time_entry endpoint.")
+	t.Log("Given the need to update a timeEntry with the timeEntry endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the modified time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using the modified timeEntry value.", testID)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 204 for the response.", dbtest.Success, testID)
 
-			r = httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+			r = httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 			w = httptest.NewRecorder()
 
 			r.Header.Set("Authorization", "Bearer "+pt.userToken)
@@ -782,7 +782,7 @@ func (pt *TimeEntryTests) putTags204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru time_entry.TimeEntry
+			var ru timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -795,26 +795,26 @@ func (pt *TimeEntryTests) putTags204(t *testing.T, id string) {
 	}
 }
 
-// stopTimeEntry204 validates updating a time_entry that does exist.
+// stopTimeEntry204 validates updating a timeEntry that does exist.
 func (pt *TimeEntryTests) stopTimeEntry204(t *testing.T, id string) {
 	body := `{"name": "Graphic Novels"}`
-	r := httptest.NewRequest(http.MethodPut, "/v1/time_entry/"+id+"/stop", strings.NewReader(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/"+id+"/stop", strings.NewReader(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to update a time_entry with the time_entry endpoint.")
+	t.Log("Given the need to update a timeEntry with the timeEntry endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the modified time_entry value.", testID)
+		t.Logf("\tTest %d:\tWhen using the modified timeEntry value.", testID)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 204 for the response.", dbtest.Success, testID)
 
-			r = httptest.NewRequest(http.MethodGet, "/v1/time_entry/"+id, nil)
+			r = httptest.NewRequest(http.MethodGet, "/v1/timeEntry/"+id, nil)
 			w = httptest.NewRecorder()
 
 			r.Header.Set("Authorization", "Bearer "+pt.userToken)
@@ -825,7 +825,7 @@ func (pt *TimeEntryTests) stopTimeEntry204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru time_entry.TimeEntry
+			var ru timeEntry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}

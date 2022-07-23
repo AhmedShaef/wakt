@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AhmedShaef/wakt/business/core/time_entry"
+	"github.com/AhmedShaef/wakt/business/core/timeEntry"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
@@ -20,7 +20,7 @@ import (
 
 // Handlers manages the set of timeEntry endpoints.
 type Handlers struct {
-	TimeEntry time_entry.Core
+	TimeEntry timeEntry.Core
 	Workspace workspace.Core
 	User      user.Core
 }
@@ -37,7 +37,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var nte time_entry.NewTimeEntry
+	var nte timeEntry.NewTimeEntry
 	if err := web.Decode(r, &nte); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -53,9 +53,9 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	usr, err := h.TimeEntry.Create(ctx, nte, claims.Subject, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("timeEntry[%+v]: %w", &usr, err)
@@ -77,7 +77,7 @@ func (h Handlers) Start(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var ste time_entry.StartTimeEntry
+	var ste timeEntry.StartTimeEntry
 	if err := web.Decode(r, &ste); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -93,9 +93,9 @@ func (h Handlers) Start(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	usr, err := h.TimeEntry.Start(ctx, ste, claims.Subject, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("timeEntry[%+v]: %w", &usr, err)
@@ -122,9 +122,9 @@ func (h Handlers) Stop(ctx context.Context, w http.ResponseWriter, r *http.Reque
 	timeEntrys, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", timeEntryID, err)
@@ -139,9 +139,9 @@ func (h Handlers) Stop(ctx context.Context, w http.ResponseWriter, r *http.Reque
 	timeEntry, err := h.TimeEntry.Stop(ctx, timeEntryID, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("ID[%s] time entry: %w", timeEntryID, err)
@@ -163,7 +163,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var ute time_entry.UpdateTimeEntry
+	var ute timeEntry.UpdateTimeEntry
 	if err := web.Decode(r, &ute); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -173,9 +173,9 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	timeEntrys, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", timeEntryID, err)
@@ -189,9 +189,9 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	if err := h.TimeEntry.Update(ctx, timeEntryID, ute, v.Now); err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("ID[%s] time entry[%+v]: %w", timeEntryID, &ute, err)
@@ -213,9 +213,9 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	timeEntrys, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", timeEntryID, err)
@@ -229,7 +229,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	if err := h.TimeEntry.Delete(ctx, timeEntryID); err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
 		default:
 			return fmt.Errorf("ID[%s]: %w", timeEntryID, err)
@@ -251,9 +251,9 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	timeEntry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
-		case errors.Is(err, time_entry.ErrInvalidID):
+		case errors.Is(err, timeEntry.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, time_entry.ErrNotFound):
+		case errors.Is(err, timeEntry.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", timeEntryID, err)
@@ -393,7 +393,7 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var ut time_entry.UpdateTimeEntryTags
+	var ut timeEntry.UpdateTimeEntryTags
 	if err := web.Decode(r, &ut); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -405,9 +405,9 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 		timeEntries, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 		if err != nil {
 			switch {
-			case errors.Is(err, time_entry.ErrInvalidID):
+			case errors.Is(err, timeEntry.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
-			case errors.Is(err, time_entry.ErrNotFound):
+			case errors.Is(err, timeEntry.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
 				return fmt.Errorf("querying workspace[%s]: %w", timeEntryID, err)
@@ -421,9 +421,9 @@ func (h Handlers) UpdateTags(ctx context.Context, w http.ResponseWriter, r *http
 
 		if err := h.TimeEntry.UpdateTags(ctx, timeEntryID, ut, v.Now); err != nil {
 			switch {
-			case errors.Is(err, time_entry.ErrInvalidID):
+			case errors.Is(err, timeEntry.ErrInvalidID):
 				return v1Web.NewRequestError(err, http.StatusBadRequest)
-			case errors.Is(err, time_entry.ErrNotFound):
+			case errors.Is(err, timeEntry.ErrNotFound):
 				return v1Web.NewRequestError(err, http.StatusNotFound)
 			default:
 				return fmt.Errorf("ID[%s] time entry[%+v]: %w", timeEntryID, &ut, err)
