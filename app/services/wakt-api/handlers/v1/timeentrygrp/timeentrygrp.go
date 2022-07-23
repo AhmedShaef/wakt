@@ -136,7 +136,7 @@ func (h Handlers) Stop(ctx context.Context, w http.ResponseWriter, r *http.Reque
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	timeEntry, err := h.TimeEntry.Stop(ctx, timeEntryID, v.Now)
+	timeentry, err := h.TimeEntry.Stop(ctx, timeEntryID, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, timeEntry.ErrInvalidID):
@@ -148,7 +148,7 @@ func (h Handlers) Stop(ctx context.Context, w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	return web.Respond(ctx, w, timeEntry, http.StatusNoContent)
+	return web.Respond(ctx, w, timeentry, http.StatusNoContent)
 }
 
 // Update updates a timeEntry in the system.
@@ -248,7 +248,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 
 	timeEntryID := web.Param(r, "id")
 
-	timeEntry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
+	timeentry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
 		case errors.Is(err, timeEntry.ErrInvalidID):
@@ -261,11 +261,11 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeEntry.UID {
+	if claims.Subject != timeentry.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	users, err := h.User.QueryByID(ctx, timeEntry.UID)
+	users, err := h.User.QueryByID(ctx, timeentry.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, user.ErrInvalidID):
@@ -273,15 +273,15 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		case errors.Is(err, user.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying user[%s]: %w", timeEntry.UID, err)
+			return fmt.Errorf("querying user[%s]: %w", timeentry.UID, err)
 		}
 	}
 
 	timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
-	timeEntry.Start.Format(timeSetting)
-	timeEntry.Stop.Format(timeSetting)
+	timeentry.Start.Format(timeSetting)
+	timeentry.Stop.Format(timeSetting)
 
-	return web.Respond(ctx, w, timeEntry, http.StatusOK)
+	return web.Respond(ctx, w, timeentry, http.StatusOK)
 }
 
 // QueryRunning returns a list of time entries with paging.

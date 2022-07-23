@@ -4,7 +4,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
+	"github.com/AhmedShaef/wakt/business/core/timeEntry/db"
 )
 
 // TimeEntry represents an individual time_entry.

@@ -10,7 +10,7 @@ import (
 
 	dbp "github.com/AhmedShaef/wakt/business/core/project/db"
 	dbt "github.com/AhmedShaef/wakt/business/core/task/db"
-	"github.com/AhmedShaef/wakt/business/core/time_entry/db"
+	"github.com/AhmedShaef/wakt/business/core/timeEntry/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/util"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
