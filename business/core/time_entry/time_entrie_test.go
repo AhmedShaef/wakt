@@ -1,4 +1,4 @@
-package time_entry
+package timeEntry
 
 import (
 	"context"

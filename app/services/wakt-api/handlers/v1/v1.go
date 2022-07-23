@@ -18,7 +18,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
 	"github.com/AhmedShaef/wakt/business/core/team"
-	"github.com/AhmedShaef/wakt/business/core/time_entry"
+	"github.com/AhmedShaef/wakt/business/core/timeEntry"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
 	"net/http"
@@ -123,20 +123,20 @@ func Routes(app *web.App, cfg Config) {
 
 	// Register time entry management endpoints.
 	tegh := timeentrygrp.Handlers{
-		TimeEntry: time_entry.NewCore(cfg.Log, cfg.DB),
+		TimeEntry: timeEntry.NewCore(cfg.Log, cfg.DB),
 		Workspace: workspace.NewCore(cfg.Log, cfg.DB),
 		User:      user.NewCore(cfg.Log, cfg.DB),
 	}
 
-	app.Handle(http.MethodPost, version, "/time_entry", tegh.Create, authen)
-	app.Handle(http.MethodPost, version, "/time_entry/start", tegh.Start, authen)
-	app.Handle(http.MethodPut, version, "/time_entry/:id/stop", tegh.Stop, authen)
-	app.Handle(http.MethodGet, version, "/time_entry/:id", tegh.QueryByID, authen)
-	app.Handle(http.MethodGet, version, "/time_entry/running/:page/:rows", tegh.QueryRunning, authen)
-	app.Handle(http.MethodPut, version, "/time_entry/update/:id", tegh.Update, authen)
-	app.Handle(http.MethodPut, version, "/time_entry/tags/:id", tegh.UpdateTags, authen)
-	app.Handle(http.MethodDelete, version, "/time_entry/delete/:id", tegh.Delete, authen)
-	app.Handle(http.MethodGet, version, "/time_entry/:page/:rows", tegh.QueryRange, authen)
+	app.Handle(http.MethodPost, version, "/timeEntry", tegh.Create, authen)
+	app.Handle(http.MethodPost, version, "/timeEntry/start", tegh.Start, authen)
+	app.Handle(http.MethodPut, version, "/timeEntry/:id/stop", tegh.Stop, authen)
+	app.Handle(http.MethodGet, version, "/timeEntry/:id", tegh.QueryByID, authen)
+	app.Handle(http.MethodGet, version, "/timeEntry/running/:page/:rows", tegh.QueryRunning, authen)
+	app.Handle(http.MethodPut, version, "/timeEntry/update/:id", tegh.Update, authen)
+	app.Handle(http.MethodPut, version, "/timeEntry/tags/:id", tegh.UpdateTags, authen)
+	app.Handle(http.MethodDelete, version, "/timeEntry/delete/:id", tegh.Delete, authen)
+	app.Handle(http.MethodGet, version, "/timeEntry/:page/:rows", tegh.QueryRange, authen)
 	app.Handle(http.MethodGet, version, "/dashboard", tegh.QueryDash, authen)
 
 	// Register user management and authentication endpoints.
