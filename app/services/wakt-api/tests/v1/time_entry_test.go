@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
-	"github.com/AhmedShaef/wakt/business/core/timeEntry"
+	"github.com/AhmedShaef/wakt/business/core/timeentry"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -163,7 +163,7 @@ func (pt *TimeEntryTests) startTimeEntry400(t *testing.T) {
 // postTimeEntry401 validates a timeEntry can't be created with the endpoint
 // unless the user is authenticated
 func (pt *TimeEntryTests) postTimeEntry401(t *testing.T) {
-	np := timeEntry.NewTimeEntry{
+	np := timeentry.NewTimeEntry{
 		Start:       time.Now(),
 		Duration:    time.Duration(60),
 		CreatedWith: "API",
@@ -196,7 +196,7 @@ func (pt *TimeEntryTests) postTimeEntry401(t *testing.T) {
 // startTimeEntry401 validates a timeEntry can't be created with the endpoint
 // unless the user is authenticated
 func (pt *TimeEntryTests) startTimeEntry401(t *testing.T) {
-	np := timeEntry.StartTimeEntry{
+	np := timeentry.StartTimeEntry{
 		CreatedWith: "API",
 	}
 
@@ -315,7 +315,7 @@ func (pt *TimeEntryTests) deleteTimeEntryNotFound(t *testing.T) {
 func (pt *TimeEntryTests) putTimeEntry404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := timeEntry.UpdateTimeEntry{
+	up := timeentry.UpdateTimeEntry{
 		Start: dbtest.TimePointer(time.Now()),
 	}
 	body, err := json.Marshal(&up)
@@ -355,7 +355,7 @@ func (pt *TimeEntryTests) putTimeEntry404(t *testing.T) {
 func (pt *TimeEntryTests) putTags404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := timeEntry.UpdateTimeEntryTags{
+	up := timeentry.UpdateTimeEntryTags{
 		Tags:    []string{"tags", "project"},
 		TagMode: "add",
 	}
@@ -440,8 +440,8 @@ func (pt *TimeEntryTests) crudTimeEntry(t *testing.T) {
 }
 
 // postTimeEntry201 validates a timeEntry can be created with the endpoint.
-func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeEntry.TimeEntry {
-	np := timeEntry.NewTimeEntry{
+func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeentry.TimeEntry {
+	np := timeentry.NewTimeEntry{
 		Start:       time.Now(),
 		Duration:    time.Duration(60),
 		CreatedWith: "API",
@@ -459,7 +459,7 @@ func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeEntry.TimeEntry {
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got timeEntry.TimeEntry
+	var got timeentry.TimeEntry
 
 	t.Log("Given the need to create a new timeEntry with the timeEntry endpoint.")
 	{
@@ -491,8 +491,8 @@ func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeEntry.TimeEntry {
 }
 
 // startTimeEntry201 validates a timeEntry can be created with the endpoint.
-func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) timeEntry.TimeEntry {
-	np := timeEntry.StartTimeEntry{
+func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) timeentry.TimeEntry {
+	np := timeentry.StartTimeEntry{
 		CreatedWith: "API",
 	}
 
@@ -508,7 +508,7 @@ func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) timeEntry.TimeEntry {
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got timeEntry.TimeEntry
+	var got timeentry.TimeEntry
 
 	t.Log("Given the need to create a new timeEntry with the timeEntry endpoint.")
 	{
@@ -578,7 +578,7 @@ func (pt *TimeEntryTests) getTimeEntry200(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got timeEntry.TimeEntry
+			var got timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -614,7 +614,7 @@ func (pt *TimeEntryTests) getRunTimeEntry200(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []timeEntry.TimeEntry
+			var got []timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -656,7 +656,7 @@ func (pt *TimeEntryTests) getRangeTimeEntry200(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []timeEntry.TimeEntry
+			var got []timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -692,7 +692,7 @@ func (pt *TimeEntryTests) getDash200(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []timeEntry.TimeEntry
+			var got []timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -739,7 +739,7 @@ func (pt *TimeEntryTests) putTimeEntry204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru timeEntry.TimeEntry
+			var ru timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -782,7 +782,7 @@ func (pt *TimeEntryTests) putTags204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru timeEntry.TimeEntry
+			var ru timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
@@ -825,7 +825,7 @@ func (pt *TimeEntryTests) stopTimeEntry204(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould receive a status code of 200 for the retrieve.", dbtest.Success, testID)
 
-			var ru timeEntry.TimeEntry
+			var ru timeentry.TimeEntry
 			if err := json.NewDecoder(w.Body).Decode(&ru); err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}
