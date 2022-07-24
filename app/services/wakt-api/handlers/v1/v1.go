@@ -18,7 +18,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
 	"github.com/AhmedShaef/wakt/business/core/team"
-	"github.com/AhmedShaef/wakt/business/core/timeEntry"
+	"github.com/AhmedShaef/wakt/business/core/timeentry"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
 	"github.com/AhmedShaef/wakt/business/core/workspace_user"
 	"net/http"
@@ -123,7 +123,7 @@ func Routes(app *web.App, cfg Config) {
 
 	// Register time entry management endpoints.
 	tegh := timeentrygrp.Handlers{
-		TimeEntry: timeEntry.NewCore(cfg.Log, cfg.DB),
+		TimeEntry: timeentry.NewCore(cfg.Log, cfg.DB),
 		Workspace: workspace.NewCore(cfg.Log, cfg.DB),
 		User:      user.NewCore(cfg.Log, cfg.DB),
 	}

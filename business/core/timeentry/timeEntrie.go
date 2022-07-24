@@ -1,7 +1,7 @@
-// Package timeEntry provides an example of a core business API. Right now these
+// Package timeentry provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
-package timeEntry
+package timeentry
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 	dbp "github.com/AhmedShaef/wakt/business/core/project/db"
 	dbt "github.com/AhmedShaef/wakt/business/core/task/db"
-	"github.com/AhmedShaef/wakt/business/core/timeEntry/db"
+	"github.com/AhmedShaef/wakt/business/core/timeentry/db"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/util"
 	"github.com/AhmedShaef/wakt/business/sys/validate"

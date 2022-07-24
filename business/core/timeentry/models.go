@@ -1,10 +1,10 @@
-package timeEntry
+package timeentry
 
 import (
 	"time"
 	"unsafe"
 
-	"github.com/AhmedShaef/wakt/business/core/timeEntry/db"
+	"github.com/AhmedShaef/wakt/business/core/timeentry/db"
 )
 
 // TimeEntry represents an individual time_entry.
