@@ -248,7 +248,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 
 	timeEntryID := web.Param(r, "id")
 
-	timeentry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
+	timeEntry, err := h.TimeEntry.QueryByID(ctx, timeEntryID)
 	if err != nil {
 		switch {
 		case errors.Is(err, timeentry.ErrInvalidID):
@@ -261,11 +261,11 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 
 	// If you are not an admin and looking to retrieve someone other than yourself.
-	if claims.Subject != timeentry.UID {
+	if claims.Subject != timeEntry.UID {
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	users, err := h.User.QueryByID(ctx, timeentry.UID)
+	users, err := h.User.QueryByID(ctx, timeEntry.UID)
 	if err != nil {
 		switch {
 		case errors.Is(err, user.ErrInvalidID):
@@ -273,15 +273,15 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		case errors.Is(err, user.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying user[%s]: %w", timeentry.UID, err)
+			return fmt.Errorf("querying user[%s]: %w", timeEntry.UID, err)
 		}
 	}
 
 	timeSetting := users.DateFormat + " " + users.TimeOfDayFormat
-	timeentry.Start.Format(timeSetting)
-	timeentry.Stop.Format(timeSetting)
+	timeEntry.Start.Format(timeSetting)
+	timeEntry.Stop.Format(timeSetting)
 
-	return web.Respond(ctx, w, timeentry, http.StatusOK)
+	return web.Respond(ctx, w, timeEntry, http.StatusOK)
 }
 
 // QueryRunning returns a list of time entries with paging.
