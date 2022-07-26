@@ -12,7 +12,7 @@ type Client struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	UID         string    `json:"uid"`
-	Wid         string    `json:"wid"`
+	WID         string    `json:"wid"`
 	Notes       string    `json:"notes"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
@@ -21,7 +21,7 @@ type Client struct {
 // NewClient contains information needed to create a new client.
 type NewClient struct {
 	Name  string `json:"name" validate:"required"`
-	Wid   string `json:"wid"`
+	WID   string `json:"wid"`
 	Notes string `json:"notes"`
 }
 
