@@ -42,14 +42,14 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if nu.Wid == "" {
+	if nu.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to query user data: %w", err)
 		}
-		nu.Wid = users.DefaultWid
+		nu.WID = users.DefaultWid
 	} else {
-		workspaces, err := h.Workspace.QueryByID(ctx, nu.Wid)
+		workspaces, err := h.Workspace.QueryByID(ctx, nu.WID)
 		if err != nil {
 			return fmt.Errorf("unable to query workspace data:%w", err)
 		}

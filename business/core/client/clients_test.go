@@ -42,7 +42,7 @@ func TestClient(t *testing.T) {
 
 			nc := NewClient{
 				Name: "Ahmed Shaef",
-				Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+				WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 			}
 
 			client, err := core.Create(ctx, nc, "5cf37266-3473-4006-984f-9325122678b7", now)

@@ -43,7 +43,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 		return Client{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	nameInWorkspace := c.store.QueryUnique(ctx, nc.Name, "wid", nc.Wid)
+	nameInWorkspace := c.store.QueryUnique(ctx, nc.Name, "wid", nc.WID)
 	if nameInWorkspace != "" {
 		return Client{}, fmt.Errorf("client name is not unique for workspace")
 	}
@@ -52,7 +52,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 		ID:          validate.GenerateID(),
 		Name:        nc.Name,
 		UID:         userID,
-		Wid:         nc.Wid,
+		Wid:         nc.WID,
 		Notes:       nc.Notes,
 		DateCreated: now,
 		DateUpdated: now,
