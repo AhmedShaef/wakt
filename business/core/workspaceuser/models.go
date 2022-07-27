@@ -1,10 +1,10 @@
-package workspace_user
+package workspaceuser
 
 import (
 	"time"
 	"unsafe"
 
-	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser/db"
 )
 
 // WorkspaceUser represents a workspace user

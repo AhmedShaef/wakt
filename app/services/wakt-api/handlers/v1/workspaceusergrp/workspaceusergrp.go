@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
@@ -15,7 +15,7 @@ import (
 
 // Handlers manages the set of workspaceUser endpoints.
 type Handlers struct {
-	WorkspaceUser workspace_user.Core
+	WorkspaceUser workspaceuser.Core
 }
 
 // Invite adds a new workspaceUser to the system.
@@ -30,7 +30,7 @@ func (h Handlers) Invite(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var nwu workspace_user.InviteUsers
+	var nwu workspaceuser.InviteUsers
 	if err := web.Decode(r, &nwu); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -38,9 +38,9 @@ func (h Handlers) Invite(ctx context.Context, w http.ResponseWriter, r *http.Req
 	workspaceUser, err := h.WorkspaceUser.QueryByID(ctx, nwu.InviterID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspaceUser[%s]: %w", workspaceUser.ID, err)
@@ -55,9 +55,9 @@ func (h Handlers) Invite(ctx context.Context, w http.ResponseWriter, r *http.Req
 	clint, err := h.WorkspaceUser.InviteUser(ctx, workspaceUser.Wid, nwu, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("workspaceUser[%+v]: %w", &clint, err)
@@ -79,7 +79,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	var upd workspace_user.UpdateWorkspaceUser
+	var upd workspaceuser.UpdateWorkspaceUser
 	if err := web.Decode(r, &upd); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
@@ -89,9 +89,9 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 	workspaceUsers, err := h.WorkspaceUser.QueryByID(ctx, workspaceUserID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", workspaceUserID, err)
@@ -105,9 +105,9 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	if err := h.WorkspaceUser.Update(ctx, workspaceUserID, upd, v.Now); err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("ID[%s] WorkspaceUser[%+v]: %w", workspaceUserID, &upd, err)
@@ -129,9 +129,9 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 	workspaceUsers, err := h.WorkspaceUser.QueryByID(ctx, workspaceUserID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace[%s]: %w", workspaceUserID, err)
@@ -145,7 +145,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	if err := h.WorkspaceUser.Delete(ctx, workspaceUserID); err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
 		default:
 			return fmt.Errorf("ID[%s]: %w", workspaceUserID, err)

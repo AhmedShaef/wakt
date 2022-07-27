@@ -1,7 +1,7 @@
-// Package workspace_user provides an example of a core business API. Right now these
+// Package workspaceuser provides an example of a core business API. Right now these
 // calls are just wrapping the data/data layer. But at some point you will
 // want auditing or something that isn't specific to the data/store layer.
-package workspace_user
+package workspaceuser
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"time"
 
 	users "github.com/AhmedShaef/wakt/business/core/user/db"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user/db"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser/db"
 	send "github.com/AhmedShaef/wakt/business/send/smtp"
 	"github.com/AhmedShaef/wakt/business/sys/database"
 	"github.com/AhmedShaef/wakt/business/sys/validate"

@@ -8,7 +8,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/project"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	feed "github.com/AhmedShaef/wakt/business/feed/geolocation"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -22,7 +22,7 @@ import (
 type Handlers struct {
 	User          user.Core
 	Workspace     workspace.Core
-	WorkspaceUser workspace_user.Core
+	WorkspaceUser workspaceuser.Core
 	Auth          *auth.Auth
 	Project       project.Core
 }

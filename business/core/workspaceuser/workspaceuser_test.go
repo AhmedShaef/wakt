@@ -1,4 +1,4 @@
-package workspace_user
+package workspaceuser
 
 import (
 	"context"
