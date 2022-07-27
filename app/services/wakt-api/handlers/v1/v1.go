@@ -20,7 +20,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/timeentry"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	"net/http"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers/v1/usergrp"
@@ -77,7 +77,7 @@ func Routes(app *web.App, cfg Config) {
 		Workspace:     workspace.NewCore(cfg.Log, cfg.DB),
 		User:          user.NewCore(cfg.Log, cfg.DB),
 		Task:          task.NewCore(cfg.Log, cfg.DB),
-		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
+		WorkspaceUser: workspaceuser.NewCore(cfg.Log, cfg.DB),
 		Team:          team.NewCore(cfg.Log, cfg.DB),
 	}
 
@@ -144,7 +144,7 @@ func Routes(app *web.App, cfg Config) {
 		User:          user.NewCore(cfg.Log, cfg.DB),
 		Auth:          cfg.Auth,
 		Workspace:     workspace.NewCore(cfg.Log, cfg.DB),
-		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
+		WorkspaceUser: workspaceuser.NewCore(cfg.Log, cfg.DB),
 		Project:       project.NewCore(cfg.Log, cfg.DB),
 	}
 	app.Handle(http.MethodPost, version, "/signup", ugh.SignUp)
@@ -166,7 +166,7 @@ func Routes(app *web.App, cfg Config) {
 		Task:          task.NewCore(cfg.Log, cfg.DB),
 		Tag:           tag.NewCore(cfg.Log, cfg.DB),
 		Team:          team.NewCore(cfg.Log, cfg.DB),
-		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
+		WorkspaceUser: workspaceuser.NewCore(cfg.Log, cfg.DB),
 	}
 
 	app.Handle(http.MethodPost, version, "/workspace", wgh.Create, authen)
@@ -184,11 +184,11 @@ func Routes(app *web.App, cfg Config) {
 
 	// Register workspace user management endpoints.
 	wugh := workspaceusergrp.Handlers{
-		WorkspaceUser: workspace_user.NewCore(cfg.Log, cfg.DB),
+		WorkspaceUser: workspaceuser.NewCore(cfg.Log, cfg.DB),
 	}
 
-	app.Handle(http.MethodPost, version, "/workspace_user", wugh.Invite, authen)
-	app.Handle(http.MethodPut, version, "/workspace_user/:id", wugh.Update, authen)
-	app.Handle(http.MethodDelete, version, "/workspace_user/:id", wugh.Delete, authen)
+	app.Handle(http.MethodPost, version, "/workspaceuser", wugh.Invite, authen)
+	app.Handle(http.MethodPut, version, "/workspaceuser/:id", wugh.Update, authen)
+	app.Handle(http.MethodDelete, version, "/workspaceuser/:id", wugh.Delete, authen)
 
 }

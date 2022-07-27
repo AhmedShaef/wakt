@@ -14,7 +14,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/web"
@@ -25,7 +25,7 @@ type Handlers struct {
 	Project       project.Core
 	Team          team.Core
 	Workspace     workspace.Core
-	WorkspaceUser workspace_user.Core
+	WorkspaceUser workspaceuser.Core
 	User          user.Core
 	Task          task.Core
 }
@@ -70,9 +70,9 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, np.Wid, claims.Subject)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)
@@ -218,9 +218,9 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/business/sys/validate"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
@@ -18,7 +18,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-// WorkspaceUserTests holds methods for each workspace_user subtest. This type allows
+// WorkspaceUserTests holds methods for each workspaceuser subtest. This type allows
 // passing dependencies for tests while still providing a convenient syntax
 // when subtests are registered.
 type WorkspaceUserTests struct {
@@ -35,7 +35,7 @@ type WorkspaceUserTests struct {
 func TestWorkspaceUsers(t *testing.T) {
 	t.Parallel()
 
-	test := dbtest.NewIntegration(t, c, "inttestworkspace_user")
+	test := dbtest.NewIntegration(t, c, "inttestworkspaceuser")
 	t.Cleanup(test.Teardown)
 
 	shutdown := make(chan os.Signal, 1)
@@ -56,19 +56,19 @@ func TestWorkspaceUsers(t *testing.T) {
 	t.Run("crudWorkspaceUsers", tests.crudWorkspaceUser)
 }
 
-// postWorkspaceUser400 validates a workspace_user can't be created with the endpoint
-// unless a valid workspace_user document is submitted.
+// postWorkspaceUser400 validates a workspaceuser can't be created with the endpoint
+// unless a valid workspaceuser document is submitted.
 func (pt *WorkspaceUserTests) postWorkspaceUser400(t *testing.T) {
-	r := httptest.NewRequest(http.MethodPost, "/v1/workspace_user", strings.NewReader(`{"inviter_id": "32c1494f-1c1f-4981-857f-b0526cb654ec"}`))
+	r := httptest.NewRequest(http.MethodPost, "/v1/workspaceuser", strings.NewReader(`{"inviter_id": "32c1494f-1c1f-4981-857f-b0526cb654ec"}`))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new workspace_user can't be created with an invalid document.")
+	t.Log("Given the need to validate a new workspaceuser can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete workspace_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete workspaceuser value.", testID)
 		{
 			if w.Code != http.StatusBadRequest {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 400 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -104,10 +104,10 @@ func (pt *WorkspaceUserTests) postWorkspaceUser400(t *testing.T) {
 	}
 }
 
-// postWorkspaceUser401 validates a workspace_user can't be created with the endpoint
+// postWorkspaceUser401 validates a workspaceuser can't be created with the endpoint
 // unless the user is authenticated
 func (pt *WorkspaceUserTests) postWorkspaceUser401(t *testing.T) {
-	np := workspace_user.InviteUsers{
+	np := workspaceuser.InviteUsers{
 		Emails:    []string{"example@example.com"},
 		InviterID: "5cf37266-3473-4006-984f-9325122678b7",
 	}
@@ -117,16 +117,16 @@ func (pt *WorkspaceUserTests) postWorkspaceUser401(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/workspace_user", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/workspaceuser", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	// Not setting an authorization header.
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate a new workspace_user can't be created with an invalid document.")
+	t.Log("Given the need to validate a new workspaceuser can't be created with an invalid document.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using an incomplete workspace_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using an incomplete workspaceuser value.", testID)
 		{
 			if w.Code != http.StatusUnauthorized {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 401 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -136,20 +136,20 @@ func (pt *WorkspaceUserTests) postWorkspaceUser401(t *testing.T) {
 	}
 }
 
-// deleteWorkspaceUserNotFound validates deleting a workspace_user that does not exist is not a failure.
+// deleteWorkspaceUserNotFound validates deleting a workspaceuser that does not exist is not a failure.
 func (pt *WorkspaceUserTests) deleteWorkspaceUserNotFound(t *testing.T) {
 	id := "112262f1-1a77-4374-9f22-39e575aa6348"
 
-	r := httptest.NewRequest(http.MethodDelete, "/v1/workspace_user/"+id, nil)
+	r := httptest.NewRequest(http.MethodDelete, "/v1/workspaceuser/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a workspace_user that does not exist.")
+	t.Log("Given the need to validate deleting a workspaceuser that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new workspace_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new workspaceuser %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -159,11 +159,11 @@ func (pt *WorkspaceUserTests) deleteWorkspaceUserNotFound(t *testing.T) {
 	}
 }
 
-// putWorkspaceUser404 validates updating a workspace_user that does not exist.
+// putWorkspaceUser404 validates updating a workspaceuser that does not exist.
 func (pt *WorkspaceUserTests) putWorkspaceUser404(t *testing.T) {
 	id := "9b468f90-1cf1-4377-b3fa-68b450d632a0"
 
-	up := workspace_user.UpdateWorkspaceUser{
+	up := workspaceuser.UpdateWorkspaceUser{
 		Active: dbtest.BoolPointer(true),
 	}
 	body, err := json.Marshal(&up)
@@ -171,16 +171,16 @@ func (pt *WorkspaceUserTests) putWorkspaceUser404(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPut, "/v1/workspace_user/"+id, bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/workspaceuser/"+id, bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate updating a workspace_user that does not exist.")
+	t.Log("Given the need to validate updating a workspaceuser that does not exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new workspace_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new workspaceuser %s.", testID, id)
 		{
 			if w.Code != http.StatusNotFound {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 404 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -207,9 +207,9 @@ func (pt *WorkspaceUserTests) crudWorkspaceUser(t *testing.T) {
 	pt.putWorkspaceUser204(t, "32c1494f-1c1f-4981-857f-b0526cb654ec")
 }
 
-// postWorkspaceUser201 validates a workspace_user can be created with the endpoint.
-func (pt *WorkspaceUserTests) postWorkspaceUser201(t *testing.T) []workspace_user.WorkspaceUser {
-	np := workspace_user.InviteUsers{
+// postWorkspaceUser201 validates a workspaceuser can be created with the endpoint.
+func (pt *WorkspaceUserTests) postWorkspaceUser201(t *testing.T) []workspaceuser.WorkspaceUser {
+	np := workspaceuser.InviteUsers{
 		Emails:    []string{"example1@example.com", "example2@example.com"},
 		InviterID: "32c1494f-1c1f-4981-857f-b0526cb654ec",
 	}
@@ -218,19 +218,19 @@ func (pt *WorkspaceUserTests) postWorkspaceUser201(t *testing.T) []workspace_use
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/v1/workspace_user", bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPost, "/v1/workspaceuser", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
 	// This needs to be returned for other dbtest.
-	var got []workspace_user.WorkspaceUser
+	var got []workspaceuser.WorkspaceUser
 
-	t.Log("Given the need to create a new workspace_user with the workspace_users endpoint.")
+	t.Log("Given the need to create a new workspaceuser with the workspaceusers endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the declared workspace_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using the declared workspaceuser value.", testID)
 		{
 			if w.Code != http.StatusCreated {
 				t.Errorf("\t%s\tTest %d:\tShould receive a status code of 201 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -256,18 +256,18 @@ func (pt *WorkspaceUserTests) postWorkspaceUser201(t *testing.T) []workspace_use
 	return got
 }
 
-// deleteWorkspaceUser200 validates deleting a workspace_user that does exist.
+// deleteWorkspaceUser200 validates deleting a workspaceuser that does exist.
 func (pt *WorkspaceUserTests) deleteWorkspaceUser204(t *testing.T, id string) {
-	r := httptest.NewRequest(http.MethodDelete, "/v1/workspace_user/"+id, nil)
+	r := httptest.NewRequest(http.MethodDelete, "/v1/workspaceuser/"+id, nil)
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to validate deleting a workspace_user that does exist.")
+	t.Log("Given the need to validate deleting a workspaceuser that does exist.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the new workspace_user %s.", testID, id)
+		t.Logf("\tTest %d:\tWhen using the new workspaceuser %s.", testID, id)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)
@@ -277,19 +277,19 @@ func (pt *WorkspaceUserTests) deleteWorkspaceUser204(t *testing.T, id string) {
 	}
 }
 
-// putWorkspaceUser204 validates updating a workspace_user that does exist.
+// putWorkspaceUser204 validates updating a workspaceuser that does exist.
 func (pt *WorkspaceUserTests) putWorkspaceUser204(t *testing.T, id string) {
 	body := `{"active": true}`
-	r := httptest.NewRequest(http.MethodPut, "/v1/workspace_user/"+id, strings.NewReader(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/workspaceuser/"+id, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
 	pt.app.ServeHTTP(w, r)
 
-	t.Log("Given the need to update a workspace_user with the workspace_users endpoint.")
+	t.Log("Given the need to update a workspaceuser with the workspaceusers endpoint.")
 	{
 		testID := 0
-		t.Logf("\tTest %d:\tWhen using the modified workspace_user value.", testID)
+		t.Logf("\tTest %d:\tWhen using the modified workspaceuser value.", testID)
 		{
 			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tTest %d:\tShould receive a status code of 204 for the response : %v", dbtest.Failed, testID, w.Code)

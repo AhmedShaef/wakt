@@ -14,7 +14,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/project"
 	"github.com/AhmedShaef/wakt/business/core/tag"
 	"github.com/AhmedShaef/wakt/business/core/task"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 
 	"github.com/AhmedShaef/wakt/app/services/wakt-api/handlers"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
@@ -442,7 +442,7 @@ func (pt *WorkspaceTests) getWorkspaceUser200(t *testing.T, id string) {
 			}
 			t.Logf("\t%s\tTest : %d\tShould receive a status code of 200 for the response.", dbtest.Success, testID)
 
-			var got []workspace_user.WorkspaceUser
+			var got []workspaceuser.WorkspaceUser
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
 				t.Fatalf("\t%s\tTest : %d\tShould be able to unmarshal the response : %v", dbtest.Failed, testID, err)
 			}

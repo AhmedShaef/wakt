@@ -16,7 +16,7 @@ import (
 	"github.com/AhmedShaef/wakt/business/core/team"
 	"github.com/AhmedShaef/wakt/business/core/user"
 	"github.com/AhmedShaef/wakt/business/core/workspace"
-	"github.com/AhmedShaef/wakt/business/core/workspace_user"
+	"github.com/AhmedShaef/wakt/business/core/workspaceuser"
 	"github.com/AhmedShaef/wakt/business/sys/auth"
 	v1Web "github.com/AhmedShaef/wakt/business/web/v1"
 	"github.com/AhmedShaef/wakt/foundation/upload"
@@ -33,7 +33,7 @@ type Handlers struct {
 	Task          task.Core
 	Tag           tag.Core
 	Team          team.Core
-	WorkspaceUser workspace_user.Core
+	WorkspaceUser workspaceuser.Core
 }
 
 // Create adds a new workspace to the system.
@@ -73,9 +73,9 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	workspaceUser, err := h.WorkspaceUser.Create(ctx, work.ID, work.UID, v.Now)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("workspace[%+v]: %w", &workspaceUser, err)
@@ -239,9 +239,9 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)
@@ -297,9 +297,9 @@ func (h Handlers) QueryWorkspaceUsers(ctx context.Context, w http.ResponseWriter
 	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, workspaces.ID, workspaces.UID)
 	if err != nil {
 		switch {
-		case errors.Is(err, workspace_user.ErrInvalidID):
+		case errors.Is(err, workspaceuser.ErrInvalidID):
 			return v1Web.NewRequestError(err, http.StatusBadRequest)
-		case errors.Is(err, workspace_user.ErrNotFound):
+		case errors.Is(err, workspaceuser.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
 			return fmt.Errorf("querying workspace user[%s]: %w", workspaceUser.ID, err)
