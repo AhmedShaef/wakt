@@ -55,7 +55,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		Pid:              nt.Pid,
 		Wid:              nt.Wid,
 		UID:              userID,
-		EstimatedSeconds: nt.EstimatedSeconds,
+		Estimated: nt.EstimatedSeconds,
 		Active:           true,
 		DateCreated:      now,
 		DateUpdated:      now,
@@ -91,7 +91,7 @@ func (c Core) Update(ctx context.Context, taskID string, uc UpdateTask, now time
 		dbtask.Name = *uc.Name
 	}
 	if uc.EstimatedSeconds != nil {
-		dbtask.EstimatedSeconds = *uc.EstimatedSeconds
+		dbtask.Estimated = *uc.EstimatedSeconds
 	}
 	if uc.Active != nil {
 		dbtask.Active = *uc.Active
