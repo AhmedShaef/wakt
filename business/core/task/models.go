@@ -9,16 +9,16 @@ import (
 
 // Task represents an individual task.
 type Task struct {
-	ID               string        `json:"id"`
-	Name             string        `json:"name"`
-	Pid              string        `json:"pid"`
-	Wid              string        `json:"wid"`
-	UID              string        `json:"uid"`
-	EstimatedSeconds time.Duration `json:"estimated_seconds"`
-	Active           bool          `json:"active"`
-	DateCreated      time.Time     `json:"date_created"`
-	DateUpdated      time.Time     `json:"date_updated"`
-	TrackedSeconds   time.Duration `json:"tracked_seconds"`
+	ID             string        `json:"id"`
+	Name           string        `json:"name"`
+	Pid            string        `json:"pid"`
+	Wid            string        `json:"wid"`
+	UID            string        `json:"uid"`
+	Estimated      time.Duration `json:"estimated_seconds"`
+	Active         bool          `json:"active"`
+	DateCreated    time.Time     `json:"date_created"`
+	DateUpdated    time.Time     `json:"date_updated"`
+	TrackedSeconds time.Duration `json:"tracked_seconds"`
 }
 
 // NewTask contains information needed to create a new task.
