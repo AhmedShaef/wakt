@@ -59,7 +59,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		Active:           true,
 		DateCreated:      now,
 		DateUpdated:      now,
-		TrackedSeconds:   nt.TrackedSeconds,
+		Tracked:   nt.TrackedSeconds,
 	}
 
 	if err := c.store.Create(ctx, dbtask); err != nil {
@@ -97,7 +97,7 @@ func (c Core) Update(ctx context.Context, taskID string, uc UpdateTask, now time
 		dbtask.Active = *uc.Active
 	}
 	if uc.TrackedSeconds != nil {
-		dbtask.TrackedSeconds = *uc.TrackedSeconds
+		dbtask.Tracked = *uc.TrackedSeconds
 	}
 	dbtask.DateUpdated = now
 
