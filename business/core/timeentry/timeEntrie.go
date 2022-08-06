@@ -293,7 +293,7 @@ func (c Core) SyncTaskTime(ctx context.Context, taskID string, now time.Time) er
 	}
 	dbTask := dbt.Task{
 		ID:             taskID,
-		TrackedSeconds: taskTime.Duration,
+		Tracked: taskTime.Duration,
 		DateUpdated:    now,
 	}
 	if err = c.store.UpdateTaskTime(ctx, dbTask); err != nil {
