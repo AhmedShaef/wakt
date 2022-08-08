@@ -55,7 +55,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		Pid:              nt.Pid,
 		Wid:              nt.Wid,
 		UID:              userID,
-		Estimated: nt.EstimatedSeconds,
+		Estimated: nt.Estimated,
 		Active:           true,
 		DateCreated:      now,
 		DateUpdated:      now,
