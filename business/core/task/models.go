@@ -23,12 +23,12 @@ type Task struct {
 
 // NewTask contains information needed to create a new task.
 type NewTask struct {
-	Name           string        `json:"name" validate:"required"`
-	Pid            string        `json:"pid" validate:"required"`
-	Wid            string        `json:"wid"`
-	UID            string        `json:"uid"`
-	Estimated      time.Duration `json:"estimated_seconds"`
-	TrackedSeconds time.Duration `json:"tracked_seconds"`
+	Name      string        `json:"name" validate:"required"`
+	Pid       string        `json:"pid" validate:"required"`
+	Wid       string        `json:"wid"`
+	UID       string        `json:"uid"`
+	Estimated time.Duration `json:"estimated_seconds"`
+	Tracked   time.Duration `json:"tracked_seconds"`
 }
 
 // UpdateTask defines what information may be provided to modify an existing
