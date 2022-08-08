@@ -59,7 +59,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		Active:           true,
 		DateCreated:      now,
 		DateUpdated:      now,
-		Tracked:   nt.TrackedSeconds,
+		Tracked:   nt.Tracked,
 	}
 
 	if err := c.store.Create(ctx, dbtask); err != nil {
