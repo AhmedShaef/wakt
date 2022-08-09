@@ -50,16 +50,16 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 	}
 
 	dbtask := db.Task{
-		ID:               validate.GenerateID(),
-		Name:             nt.Name,
-		Pid:              nt.Pid,
-		Wid:              nt.Wid,
-		UID:              userID,
-		Estimated: nt.Estimated,
-		Active:           true,
-		DateCreated:      now,
-		DateUpdated:      now,
-		Tracked:   nt.Tracked,
+		ID:          validate.GenerateID(),
+		Name:        nt.Name,
+		Pid:         nt.Pid,
+		Wid:         nt.Wid,
+		UID:         userID,
+		Estimated:   nt.Estimated,
+		Active:      true,
+		DateCreated: now,
+		DateUpdated: now,
+		Tracked:     nt.Tracked,
 	}
 
 	if err := c.store.Create(ctx, dbtask); err != nil {
@@ -90,8 +90,8 @@ func (c Core) Update(ctx context.Context, taskID string, uc UpdateTask, now time
 	if uc.Name != nil {
 		dbtask.Name = *uc.Name
 	}
-	if uc.EstimatedSeconds != nil {
-		dbtask.Estimated = *uc.EstimatedSeconds
+	if uc.Estimated != nil {
+		dbtask.Estimated = *uc.Estimated
 	}
 	if uc.Active != nil {
 		dbtask.Active = *uc.Active

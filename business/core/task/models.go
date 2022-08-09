@@ -39,7 +39,7 @@ type NewTask struct {
 // marshalling/unmarshalling.
 type UpdateTask struct {
 	Name             *string        `json:"name"`
-	EstimatedSeconds *time.Duration `json:"estimated_seconds"`
+	Estimated *time.Duration `json:"estimated_seconds"`
 	Active           *bool          `json:"active"`
 	TrackedSeconds   *time.Duration `json:"tracked_seconds"`
 }
