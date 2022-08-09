@@ -41,7 +41,7 @@ type UpdateTask struct {
 	Name             *string        `json:"name"`
 	Estimated *time.Duration `json:"estimated_seconds"`
 	Active           *bool          `json:"active"`
-	TrackedSeconds   *time.Duration `json:"tracked_seconds"`
+	Tracked   *time.Duration `json:"tracked_seconds"`
 }
 
 // =============================================================================

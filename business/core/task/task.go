@@ -96,8 +96,8 @@ func (c Core) Update(ctx context.Context, taskID string, uc UpdateTask, now time
 	if uc.Active != nil {
 		dbtask.Active = *uc.Active
 	}
-	if uc.TrackedSeconds != nil {
-		dbtask.Tracked = *uc.TrackedSeconds
+	if uc.Tracked != nil {
+		dbtask.Tracked = *uc.Tracked
 	}
 	dbtask.DateUpdated = now
 
