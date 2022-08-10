@@ -58,6 +58,7 @@ func TestTimeEntry(t *testing.T) {
 	t.Run("getTimeEntry400", tests.getTimeEntry400)
 	t.Run("deleteTimeEntryNotFound", tests.deleteTimeEntryNotFound)
 	t.Run("putTimeEntry404", tests.putTimeEntry404)
+	t.Run("putTags404", tests.putTags404)
 	t.Run("stopTimeEntry404", tests.stopTimeEntry404)
 	t.Run("crudTimeEntry", tests.crudTimeEntry)
 }
