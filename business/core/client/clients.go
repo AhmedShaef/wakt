@@ -52,7 +52,7 @@ func (c Core) Create(ctx context.Context, nc NewClient, userID string, now time.
 		ID:          validate.GenerateID(),
 		Name:        nc.Name,
 		UID:         userID,
-		Wid:         nc.WID,
+		WID:         nc.WID,
 		Notes:       nc.Notes,
 		DateCreated: now,
 		DateUpdated: now,

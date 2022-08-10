@@ -10,7 +10,7 @@ type Client struct {
 	ID          string    `db:"client_id"`
 	Name        string    `db:"name"`
 	UID         string    `db:"uid"`
-	Wid         string    `db:"wid"`
+	WID         string    `db:"wid"`
 	Notes       string    `db:"notes"`
 	DateCreated time.Time `db:"date_created"`
 	DateUpdated time.Time `db:"date_updated"`
