@@ -109,7 +109,7 @@ func (pt *GroupTests) postGroup400(t *testing.T) {
 func (pt *GroupTests) postGroup401(t *testing.T) {
 	np := group.NewGroup{
 		Name: "Comic Books",
-		Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+		WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 	}
 
 	body, err := json.Marshal(&np)
@@ -211,7 +211,7 @@ func (pt *GroupTests) crudGroup(t *testing.T) {
 func (pt *GroupTests) postGroup201(t *testing.T) group.Group {
 	np := group.NewGroup{
 		Name: "Comic Books",
-		Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+		WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 	}
 
 	body, err := json.Marshal(&np)
@@ -246,7 +246,7 @@ func (pt *GroupTests) postGroup201(t *testing.T) group.Group {
 			// fields like ID and Dates so we copy p.
 			exp := got
 			exp.Name = "Comic Books"
-			exp.Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
+			exp.WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)
