@@ -42,7 +42,7 @@ func TestGroup(t *testing.T) {
 
 			ng := NewGroup{
 				Name: "Ahmed Shaef",
-				Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+				WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 			}
 
 			group, err := core.Create(ctx, "5cf37266-3473-4006-984f-9325122678b7", ng, now)
