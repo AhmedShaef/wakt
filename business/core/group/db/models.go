@@ -9,7 +9,7 @@ import (
 type Group struct {
 	ID          string    `db:"group_id"`
 	Name        string    `db:"name"`
-	Wid         string    `db:"wid"`
+	WID         string    `db:"wid"`
 	UID         string    `db:"uid"`
 	DateCreated time.Time `db:"date_created"`
 	DateUpdated time.Time `db:"date_updated"`

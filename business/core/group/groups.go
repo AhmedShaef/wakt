@@ -46,7 +46,7 @@ func (c Core) Create(ctx context.Context, userID string, ng NewGroup, now time.T
 	dbgrop := db.Group{
 		ID:          validate.GenerateID(),
 		Name:        ng.Name,
-		Wid:         ng.WID,
+		WID:         ng.WID,
 		UID:         userID,
 		DateCreated: now,
 		DateUpdated: now,
