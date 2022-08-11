@@ -7,7 +7,7 @@ import "time"
 type Project struct {
 	ID             string        `db:"project_id"`
 	Name           string        `db:"name"`
-	Wid            string        `db:"wid"`
+	WID            string        `db:"wid"`
 	Cid            string        `db:"cid"`
 	UID            string        `db:"uid"`
 	Active         bool          `db:"active"`
