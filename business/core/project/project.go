@@ -57,7 +57,7 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 	dbprojct := db.Project{
 		ID:             validate.GenerateID(),
 		Name:           np.Name,
-		Wid:            np.Wid,
+		WID:            np.Wid,
 		Cid:            np.Cid,
 		UID:            userID,
 		Active:         false,
