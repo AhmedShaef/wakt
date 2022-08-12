@@ -11,7 +11,7 @@ type Project struct {
 	ID             string        `json:"id"`
 	Name           string        `json:"name"`
 	Wid            string        `json:"wid"`
-	Cid            string        `json:"cid"`
+	CID            string        `json:"cid"`
 	UID            string        `json:"uid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
@@ -28,7 +28,7 @@ type Project struct {
 type NewProject struct {
 	Name           string        `json:"name" validate:"required"`
 	Wid            string        `json:"wid"`
-	Cid            string        `json:"cid"`
+	CID            string        `json:"cid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
 	AutoEstimates  bool          `json:"auto_estimates"`
