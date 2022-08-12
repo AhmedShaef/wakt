@@ -58,7 +58,7 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		ID:             validate.GenerateID(),
 		Name:           np.Name,
 		WID:            np.Wid,
-		Cid:            np.Cid,
+		CID:            np.Cid,
 		UID:            userID,
 		Active:         false,
 		IsPrivate:      np.IsPrivate,
@@ -71,8 +71,8 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		HexColor:       np.HexColor,
 	}
 
-	if dbprojct.Cid == "" {
-		dbprojct.Cid = "00000000-0000-0000-0000-000000000000"
+	if dbprojct.CID == "" {
+		dbprojct.CID = "00000000-0000-0000-0000-000000000000"
 	}
 
 	if err := c.store.Create(ctx, dbprojct); err != nil {
