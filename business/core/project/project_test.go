@@ -43,7 +43,7 @@ func TestProject(t *testing.T) {
 			nc := NewProject{
 				Name: "Ahmed Shaef",
 				Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
-				Cid:  "c78db68e-e004-44f5-895b-ba562dc53d9d",
+				CID:  "c78db68e-e004-44f5-895b-ba562dc53d9d",
 			}
 
 			project, err := core.Create(ctx, "5cf37266-3473-4006-984f-9325122678b7", nc, now)
