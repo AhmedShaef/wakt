@@ -47,15 +47,15 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if np.Wid == "" {
+	if np.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to query user: %w", err)
 		}
-		np.Wid = users.DefaultWid
+		np.WID = users.DefaultWid
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, np.Wid)
+	workspaces, err := h.Workspace.QueryByID(ctx, np.WID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace.ErrInvalidID):
@@ -63,11 +63,11 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		case errors.Is(err, workspace.ErrNotFound):
 			return v1Web.NewRequestError(err, http.StatusNotFound)
 		default:
-			return fmt.Errorf("querying workspace[%s]: %w", np.Wid, err)
+			return fmt.Errorf("querying workspace[%s]: %w", np.WID, err)
 		}
 	}
 
-	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, np.Wid, claims.Subject)
+	workspaceUser, err := h.WorkspaceUser.QueryByuIDwID(ctx, np.WID, claims.Subject)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspaceuser.ErrInvalidID):
@@ -104,7 +104,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	npu := team.NewTeam{
 		Pid:     prj.ID,
 		UID:     workspaces.UID,
-		Wid:     prj.Wid,
+		Wid:     prj.WID,
 		Manager: true,
 	}
 	projectUser, err := h.Team.Create(ctx, npu, v.Now)
@@ -152,7 +152,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("querying workspace[%s]: %w", projectID, err)
 		}
 	}
-	workspaces, err := h.Workspace.QueryByID(ctx, projects.Wid)
+	workspaces, err := h.Workspace.QueryByID(ctx, projects.WID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace.ErrInvalidID):
@@ -203,7 +203,7 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 		}
 	}
 
-	workspaces, err := h.Workspace.QueryByID(ctx, projects.Wid)
+	workspaces, err := h.Workspace.QueryByID(ctx, projects.WID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace.ErrInvalidID):
@@ -263,7 +263,7 @@ func (h Handlers) BulkDelete(ctx context.Context, w http.ResponseWriter, r *http
 			}
 		}
 
-		workspaces, err := h.Workspace.QueryByID(ctx, projects.Wid)
+		workspaces, err := h.Workspace.QueryByID(ctx, projects.WID)
 		if err != nil {
 			switch {
 			case errors.Is(err, workspace.ErrInvalidID):

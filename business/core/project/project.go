@@ -43,7 +43,7 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 		return Project{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	nameInWorkspace := c.store.QueryUnique(ctx, np.Name, "wid", np.Wid)
+	nameInWorkspace := c.store.QueryUnique(ctx, np.Name, "wid", np.WID)
 	if nameInWorkspace != "" {
 		return Project{}, fmt.Errorf("project name is not unique for workspace")
 	}
@@ -57,7 +57,7 @@ func (c Core) Create(ctx context.Context, userID string, np NewProject, now time
 	dbprojct := db.Project{
 		ID:             validate.GenerateID(),
 		Name:           np.Name,
-		WID:            np.Wid,
+		WID:            np.WID,
 		CID:            np.CID,
 		UID:            userID,
 		Active:         false,

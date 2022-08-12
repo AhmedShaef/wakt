@@ -10,7 +10,7 @@ import (
 type Project struct {
 	ID             string        `json:"id"`
 	Name           string        `json:"name"`
-	Wid            string        `json:"wid"`
+	WID            string        `json:"wid"`
 	CID            string        `json:"cid"`
 	UID            string        `json:"uid"`
 	Active         bool          `json:"active"`
@@ -27,7 +27,7 @@ type Project struct {
 // NewProject contains information needed to create a new project.
 type NewProject struct {
 	Name           string        `json:"name" validate:"required"`
-	Wid            string        `json:"wid"`
+	WID            string        `json:"wid"`
 	CID            string        `json:"cid"`
 	Active         bool          `json:"active"`
 	IsPrivate      bool          `json:"is_private"`
