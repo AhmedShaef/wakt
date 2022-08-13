@@ -39,14 +39,14 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if nt.Wid == "" {
+	if nt.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to querying user: %w", err)
 		}
-		nt.Wid = users.DefaultWid
+		nt.WID = users.DefaultWid
 	} else {
-		workspaces, err := h.Workspace.QueryByID(ctx, nt.Wid)
+		workspaces, err := h.Workspace.QueryByID(ctx, nt.WID)
 		if err != nil {
 			switch {
 			case errors.Is(err, workspace.ErrInvalidID):
@@ -108,7 +108,7 @@ func (h Handlers) Update(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("querying workspace[%s]: %w", tagID, err)
 		}
 	}
-	workspaces, err := h.Workspace.QueryByID(ctx, tags.Wid)
+	workspaces, err := h.Workspace.QueryByID(ctx, tags.WID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace.ErrInvalidID):
@@ -159,7 +159,7 @@ func (h Handlers) Delete(ctx context.Context, w http.ResponseWriter, r *http.Req
 			return fmt.Errorf("querying workspace[%s]: %w", tagID, err)
 		}
 	}
-	workspaces, err := h.Workspace.QueryByID(ctx, tags.Wid)
+	workspaces, err := h.Workspace.QueryByID(ctx, tags.WID)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspace.ErrInvalidID):

@@ -10,7 +10,7 @@ import (
 type Tag struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
-	Wid         string    `json:"wid"`
+	WID         string    `json:"wid"`
 	DateCreated time.Time `json:"date_created"`
 	DateUpdated time.Time `json:"date_updated"`
 }
@@ -18,7 +18,7 @@ type Tag struct {
 // NewTag contains information needed to create a new tag.
 type NewTag struct {
 	Name string `json:"name" validate:"required"`
-	Wid  string `json:"wid"`
+	WID  string `json:"wid"`
 }
 
 // UpdateTag defines what information may be provided to modify an existing

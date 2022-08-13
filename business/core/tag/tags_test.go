@@ -42,7 +42,7 @@ func TestTag(t *testing.T) {
 
 			nt := NewTag{
 				Name: "Ahmed Shaef",
-				Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+				WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 			}
 
 			tag, err := core.Create(ctx, nt, now)
