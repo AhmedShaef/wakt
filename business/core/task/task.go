@@ -52,7 +52,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 	dbtask := db.Task{
 		ID:          validate.GenerateID(),
 		Name:        nt.Name,
-		Pid:         nt.Pid,
+		PID:         nt.Pid,
 		Wid:         nt.Wid,
 		UID:         userID,
 		Estimated:   nt.Estimated,

@@ -9,7 +9,7 @@ import (
 type Task struct {
 	ID          string        `db:"task_id"`
 	Name        string        `db:"name"`
-	Pid         string        `db:"pid"`
+	PID         string        `db:"pid"`
 	Wid         string        `db:"wid"`
 	UID         string        `db:"uid"`
 	Estimated   time.Duration `db:"estimated_seconds"`
