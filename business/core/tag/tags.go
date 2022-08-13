@@ -42,7 +42,7 @@ func (c Core) Create(ctx context.Context, nt NewTag, now time.Time) (Tag, error)
 	dbtg := db.Tag{
 		ID:          validate.GenerateID(),
 		Name:        nt.Name,
-		WID:         nt.Wid,
+		WID:         nt.WID,
 		DateCreated: now,
 		DateUpdated: now,
 	}
