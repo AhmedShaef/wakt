@@ -10,7 +10,7 @@ type Task struct {
 	ID          string        `db:"task_id"`
 	Name        string        `db:"name"`
 	PID         string        `db:"pid"`
-	Wid         string        `db:"wid"`
+	WID         string        `db:"wid"`
 	UID         string        `db:"uid"`
 	Estimated   time.Duration `db:"estimated_seconds"`
 	Active      bool          `db:"active"`
