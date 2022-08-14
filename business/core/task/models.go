@@ -11,7 +11,7 @@ import (
 type Task struct {
 	ID          string        `json:"id"`
 	Name        string        `json:"name"`
-	Pid         string        `json:"pid"`
+	PID         string        `json:"pid"`
 	Wid         string        `json:"wid"`
 	UID         string        `json:"uid"`
 	Estimated   time.Duration `json:"estimated_seconds"`
@@ -24,7 +24,7 @@ type Task struct {
 // NewTask contains information needed to create a new task.
 type NewTask struct {
 	Name      string        `json:"name" validate:"required"`
-	Pid       string        `json:"pid" validate:"required"`
+	PID       string        `json:"pid" validate:"required"`
 	Wid       string        `json:"wid"`
 	UID       string        `json:"uid"`
 	Estimated time.Duration `json:"estimated_seconds"`

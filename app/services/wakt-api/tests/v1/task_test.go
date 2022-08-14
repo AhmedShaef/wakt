@@ -112,7 +112,7 @@ func (pt *TaskTests) postTask400(t *testing.T) {
 func (pt *TaskTests) postTask401(t *testing.T) {
 	np := task.NewTask{
 		Name: "Comic Books",
-		Pid:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
+		PID:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
 	}
 
 	body, err := json.Marshal(&np)
@@ -279,7 +279,7 @@ func (pt *TaskTests) crudTask(t *testing.T) {
 func (pt *TaskTests) postTask201(t *testing.T) task.Task {
 	np := task.NewTask{
 		Name: "Comic Books",
-		Pid:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
+		PID:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
 	}
 
@@ -316,7 +316,7 @@ func (pt *TaskTests) postTask201(t *testing.T) task.Task {
 			exp := got
 			exp.Name = "Comic Books"
 			exp.Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
-			exp.Pid = "45cf87a3-5915-4079-a9af-6c559239ddbf"
+			exp.PID = "45cf87a3-5915-4079-a9af-6c559239ddbf"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)

@@ -44,7 +44,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		return Task{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	nameInProject := c.store.QueryUnique(ctx, nt.Name, "pid", nt.Pid)
+	nameInProject := c.store.QueryUnique(ctx, nt.Name, "pid", nt.PID)
 	if nameInProject != "" {
 		return Task{}, fmt.Errorf("project name is not unique for workspace")
 	}
@@ -52,7 +52,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 	dbtask := db.Task{
 		ID:          validate.GenerateID(),
 		Name:        nt.Name,
-		PID:         nt.Pid,
+		PID:         nt.PID,
 		WID:         nt.Wid,
 		UID:         userID,
 		Estimated:   nt.Estimated,
