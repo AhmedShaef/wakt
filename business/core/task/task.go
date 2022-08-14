@@ -53,7 +53,7 @@ func (c Core) Create(ctx context.Context, userID string, nt NewTask, now time.Ti
 		ID:          validate.GenerateID(),
 		Name:        nt.Name,
 		PID:         nt.PID,
-		WID:         nt.Wid,
+		WID:         nt.WID,
 		UID:         userID,
 		Estimated:   nt.Estimated,
 		Active:      true,

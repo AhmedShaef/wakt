@@ -280,7 +280,7 @@ func (pt *TaskTests) postTask201(t *testing.T) task.Task {
 	np := task.NewTask{
 		Name: "Comic Books",
 		PID:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
-		Wid:  "7da3ca14-6366-47cf-b953-f706226567d8",
+		WID:  "7da3ca14-6366-47cf-b953-f706226567d8",
 	}
 
 	body, err := json.Marshal(&np)
@@ -315,7 +315,7 @@ func (pt *TaskTests) postTask201(t *testing.T) task.Task {
 			// fields like ID and Dates so we copy p.
 			exp := got
 			exp.Name = "Comic Books"
-			exp.Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
+			exp.WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 			exp.PID = "45cf87a3-5915-4079-a9af-6c559239ddbf"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
