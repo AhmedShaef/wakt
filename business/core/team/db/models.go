@@ -10,7 +10,7 @@ type Team struct {
 	ID          string    `db:"team_id"`
 	PID         string    `db:"pid"`
 	UID         string    `db:"uid"`
-	Wid         string    `db:"wid"`
+	WID         string    `db:"wid"`
 	Manager     bool      `db:"manager"`
 	Rate        float64   `db:"rate"`
 	DateCreated time.Time `db:"date_created"`
