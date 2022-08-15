@@ -8,7 +8,7 @@ import (
 // between the app and the database.
 type Team struct {
 	ID          string    `db:"team_id"`
-	Pid         string    `db:"pid"`
+	PID         string    `db:"pid"`
 	UID         string    `db:"uid"`
 	Wid         string    `db:"wid"`
 	Manager     bool      `db:"manager"`
