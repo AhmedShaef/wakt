@@ -12,7 +12,7 @@ type Team struct {
 	ID          string    `json:"team_id"`
 	Pid         string    `json:"pid"`
 	UID         string    `json:"uid"`
-	Wid         string    `json:"wid"`
+	WID         string    `json:"wid"`
 	Manager     bool      `json:"manager"`
 	Rate        float64   `json:"rate"`
 	DateCreated time.Time `json:"date_created"`
@@ -23,7 +23,7 @@ type Team struct {
 type NewTeam struct {
 	Pid     string  `json:"pid" validate:"required"`
 	UID     string  `json:"uid" validate:"required"`
-	Wid     string  `json:"wid"`
+	WID     string  `json:"wid"`
 	Manager bool    `json:"manager"`
 	Rate    float64 `json:"rate"`
 	Puis    string  `json:"puis"`

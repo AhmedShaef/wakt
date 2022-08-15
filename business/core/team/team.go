@@ -54,7 +54,7 @@ func (c Core) Create(ctx context.Context, npu NewTeam, now time.Time) ([]Team, e
 			ID:          validate.GenerateID(),
 			PID:         npu.Pid,
 			UID:         uid,
-			WID:         npu.Wid,
+			WID:         npu.WID,
 			Manager:     npu.Manager,
 			Rate:        npu.Rate,
 			DateCreated: now,

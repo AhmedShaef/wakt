@@ -40,12 +40,12 @@ func (h Handlers) Add(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if npu.Wid == "" {
+	if npu.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to querying user: %w", err)
 		}
-		npu.Wid = users.DefaultWid
+		npu.WID = users.DefaultWid
 	}
 
 	projectUser, err := h.Team.QueryByID(ctx, npu.Puis)

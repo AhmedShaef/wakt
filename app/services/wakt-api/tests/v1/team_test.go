@@ -277,7 +277,7 @@ func (pt *TeamTests) postTeam201(t *testing.T) []team.Team {
 			// Define what we wanted to receive. We will just trust the generated
 			// fields like ID and Dates so we copy p.
 			exp := got
-			exp[0].Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
+			exp[0].WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 			exp[0].UID = "5cf37266-3473-4006-984f-9325122678b7"
 			exp[0].Pid = "45cf87a3-5915-4079-a9af-6c559239ddbf"
 

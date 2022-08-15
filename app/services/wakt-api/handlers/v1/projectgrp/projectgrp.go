@@ -104,7 +104,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 	npu := team.NewTeam{
 		Pid:     prj.ID,
 		UID:     workspaces.UID,
-		Wid:     prj.WID,
+		WID:     prj.WID,
 		Manager: true,
 	}
 	projectUser, err := h.Team.Create(ctx, npu, v.Now)
