@@ -10,7 +10,7 @@ import (
 // Team represents an individual Team.
 type Team struct {
 	ID          string    `json:"team_id"`
-	Pid         string    `json:"pid"`
+	PID         string    `json:"pid"`
 	UID         string    `json:"uid"`
 	WID         string    `json:"wid"`
 	Manager     bool      `json:"manager"`
@@ -21,7 +21,7 @@ type Team struct {
 
 // NewTeam contains information needed to create a new Team.
 type NewTeam struct {
-	Pid     string  `json:"pid" validate:"required"`
+	PID     string  `json:"pid" validate:"required"`
 	UID     string  `json:"uid" validate:"required"`
 	WID     string  `json:"wid"`
 	Manager bool    `json:"manager"`
