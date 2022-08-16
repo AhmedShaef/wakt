@@ -57,7 +57,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		Description: nt.Description,
 		UID:         userID,
 		Wid:         nt.Wid,
-		Pid:         nt.Pid,
+		PID:         nt.Pid,
 		Tid:         nt.Tid,
 		Billable:    nt.Billable,
 		Start:       nt.Start,
@@ -69,8 +69,8 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		DateCreated: now,
 		DateUpdated: now,
 	}
-	if dbTimeEntry.Pid == "" {
-		dbTimeEntry.Pid = "00000000-0000-0000-0000-000000000000"
+	if dbTimeEntry.PID == "" {
+		dbTimeEntry.PID = "00000000-0000-0000-0000-000000000000"
 	}
 	if dbTimeEntry.Tid == "" {
 		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
@@ -87,7 +87,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
 	}
 
-	if err := c.SyncProjectTime(ctx, dbTimeEntry.Pid, now); err != nil {
+	if err := c.SyncProjectTime(ctx, dbTimeEntry.PID, now); err != nil {
 		return TimeEntry{}, fmt.Errorf("sync project time: %w", err)
 	}
 
@@ -110,7 +110,7 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 		Description: st.Description,
 		UID:         userID,
 		Wid:         st.Wid,
-		Pid:         st.Pid,
+		PID:         st.Pid,
 		Tid:         st.Tid,
 		Billable:    st.Billable,
 		Start:       now,
@@ -123,8 +123,8 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 		DateUpdated: now,
 	}
 
-	if dbTimeEntry.Pid == "" {
-		dbTimeEntry.Pid = "00000000-0000-0000-0000-000000000000"
+	if dbTimeEntry.PID == "" {
+		dbTimeEntry.PID = "00000000-0000-0000-0000-000000000000"
 	}
 	if dbTimeEntry.Tid == "" {
 		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
@@ -166,7 +166,7 @@ func (c Core) Stop(ctx context.Context, TimeEntryID string, now time.Time) (Time
 		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
 	}
 
-	if err := c.SyncProjectTime(ctx, dbTimeEntry.Pid, now); err != nil {
+	if err := c.SyncProjectTime(ctx, dbTimeEntry.PID, now); err != nil {
 		return TimeEntry{}, fmt.Errorf("sync project time: %w", err)
 	}
 
