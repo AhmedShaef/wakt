@@ -43,7 +43,7 @@ func TestTeam(t *testing.T) {
 
 			npu := NewTeam{
 				UID: "5cf37266-3473-4006-984f-9325122678b7",
-				Pid: "45cf87a3-5915-4079-a9af-6c559239ddbf",
+				PID: "45cf87a3-5915-4079-a9af-6c559239ddbf",
 				WID: "7da3ca14-6366-47cf-b953-f706226567d8",
 			}
 

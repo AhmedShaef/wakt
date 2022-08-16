@@ -102,7 +102,7 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		}
 	}
 	npu := team.NewTeam{
-		Pid:     prj.ID,
+		PID:     prj.ID,
 		UID:     workspaces.UID,
 		WID:     prj.WID,
 		Manager: true,

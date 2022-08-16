@@ -105,7 +105,7 @@ func (pt *TeamTests) postTeam400(t *testing.T) {
 // unless the user is authenticated
 func (pt *TeamTests) postTeam403(t *testing.T) {
 	np := team.NewTeam{
-		Pid:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
+		PID:  "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		UID:  "5cf37266-3473-4006-984f-9325122678b7",
 		Puis: "c7142720-91d3-4d1e-841d-680042b6500c",
 	}
@@ -138,7 +138,7 @@ func (pt *TeamTests) postTeam403(t *testing.T) {
 // unless the user is authenticated
 func (pt *TeamTests) postTeam401(t *testing.T) {
 	np := team.NewTeam{
-		Pid: "45cf87a3-5915-4079-a9af-6c559239ddbf",
+		PID: "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		UID: "5cf37266-3473-4006-984f-9325122678b7",
 	}
 
@@ -240,7 +240,7 @@ func (pt *TeamTests) crudTeam(t *testing.T) {
 // postTeam201 validates a team can be created with the endpoint.
 func (pt *TeamTests) postTeam201(t *testing.T) []team.Team {
 	np := team.NewTeam{
-		Pid:     "45cf87a3-5915-4079-a9af-6c559239ddbf",
+		PID:     "45cf87a3-5915-4079-a9af-6c559239ddbf",
 		UID:     "5cf37266-3473-4006-984f-9325122678b7",
 		Puis:    "efcc74aa-86d2-4e11-80f9-3ca912af8269",
 		Manager: true,
@@ -279,7 +279,7 @@ func (pt *TeamTests) postTeam201(t *testing.T) []team.Team {
 			exp := got
 			exp[0].WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 			exp[0].UID = "5cf37266-3473-4006-984f-9325122678b7"
-			exp[0].Pid = "45cf87a3-5915-4079-a9af-6c559239ddbf"
+			exp[0].PID = "45cf87a3-5915-4079-a9af-6c559239ddbf"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)

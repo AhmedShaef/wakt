@@ -52,7 +52,7 @@ func (c Core) Create(ctx context.Context, npu NewTeam, now time.Time) ([]Team, e
 		}
 		dbprojectuser = db.Team{
 			ID:          validate.GenerateID(),
-			PID:         npu.Pid,
+			PID:         npu.PID,
 			UID:         uid,
 			WID:         npu.WID,
 			Manager:     npu.Manager,
