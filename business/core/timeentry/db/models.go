@@ -13,7 +13,7 @@ type TimeEntry struct {
 	Description string         `db:"description"`
 	UID         string         `db:"uid"`
 	Wid         string         `db:"wid"`
-	Pid         string         `db:"pid"`
+	PID         string         `db:"pid"`
 	Tid         string         `db:"tid"`
 	Billable    bool           `db:"billable"`
 	Start       time.Time      `db:"start"`
