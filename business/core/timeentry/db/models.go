@@ -12,7 +12,7 @@ type TimeEntry struct {
 	ID          string         `db:"time_entry_id"`
 	Description string         `db:"description"`
 	UID         string         `db:"uid"`
-	Wid         string         `db:"wid"`
+	WID         string         `db:"wid"`
 	PID         string         `db:"pid"`
 	Tid         string         `db:"tid"`
 	Billable    bool           `db:"billable"`
