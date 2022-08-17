@@ -479,7 +479,7 @@ func (pt *TimeEntryTests) postTimeEntry201(t *testing.T) timeentry.TimeEntry {
 			// Define what we wanted to receive. We will just trust the generated
 			// fields like ID and Dates so we copy p.
 			exp := got
-			exp.Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
+			exp.WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)
@@ -528,7 +528,7 @@ func (pt *TimeEntryTests) startTimeEntry201(t *testing.T) timeentry.TimeEntry {
 			// Define what we wanted to receive. We will just trust the generated
 			// fields like ID and Dates so we copy p.
 			exp := got
-			exp.Wid = "7da3ca14-6366-47cf-b953-f706226567d8"
+			exp.WID = "7da3ca14-6366-47cf-b953-f706226567d8"
 
 			if diff := cmp.Diff(got, exp); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get the expected result. Diff:\n%s", dbtest.Failed, testID, diff)

@@ -12,7 +12,7 @@ type TimeEntry struct {
 	ID          string        `json:"id"`
 	Description string        `json:"description"`
 	UID         string        `json:"uid"`
-	Wid         string        `json:"wid"`
+	WID         string        `json:"wid"`
 	Pid         string        `json:"pid"`
 	TID         string        `json:"tid"`
 	Billable    bool          `json:"billable"`
@@ -29,7 +29,7 @@ type TimeEntry struct {
 // NewTimeEntry contains information needed to create a new time_entry.
 type NewTimeEntry struct {
 	Description string        `json:"description"`
-	Wid         string        `json:"wid"`
+	WID         string        `json:"wid"`
 	Pid         string        `json:"pid"`
 	TID         string        `json:"tid"`
 	Billable    bool          `json:"billable"`
@@ -44,7 +44,7 @@ type NewTimeEntry struct {
 //StartTimeEntry contains information needed to start a new time_entry.
 type StartTimeEntry struct {
 	Description string   `json:"description"`
-	Wid         string   `json:"wid"`
+	WID         string   `json:"wid"`
 	Pid         string   `json:"pid"`
 	TID         string   `json:"tid"`
 	Billable    bool     `json:"billable"`

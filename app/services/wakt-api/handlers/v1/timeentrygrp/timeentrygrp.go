@@ -42,12 +42,12 @@ func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if nte.Wid == "" {
+	if nte.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to querying user: %w", err)
 		}
-		nte.Wid = users.DefaultWid
+		nte.WID = users.DefaultWid
 	}
 
 	usr, err := h.TimeEntry.Create(ctx, nte, claims.Subject, v.Now)
@@ -82,12 +82,12 @@ func (h Handlers) Start(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	if ste.Wid == "" {
+	if ste.WID == "" {
 		users, err := h.User.QueryByID(ctx, claims.Subject)
 		if err != nil {
 			return fmt.Errorf("unable to querying user: %w", err)
 		}
-		ste.Wid = users.DefaultWid
+		ste.WID = users.DefaultWid
 	}
 
 	usr, err := h.TimeEntry.Start(ctx, ste, claims.Subject, v.Now)
