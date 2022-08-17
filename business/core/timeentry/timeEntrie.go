@@ -58,7 +58,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		UID:         userID,
 		WID:         nt.Wid,
 		PID:         nt.Pid,
-		Tid:         nt.Tid,
+		TID:         nt.Tid,
 		Billable:    nt.Billable,
 		Start:       nt.Start,
 		Stop:        stop,
@@ -72,8 +72,8 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 	if dbTimeEntry.PID == "" {
 		dbTimeEntry.PID = "00000000-0000-0000-0000-000000000000"
 	}
-	if dbTimeEntry.Tid == "" {
-		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
+	if dbTimeEntry.TID == "" {
+		dbTimeEntry.TID = "00000000-0000-0000-0000-000000000000"
 	}
 	if dbTimeEntry.Tags == nil {
 		dbTimeEntry.Tags = []string{}
@@ -83,7 +83,7 @@ func (c Core) Create(ctx context.Context, nt NewTimeEntry, userID string, now ti
 		return TimeEntry{}, fmt.Errorf("create: %w", err)
 	}
 
-	if err := c.SyncTaskTime(ctx, dbTimeEntry.Tid, now); err != nil {
+	if err := c.SyncTaskTime(ctx, dbTimeEntry.TID, now); err != nil {
 		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
 	}
 
@@ -111,7 +111,7 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 		UID:         userID,
 		WID:         st.Wid,
 		PID:         st.Pid,
-		Tid:         st.Tid,
+		TID:         st.Tid,
 		Billable:    st.Billable,
 		Start:       now,
 		Stop:        time.Time{},
@@ -126,8 +126,8 @@ func (c Core) Start(ctx context.Context, st StartTimeEntry, userID string, now t
 	if dbTimeEntry.PID == "" {
 		dbTimeEntry.PID = "00000000-0000-0000-0000-000000000000"
 	}
-	if dbTimeEntry.Tid == "" {
-		dbTimeEntry.Tid = "00000000-0000-0000-0000-000000000000"
+	if dbTimeEntry.TID == "" {
+		dbTimeEntry.TID = "00000000-0000-0000-0000-000000000000"
 	}
 	if dbTimeEntry.Tags == nil {
 		dbTimeEntry.Tags = []string{}
@@ -162,7 +162,7 @@ func (c Core) Stop(ctx context.Context, TimeEntryID string, now time.Time) (Time
 		return TimeEntry{}, fmt.Errorf("stop: %w", err)
 	}
 
-	if err := c.SyncTaskTime(ctx, dbTimeEntry.Tid, now); err != nil {
+	if err := c.SyncTaskTime(ctx, dbTimeEntry.TID, now); err != nil {
 		return TimeEntry{}, fmt.Errorf("sync task time: %w", err)
 	}
 
