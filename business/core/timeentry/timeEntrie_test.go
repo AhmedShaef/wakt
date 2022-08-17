@@ -43,7 +43,7 @@ func TestTimeEntry(t *testing.T) {
 			ntc := NewTimeEntry{
 				Wid:         "7da3ca14-6366-47cf-b953-f706226567d8",
 				Pid:         "45cf87a3-5915-4079-a9af-6c559239ddbf",
-				Tid:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
+				TID:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
 				Start:       time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC),
 				Duration:    60 * 60 * 8,
 				CreatedWith: "API",
@@ -69,7 +69,7 @@ func TestTimeEntry(t *testing.T) {
 			nts := StartTimeEntry{
 				Wid:         "7da3ca14-6366-47cf-b953-f706226567d8",
 				Pid:         "45cf87a3-5915-4079-a9af-6c559239ddbf",
-				Tid:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
+				TID:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
 				CreatedWith: "API",
 			}
 			timeEntryStart, err := core.Start(ctx, nts, "5cf37266-3473-4006-984f-9325122678b7", now)
