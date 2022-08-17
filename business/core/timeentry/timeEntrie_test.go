@@ -41,7 +41,7 @@ func TestTimeEntry(t *testing.T) {
 			now := time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 			ntc := NewTimeEntry{
-				Wid:         "7da3ca14-6366-47cf-b953-f706226567d8",
+				WID:         "7da3ca14-6366-47cf-b953-f706226567d8",
 				Pid:         "45cf87a3-5915-4079-a9af-6c559239ddbf",
 				TID:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
 				Start:       time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC),
@@ -67,7 +67,7 @@ func TestTimeEntry(t *testing.T) {
 			t.Logf("\t%s\tTest %d:\tShould get back the same timeEntryCreated.", dbtest.Success, testID)
 
 			nts := StartTimeEntry{
-				Wid:         "7da3ca14-6366-47cf-b953-f706226567d8",
+				WID:         "7da3ca14-6366-47cf-b953-f706226567d8",
 				Pid:         "45cf87a3-5915-4079-a9af-6c559239ddbf",
 				TID:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
 				CreatedWith: "API",
