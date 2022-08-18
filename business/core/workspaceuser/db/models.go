@@ -7,7 +7,7 @@ import "time"
 type WorkspaceUser struct {
 	ID          string    `db:"workspace_user_id"`
 	UID         string    `db:"uid"`
-	Wid         string    `db:"wid"`
+	WID         string    `db:"wid"`
 	Admin       bool      `db:"admin"`
 	Active      bool      `db:"active"`
 	InviteKey   string    `db:"invite_key"`
