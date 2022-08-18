@@ -51,7 +51,7 @@ func (c Core) Create(ctx context.Context, workspaceID string, userID string, now
 	dbWorkspaceUser := db.WorkspaceUser{
 		ID:          validate.GenerateID(),
 		UID:         userID,
-		Wid:         workspaceID,
+		WID:         workspaceID,
 		Admin:       true,
 		Active:      true,
 		DateCreated: now,
@@ -111,7 +111,7 @@ func (c Core) InviteUser(ctx context.Context, workspaceID string, ni InviteUsers
 		dbWorkspaceUser := db.WorkspaceUser{
 			ID:          validate.GenerateID(),
 			UID:         userID,
-			Wid:         workspaceID,
+			WID:         workspaceID,
 			Admin:       false,
 			Active:      false,
 			InviteKey:   "?invite_key=" + "68hh6542-" + userID + "-9fo5d7l5-" + workspaceID + "-9y6d4y2b5r6o",
