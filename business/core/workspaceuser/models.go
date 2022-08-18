@@ -11,7 +11,7 @@ import (
 type WorkspaceUser struct {
 	ID          string    `json:"id"`
 	UID         string    `json:"uid"`
-	Wid         string    `json:"wid"`
+	WID         string    `json:"wid"`
 	Admin       bool      `json:"admin"`
 	Active      bool      `json:"active"`
 	InviteKey   string    `json:"invite_key"`

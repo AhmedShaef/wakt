@@ -52,7 +52,7 @@ func (h Handlers) Invite(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return v1Web.NewRequestError(auth.ErrForbidden, http.StatusForbidden)
 	}
 
-	clint, err := h.WorkspaceUser.InviteUser(ctx, workspaceUser.Wid, nwu, v.Now)
+	clint, err := h.WorkspaceUser.InviteUser(ctx, workspaceUser.WID, nwu, v.Now)
 	if err != nil {
 		switch {
 		case errors.Is(err, workspaceuser.ErrInvalidID):
