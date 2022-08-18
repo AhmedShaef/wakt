@@ -13,7 +13,7 @@ type TimeEntry struct {
 	Description string        `json:"description"`
 	UID         string        `json:"uid"`
 	WID         string        `json:"wid"`
-	Pid         string        `json:"pid"`
+	PID         string        `json:"pid"`
 	TID         string        `json:"tid"`
 	Billable    bool          `json:"billable"`
 	Start       time.Time     `json:"start"`
@@ -30,7 +30,7 @@ type TimeEntry struct {
 type NewTimeEntry struct {
 	Description string        `json:"description"`
 	WID         string        `json:"wid"`
-	Pid         string        `json:"pid"`
+	PID         string        `json:"pid"`
 	TID         string        `json:"tid"`
 	Billable    bool          `json:"billable"`
 	Start       time.Time     `json:"start" validate:"required"`
@@ -45,7 +45,7 @@ type NewTimeEntry struct {
 type StartTimeEntry struct {
 	Description string   `json:"description"`
 	WID         string   `json:"wid"`
-	Pid         string   `json:"pid"`
+	PID         string   `json:"pid"`
 	TID         string   `json:"tid"`
 	Billable    bool     `json:"billable"`
 	CreatedWith string   `json:"created_with" validate:"required"`
