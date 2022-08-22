@@ -365,7 +365,7 @@ func (pt *TimeEntryTests) putTags404(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/"+id, bytes.NewBuffer(body))
+	r := httptest.NewRequest(http.MethodPut, "/v1/timeEntry/tags/"+id, bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
 
 	r.Header.Set("Authorization", "Bearer "+pt.userToken)
