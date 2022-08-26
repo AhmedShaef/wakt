@@ -59,7 +59,7 @@ func TestTeam(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould be able to retrieve Team by ID.", dbtest.Success, testID)
 
-			if diff := cmp.Diff(projectUser, saved); diff != "" {
+			if diff := cmp.Diff(projectUser[0], saved); diff != "" {
 				t.Errorf("\t%s\tTest %d:\tShould get back the same Team. Diff:\n%s", dbtest.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same Team.", dbtest.Success, testID)
