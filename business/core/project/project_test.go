@@ -38,7 +38,7 @@ func TestProject(t *testing.T) {
 		t.Logf("\tTest %d:\tWhen handling a single project.", testID)
 		{
 			ctx := context.Background()
-			now := time.Now()
+			now := time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 			nc := NewProject{
 				Name: "Ahmed Shaef",
