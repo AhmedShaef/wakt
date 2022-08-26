@@ -28,7 +28,7 @@ VALUES ('45cf87a3-5915-4079-a9af-6c559239ddbf', 'Default Project', '7da3ca14-636
         'c78db68e-e004-44f5-895b-ba562dc53d9d','5cf37266-3473-4006-984f-9325122678b7', 'false', 'false', 'true', 'false', '30.0', '2019-03-24 00:00:00',
         '2019-03-24 00:00:00', '30', '#ffffff'),
        ('d774cc57-e4a6-4be2-bca1-cb50610fb3f5', 'User Project', '7da3ca14-6366-47cf-b953-f706226567d8',
-        'a9c8488a-5df2-40c5-8e76-4ac1670e7ac7','5cf37266-3473-4006-984f-9325122678b7', 'false', 'false', 'true', 'true', '0.0', '2019-03-24 00:00:00',
+        'c78db68e-e004-44f5-895b-ba562dc53d9d','5cf37266-3473-4006-984f-9325122678b7', 'false', 'false', 'true', 'true', '0.0', '2019-03-24 00:00:00',
         '2019-03-24 00:00:00', '30', '#ffffff')
 ON CONFLICT DO NOTHING;
 INSERT INTO tasks (task_id, name, pid, wid, uid, estimated_seconds, active, date_created, date_updated, tracked_seconds)
