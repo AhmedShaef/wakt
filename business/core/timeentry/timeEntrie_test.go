@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/data/dbschema"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/foundation/docker"
 	"github.com/google/go-cmp/cmp"
-	"testing"
-	"time"
 )
 
 var c *docker.Container
@@ -45,7 +46,7 @@ func TestTimeEntry(t *testing.T) {
 				PID:         "45cf87a3-5915-4079-a9af-6c559239ddbf",
 				TID:         "346efd40-6d6e-46d5-b60b-5db9fc171779",
 				Start:       time.Date(2021, time.October, 1, 0, 0, 0, 0, time.UTC),
-				Duration:    60 * 60 * 8,
+				Duration:    600 * 1000000,
 				CreatedWith: "API",
 			}
 
