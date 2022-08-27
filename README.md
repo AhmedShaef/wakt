@@ -2,6 +2,7 @@
 ![](wakt.png)
 
 ----
+[![CircleCI](https://circleci.com/gh/AhmedShaef/wakt.svg?style=svg)](https://circleci.com/gh/AhmedShaef/wakt)
 [![go.mod Go version](https://img.shields.io/github/go-mod/go-version/AhmedShaef/wakt)](https://github.com/AhmedShaef/wakt)
 [![Go Report Card](https://goreportcard.com/badge/github.com/AhmedShaef/wakt)](https://goreportcard.com/report/github.com/AhmedShaef/wakt)
 [![Wiki](https://img.shields.io/badge/wiki-wakt-blue.svg)](https://github.com/AhmedShaef/wakt/wiki)
