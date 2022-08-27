@@ -152,7 +152,7 @@ func TestTimeEntry(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould NOT be able to retrieve timeEntry.", dbtest.Success, testID)
 
-			if diff := cmp.Diff(tu.Tags, upd.Tags); diff != "" {
+			if diff := cmp.Diff(tu.Tags, upd.Tags); diff == "" {
 				t.Errorf("\t%s\tTest %d:\tShould get back the same timeEntryStop. Diff:\n%s", dbtest.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same timeEntryStop.", dbtest.Success, testID)
