@@ -111,8 +111,8 @@ func (c Core) Delete(ctx context.Context, clientID string) error {
 	return nil
 }
 
-//Query retrieves a list of existing client from the database.
-func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
+// List retrieves a list of existing client from the database.
+func (c Core) List(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
 	if err := validate.CheckID(userID); err != nil {
 		return []Client{}, ErrInvalidID
 	}
