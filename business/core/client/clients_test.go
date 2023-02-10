@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/AhmedShaef/wakt/business/data/dbschema"
 	"github.com/AhmedShaef/wakt/business/data/dbtest"
 	"github.com/AhmedShaef/wakt/foundation/docker"
 	"github.com/google/go-cmp/cmp"
-	"testing"
-	"time"
 )
 
 var c *docker.Container
@@ -111,7 +112,7 @@ func TestPagingClient(t *testing.T) {
 		{
 			ctx := context.Background()
 
-			clients1, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
+			clients1, err := core.List(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve clients for page 1 : %s.", dbtest.Failed, testID, err)
 			}
@@ -122,7 +123,7 @@ func TestPagingClient(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould have a single client.", dbtest.Success, testID)
 
-			clients2, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
+			clients2, err := core.List(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve clients for page 2 : %s.", dbtest.Failed, testID, err)
 			}

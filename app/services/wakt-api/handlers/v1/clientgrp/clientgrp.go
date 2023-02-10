@@ -180,7 +180,7 @@ func (h Handlers) Query(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
 	}
 
-	clint, err := h.Client.Query(ctx, claims.Subject, pageNumber, rowsPerPage)
+	clint, err := h.Client.List(ctx, claims.Subject, pageNumber, rowsPerPage)
 	if err != nil {
 		return fmt.Errorf("unable to query for clients: %w", err)
 	}
