@@ -101,8 +101,8 @@ func (s Store) Delete(ctx context.Context, clientID string) error {
 	return nil
 }
 
-// Query retrieves a list of existing client from the database.
-func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
+// List retrieves a list of existing client from the database.
+func (s Store) List(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Client, error) {
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
