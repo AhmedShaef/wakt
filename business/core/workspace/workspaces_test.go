@@ -100,7 +100,7 @@ func TestPagingWorkspace(t *testing.T) {
 		{
 			ctx := context.Background()
 
-			workspaces1, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
+			workspaces1, err := core.List(ctx, "5cf37266-3473-4006-984f-9325122678b7", 1, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve workspaces for page 1 : %s.", dbtest.Failed, testID, err)
 			}
@@ -111,7 +111,7 @@ func TestPagingWorkspace(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould have a single workspace.", dbtest.Success, testID)
 
-			workspaces2, err := core.Query(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
+			workspaces2, err := core.List(ctx, "5cf37266-3473-4006-984f-9325122678b7", 2, 1)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to retrieve workspaces for page 2 : %s.", dbtest.Failed, testID, err)
 			}
