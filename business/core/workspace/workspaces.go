@@ -143,8 +143,8 @@ func (c Core) UpdateLogo(ctx context.Context, workspaceID string, uw UpdateWorks
 	return nil
 }
 
-//Query retrieves a list of existing workspace from the database.
-func (c Core) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
+// List retrieves a list of existing workspace from the database.
+func (c Core) List(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
 	if err := validate.CheckID(userID); err != nil {
 		return []Workspace{}, ErrInvalidID
 	}

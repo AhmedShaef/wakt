@@ -208,7 +208,7 @@ func (h Handlers) Query(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, rows[%s]", rows), http.StatusBadRequest)
 	}
 
-	work, err := h.Workspace.Query(ctx, claims.Subject, pageNumber, rowsPerPage)
+	work, err := h.Workspace.List(ctx, claims.Subject, pageNumber, rowsPerPage)
 	if err != nil {
 		return fmt.Errorf("unable to query for workspaces: %w", err)
 	}
