@@ -148,7 +148,7 @@ func (c Core) List(ctx context.Context, userID string, pageNumber int, rowsPerPa
 	if err := validate.CheckID(userID); err != nil {
 		return []Workspace{}, ErrInvalidID
 	}
-	dbWorkspace, err := c.store.Query(ctx, userID, pageNumber, rowsPerPage)
+	dbWorkspace, err := c.store.List(ctx, userID, pageNumber, rowsPerPage)
 	if err != nil {
 		return nil, fmt.Errorf("query: %w", err)
 	}
