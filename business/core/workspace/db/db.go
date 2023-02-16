@@ -87,8 +87,8 @@ func (s Store) Update(ctx context.Context, workspace Workspace) error {
 
 }
 
-// Query retrieves a list of existing workspaces from the database.
-func (s Store) Query(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
+// List retrieves a list of existing workspaces from the database.
+func (s Store) List(ctx context.Context, userID string, pageNumber int, rowsPerPage int) ([]Workspace, error) {
 	data := struct {
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
