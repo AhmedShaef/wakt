@@ -18,7 +18,7 @@ Wakt is an open-source time tracking Microservice, based on [Ardanlabs service 3
 ```shell
 make run
 ```
-3- apply the scemma and seed demo data.
+3- apply the schema and seed demo data.
 ```shell
 make seed
 ```
